@@ -11,8 +11,8 @@ Development Projects for Linked Data Workshop and other fun.
 
 # Graph Editor
 ## Requirements and Dependencies
-* Python installed and available at command line to provide http server.
-# D3js Version 3 , supplied in /LinkedDataDev/d3 
+* Python installed and available at command line to provide http server (or any other http localhost server...)
+* D3js Version 3 , supplied in /LinkedDataDev/d3 
 * Chrome as web browser
 
 ## Installation
