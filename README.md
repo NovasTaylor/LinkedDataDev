@@ -1,10 +1,3 @@
----
-title: "Linked Data Development Repository"
-output:
-  html_document:
-    toc: true
-    
----
 
 # LinkedDataDev
 Development Projects for Linked Data Workshop and other fun.
