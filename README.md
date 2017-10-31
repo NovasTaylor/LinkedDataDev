@@ -19,3 +19,15 @@ python -m http.server
 ```
 
 3. Open web browser to URL: http://localhost:8000/GraphEditor/GraphEditor.html
+
+
+## JavaScript Packages
+Location in GraphEditor/js
+
+1. FileSaver.min.js  
+* Save file from browser to local drive. 
+* Test file: Test-FileSaverJS-FileCreation.html  , output to file
+
+2. n3-browswer.min.js
+* Create TTL 
+* Test file: Test-N3-TTLCreation.html, output to console.log
