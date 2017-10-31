@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-----------------------------------------------------------------------------
+FILE: /LinkedDataDev/GraphEditor/Test-N3-TTLCreation.html
+DESC: Test use of N3 to create TTL
+REQ : N3 : https://github.com/RubenVerborgh/N3.js
+VIEW: http://localhost:8000/GraphEditor/Test-N3-TTLCreation.html
+SRC :
+
+IN  :
+OUT : Console.log
+NOTE: Example code from https://github.com/RubenVerborgh/N3.js, section: Writing
+TODO:
+------------------------------------------------------------------------------>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Testing N3</title>
+    <script src="/GraphEditor/js/n3-browser.min.js"></script>
+  </head>
+  <body>
+  </body>
+  <script>
+  var writer = N3.Writer({ prefixes: { c: 'http://example.org/cartoons#' } });
+  writer.addTriple('http://example.org/cartoons#Tom',
+                   'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+                   'http://example.org/cartoons#Cat');
+  writer.addTriple({
+    subject:   'http://example.org/cartoons#Tom',
+    predicate: 'http://example.org/cartoons#name',
+    object:    '"Tom"'
+  });
+  writer.end(function (error, result) { console.log(result); });
+</script>
+</html>
