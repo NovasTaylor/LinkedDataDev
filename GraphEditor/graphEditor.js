@@ -1,32 +1,38 @@
 /*-----------------------------------------------------------------------------
 FILE: /LinkedDataDev/GraphEditor/graphEditor.js
 DESC: Called from graphEditor.html
-REQ : 
+REQ :
 VIEW: http://localhost:8000/GraphEditor/GraphEditor.html
-SRC : http://bl.ocks.org/rkirsling/5001347 
-IN  : 
-OUT : 
+SRC : http://bl.ocks.org/rkirsling/5001347
+IN  :
+OUT :
 NOTE: LINKS
         Changing Link Direction Arrows. With Link selected:
         R - arrow to right
-        L - arrow to left 
+        L - arrow to left
         B - arrow in BOTh directions (remove for course?)
-        
+
        NODES
-       With node selected:  
+       With node selected:
        R - toggles reflexivity on/off.  (remove for course)
-         
+
       CTRL + Left Mouse = Drag of node.
-TODO: 
+TODO:
       Add drag and drop positioning of nodes. Need to set d.fixed = true on mouseup at end of node drag
       Add Zoom as per:  https://bl.ocks.org/cjrd/6863459
-      Link text Display layer order change.
+      Add transform of the whiteboard image to upper left, or drop its use altogether?
+      Change Link text Display layer order to show ABOVE Links, nodes
+      Add boxes around link text display ?
+      Add detection of attempt to enter node name that lready exists.
       Add button to dump to JSON file
       Add ability to edit both Node and Relation Values
+      Change prompt boxes to custom prompts that remove "localhost:8000 says:"
 -----------------------------------------------------------------------------*/
-// set up the SVG 
-var width  = 960,
-  height = 500,
+"use strict";
+
+// set up the SVG
+var width  = 1400,
+  height = 600,
   colors = d3.scale.category10();
 
 var nodeRadius = 50,
@@ -37,6 +43,15 @@ var svg = d3.select('body')
   .append('svg')
   .attr('width', width)
   .attr('height', height);
+
+  svg.append("image")
+    .attr("xlink:href", "/graphEditor/img/whiteboard.png")
+    .attr("x", -240)
+    .attr("y", 0)
+
+    .attr("width", "100%")
+    .attr("height", "100%");
+
 
 // set up initial nodes and links
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
@@ -91,7 +106,7 @@ var drag_line = svg.append('svg:path')
 
 // Handles to link and node element groups
 var path     = svg.append('svg:g').selectAll('path'),
-    linkText = svg.append('svg:g').selectAll('textPath'),  // Group for edge labels 
+    linkText = svg.append('svg:g').selectAll('textPath'),  // Group for edge labels
     circle   = svg.append('svg:g').selectAll('g');
 
 // Mouse event var initializations and reset
@@ -117,15 +132,15 @@ function tick() {
       normX = deltaX / dist,
       normY = deltaY / dist,
       sourcePadding = d.left ? backOffTarget : 12,
-      targetPadding = d.right ? backOffTarget : 12
+      targetPadding = d.right ? backOffTarget : 12,
       sourceX = d.source.x + (sourcePadding * normX),
       sourceY = d.source.y + (sourcePadding * normY),
       targetX = d.target.x - (targetPadding * normX),
       targetY = d.target.y - (targetPadding * normY);
     return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
   });
-  
-  // Link text positioning. 
+
+  // Link text positioning.
   // TODO: Add classes. Add rotation??
   linkText
     .attr("x", function(d){
@@ -169,7 +184,7 @@ function restart() {
       selected_node = null;
       restart();
     });
-  
+
 // Link text values
    linkText = linkText.data(links);
    linkText.enter().append("text")
@@ -190,7 +205,7 @@ function restart() {
 
   // Update existing nodes (reflexive & selected visual states)
   circle.selectAll('circle')
-    .style('fill', function(d) { return (d === selected_node) ? 
+    .style('fill', function(d) { return (d === selected_node) ?
       d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
     .classed('reflexive', function(d) { return d.reflexive; });  //TW Not currently using reflexive...
 
