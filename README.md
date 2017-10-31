@@ -22,7 +22,7 @@ python -m http.server
 
 
 ## JavaScript Packages
-Location in GraphEditor/js
+Location: .../GraphEditor/js
 
 1. FileSaver.min.js  
 * Save file from browser to local drive. 
