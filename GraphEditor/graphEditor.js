@@ -317,13 +317,14 @@ function mousedown() {
 
   // Insert new node at point
   var vertex_id = prompt("Please enter term", "vertex");
-
-  var point = d3.mouse(this),
-      node = {id: vertex_id, reflexive: false};
-  node.x = point[0];
-  node.y = point[1];
-  nodes.push(node);
-  restart();
+  if (vertex_id) { // Allow cancel of node creation with no null node created!
+    var point = d3.mouse(this),
+        node = {id: vertex_id, reflexive: false};
+    node.x = point[0];
+    node.y = point[1];
+    nodes.push(node);
+    restart();
+  }
 }
 
 function mousemove() {
