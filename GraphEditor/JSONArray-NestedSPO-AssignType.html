@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-----------------------------------------------------------------------------
+FILE : JSONArray_NestedSPO2
+DESCR: Eg. of how to access the Nodes from the Links array and assign XSD:Type
+    to the triples. Proof of concept on how to access the data for later use in
+    N3.js to create TTl
+ 
+VIEW : http://localhost:8000/GraphEditor/JSONArray_NestedSPO2.html
+IN   :
+OUT  :
+REQ  :
+NOTES:
+TODO :
+------------------------------------------------------------------------------>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>JSON-NestedSPO-AssignType</title>
+</head>
+<body>
+
+<script>
+"use strict";
+var nodes = [
+  {id: 'STUDY1',  x:500, y:100, fixed:true, type: 'URI'},
+  {id: 'TREAT1',  x:350, y:300, fixed:true, type: 'URI'},
+  {id: 'PERSON1', x:200, y:100, fixed:true, type: 'URI'},
+  {id: '32',      x:680, y:336, fixed:true, type: 'INT'},
+  {id: 'Bob',     x:680, y:336, fixed:true, type: 'STRING'}
+  ],
+  links = [
+    {source: nodes[0], target: nodes[1], left: false, right: true ,linkLabel: 'treatmentArm'},
+    {source: nodes[2], target: nodes[1], left: false, right: true, linkLabel: 'treatment'},
+    {source: nodes[2], target: nodes[0], left: false, right: true, linkLabel: 'enrolledIn'},
+    {source: nodes[2], target: nodes[3], left: false, right: true, linkLabel: 'hasAge'},
+    {source: nodes[2], target: nodes[4], left: false, right: true, linkLabel: 'hasFirstName'}
+  ];
+
+// console.log(links)
+
+for(var i = 0; i < links.length; i++) {
+  var obj = links[i];
+  if (obj.target.type =='URI') {
+   console.log(obj.source.id + " -- " + obj.linkLabel + " --> " + obj.target.id);
+  }
+  else{
+    if (obj.target.type =='INT') {
+      console.log(obj.source.id + ' -- ' + obj.linkLabel + ' --> "' + obj.target.id + '"^^xsd:integer');
+    }
+    else if (obj.target.type =='STRING') {
+      console.log(obj.source.id +' -- '+ obj.linkLabel+' --> "' + obj.target.id + '"^^xsd:string');
+    }
+  }
+}
+</script>
+</body>
+</html>
