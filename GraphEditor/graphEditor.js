@@ -14,19 +14,31 @@ NOTE: LINKS
 
        NODES
        With node selected:
-       R - toggles reflexivity on/off.  (remove for course)
+       R - toggles reflexivity on/off.  (remove for course: we will not use this.)
 
       CTRL + Left Mouse = Drag of node.
 TODO:
-      Add drag and drop positioning of nodes. Need to set d.fixed = true on mouseup at end of node drag
-      Add Zoom as per:  https://bl.ocks.org/cjrd/6863459
-      Add transform of the whiteboard image to upper left, or drop its use altogether?
+      NODES:
+      Fix problem when a new node has the same name as existing node.
+        (detect and prevent use of existing node names)
+      Add ability to specify node type (URI, literal + type of literal) during
+         node creation.
+      Add ability to change/aedit all node properties.
+
+      LINKS
       Change Link text Display layer order to show ABOVE Links, nodes
       Add boxes around link text display ?
-      Add detection of attempt to enter node name that lready exists.
-      Add button to dump to JSON file
-      Add ability to edit both Node and Relation Values
+
+      INTERACTION
+      Add drag and drop positioning of NEW nodes. Currently is workin for existing nodes.
+        (set d.fixed = true for new nodes)
       Change prompt boxes to custom prompts that remove "localhost:8000 says:"
+      Add Zoom as per:  https://bl.ocks.org/cjrd/6863459
+      Consider removal of cheesy whiteboard: replace with fine line rectangle
+        to increase screen realestate.
+      Add ability to edit link names (low priority: can delete, recreate instead)
+      OUTPUT
+      Add button to dump to JSON file
 -----------------------------------------------------------------------------*/
 "use strict";
 
@@ -321,6 +333,7 @@ function mousedown() {
         node = {id: vertex_id, reflexive: false};
     node.x = point[0];
     node.y = point[1];
+    node.fixed = true;  //TW
     nodes.push(node);
     restart();
   }
