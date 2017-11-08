@@ -14,7 +14,7 @@ NOTE: LINKS
 
        NODES
        With node selected:
-       R - toggles reflexivity on/off.  (remove for course: we will not use this.)
+       R - NOT IN USE. Previous: toggled reflexivity on/off.
 
       CTRL + Left Mouse = Drag of node.
 TODO:
@@ -24,6 +24,7 @@ TODO:
       Add ability to specify node type (URI, literal + type of literal) during
          node creation.
       Add ability to change/aedit all node properties.
+      Change node colour to be based on type: URI's all one color, literals as white?
 
       LINKS
       Change Link text Display layer order to show ABOVE Links, nodes
@@ -60,19 +61,16 @@ var svg = d3.select('body')
     .attr("xlink:href", "/graphEditor/img/whiteboard.png")
     .attr("x", -240)
     .attr("y", 0)
-
     .attr("width", "100%")
     .attr("height", "100%");
 
-
 // set up initial nodes and links
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
-//  - reflexive edges are indicated on the node (as a bold black circle). (remove for course?)
 //  - links are always source -to--> target of dragging. Edge directions can be reset using L, R.
 var nodes = [
-  {id: 'STUDY1',  x:500, y:100, fixed:true, reflexive: false},
-  {id: 'TREAT1',  x:350, y:300, fixed:true,reflexive: false},
-  {id: 'PERSON1', x:200, y:100, fixed:true, reflexive: false}
+  {id: 'STUDY1',  x:500, y:100, fixed:true, type: 'URI'},
+  {id: 'TREAT1',  x:350, y:300, fixed:true, type: 'URI'},
+  {id: 'PERSON1', x:200, y:100, fixed:true, type: 'URI'}
   ],
   links = [
     {source: nodes[0], target: nodes[1], left: false, right: true ,linkLabel: 'treatmentArm'},
@@ -159,13 +157,12 @@ function tick() {
       return ((d.source.x+d.target.x)/2);
       })
     .attr("y", function(d){
-      return ((d.source.y + d.target.y)/2);
+      return ( ( (d.source.y + d.target.y)/2) -5 );
       });
 
   circle.attr('transform', function(d) {
       return 'translate(' + d.x + ',' + d.y + ')'
   })
-  //??HERE?
 }
 
 // Update graph (called when needed)
@@ -202,7 +199,9 @@ function restart() {
    linkText.enter().append("text")
      .text(function(d){
        return d.linkLabel;
-   });
+     })
+     .attr("class", "linkLabel")
+   ;
 
   // Remove old links
   path.exit().remove();
@@ -212,14 +211,14 @@ function restart() {
 
   //---------- NODES SECTION --------------------------------------------------
   // circle (node) group
-  // NB: the function arg is crucial here! nodes are known by id, not by index!
+  // NB: the function arg is crucial: Nodes are known by id, not by index!
   circle = circle.data(nodes, function(d) { return d.id; });
 
-  // Update existing nodes (reflexive & selected visual states)
+  // Change to base node color on node type using class/CSS
   circle.selectAll('circle')
     .style('fill', function(d) { return (d === selected_node) ?
-      d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
-    .classed('reflexive', function(d) { return d.reflexive; });  //TW Not currently using reflexive...
+      d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
+    });
 
   // Add new nodes
   var g = circle.enter().append('svg:g');
@@ -227,9 +226,16 @@ function restart() {
   g.append('svg:circle')
     .attr('class', 'node')
     .attr('r', nodeRadius)
-    .style('fill', function(d) { return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
-    .style('stroke', function(d) { return d3.rgb(colors(d.id)).darker().toString(); })
-    .classed('reflexive', function(d) { return d.reflexive; })
+    // Node is selected. Hook in to this code to display/edit node text and type
+    .style('fill', function(d) {
+      return (d === selected_node) ? d3.rgb(colors(d.id))
+      .brighter()
+      .toString() : colors(d.id);
+    })
+    .style('stroke', function(d) {
+      return d3.rgb(colors(d.id))
+      .darker()
+      .toString(); })
     .on('mouseover', function(d) {
         if(!mousedown_node || d === mousedown_node) return;
         // enlarge target node
@@ -242,7 +248,6 @@ function restart() {
     })
     .on('mousedown', function(d) {
         if(d3.event.ctrlKey) return;
-
         // select node
         mousedown_node = d;
         if(mousedown_node === selected_node) selected_node = null;
@@ -254,8 +259,7 @@ function restart() {
             .style('marker-end', 'url(#end-arrow)')
             .classed('hidden', false)
             .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
-
-          restart();
+        restart();
     })
     .on('mouseup', function(d) {
         if(!mousedown_node) return;
@@ -330,10 +334,11 @@ function mousedown() {
   var vertex_id = prompt("Please enter term", "vertex");
   if (vertex_id) { // Allow cancel of node creation with no null node created!
     var point = d3.mouse(this),
-        node = {id: vertex_id, reflexive: false};
+        node = {id: vertex_id};
     node.x = point[0];
     node.y = point[1];
-    node.fixed = true;  //TW
+    node.fixed = true;
+    node.type = 'URI'; //TODO Need to set this during node creation to URI,STRING, INT, etc.
     nodes.push(node);
     restart();
   }
@@ -419,8 +424,9 @@ function keydown() {
       break;
     case 82: // R
       if(selected_node) {
-          // toggle node reflexivity
-          selected_node.reflexive = !selected_node.reflexive;
+          // Was used to toggle node reflexivity. Not in use for simplified graph
+          // All other reflexive code removed
+          // selected_node.reflexive = !selected_node.reflexive;
       } else if(selected_link) {
           // set link direction to right only
           selected_link.left = false;
@@ -443,7 +449,7 @@ function keyup() {
   }
 }
 
-// app starts here
+// Start the App
 svg.on('mousedown', mousedown)
   .on('mousemove', mousemove)
   .on('mouseup', mouseup);

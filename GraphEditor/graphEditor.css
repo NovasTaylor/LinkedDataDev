@@ -50,6 +50,14 @@ text {
   pointer-events: none;
 }
 
+/* text for link labels */
+.linkLabel{
+    font: 14px sans-serif;
+    /* font-weight: bold; */
+    fill: #000058;
+    /* stroke: #000058; */
+}
+
 text.id {
   text-anchor: middle;
   font-weight: bold;
