@@ -312,8 +312,6 @@ function mousedown() {
 
   //RK Active only works in WebKit?
   svg.classed('active', true);
-
-<<<<<<< HEAD
   if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;
 
   // Insert new node at point
@@ -325,30 +323,6 @@ function mousedown() {
     node.y = point[1];
     nodes.push(node);
     restart();
-=======
-  // Return if ctrl is pressed when clicking
-  if(d3.event.ctrlKey) return;
-
-  if(mousedown_node) {          // Clicking on a node
-    alert("Clicking on a node")
-    mousedown_node = false
-    return;
-  } else if (mousedown_link) { // Clicking on a link
-    alert("Clicking on a link")
-    mousedown_link = false
-    return;
-  } else {                     // Clicking on an empty spot in the svg -> create a node
-    // Insert new node at point
-    var vertex_id = prompt("Please enter term", "vertex");
-    if (vertex_id) {
-      var point = d3.mouse(this),
-          node = {id: vertex_id, reflexive: false};
-      node.x = point[0];
-      node.y = point[1];
-      nodes.push(node);
-      restart();
-    }
->>>>>>> 2b75a277a1f53aa7b2b21b1c36edd7675b800534
   }
 }
 
