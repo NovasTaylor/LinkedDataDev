@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-----------------------------------------------------------------------------
+FILE: /LinkedDataDev/GraphEditor/Test-FileSaverJS-FIleCreation.html
+DESC: Test use of N3 to create TTL
+REQ : FileSaver.js : https://github.com/eligrey/FileSaver.js
+VIEW: http://localhost:8000/GraphEditor/Test-FileSaverJS-FileCreation.html
+SRC :
+
+IN  :
+OUT : Automatic download to user profile area. On Windows:
+      C:\Users\<UserID>\DOwnloads
+NOTE: Example code from https://github.com/RubenVerborgh/N3.js, section: Writing
+TODO:
+------------------------------------------------------------------------------>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Testing File Creation</title>
+  <script src="/GraphEditor/js/FileSaver.min.js"></script>
+</head>
+<body>
+</body>
+<script>
+  var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
+  saveAs(blob, "hello world.txt");
+</script>
+</html>
