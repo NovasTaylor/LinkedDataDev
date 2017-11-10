@@ -315,43 +315,42 @@ body.appendChild(button);
 button.addEventListener ("click", function() {
   alert("This will create the TTL file. Click OK to confirm.");
 
+  // Set the prefixes
+  var writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#' } });
   // Test with write to console
   for(var i = 0; i < links.length; i++) {
     var obj = links[i];
+    // Prefixes are hard-coded.
+    // All values are currently URI's
     if (obj.target.type =='URI') {
-     console.log(obj.source.id + " -- " + obj.linkLabel + " --> " + obj.target.id);
+      writer.addTriple('ldw:' + obj.source.id,
+                       'ldw:' + obj.linkLabel,
+                       'ldw:' + obj.target.id);
+
+     // console.log(obj.source.id + " -- " + obj.linkLabel + " --> " + obj.target.id);
     }
     else{
+    // Literal values are enquoted with use of '"'
       if (obj.target.type =='INT') {
-        console.log(obj.source.id + ' -- ' + obj.linkLabel + ' --> "' + obj.target.id + '"^^xsd:integer');
+        writer.addTriple('ldw:' + obj.source.id,
+                         'ldw:' + obj.linkLabel,
+                         '"'+ obj.target.id + '"^^xsd:integer');
+        // console.log(obj.source.id + ' -- ' + obj.linkLabel + ' --> "' + obj.target.id + '"^^xsd:integer');
       }
       else if (obj.target.type =='STRING') {
-        console.log(obj.source.id +' -- '+ obj.linkLabel+' --> "' + obj.target.id + '"^^xsd:string');
+        writer.addTriple('ldw:' + obj.source.id,
+                         'ldw:' + obj.linkLabel,
+                         '"'+ obj.target.id + '"^^xsd:string');
+        //console.log(obj.source.id +' -- '+ obj.linkLabel+' --> "' + obj.target.id + '"^^xsd:string');
       }
     }
   }
-
-
-
-
-
-  /*
-  var writer = N3.Writer({ prefixes: { c: 'http://example.org/cartoons#' } });
-  writer.addTriple('http://example.org/cartoons#Tom',
-                   'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
-                   'http://example.org/cartoons#Cat');
-  writer.addTriple({
-    subject:   'http://example.org/cartoons#Tom',
-    predicate: 'http://example.org/cartoons#name',
-    object:    '"Tom"'
-  });
+  // Write out to file
   writer.end(function (error, result) {
      console.log(result);
     var blob = new Blob([result], {type: "text/plain;charset=utf-8"});
     saveAs(blob, "WhiteBoardTriples.ttl");
   });
-*/
-
 });
 
 
