@@ -5,7 +5,7 @@ REQ :
 VIEW: http://localhost:8000/GraphEditor/GraphEditor.html
 SRC : http://bl.ocks.org/rkirsling/5001347
 IN  :
-OUT :
+OUT : WhiteBoardTriples.TTL
 NOTE: LINKS
         Changing Link Direction Arrows. With Link selected:
         R - arrow to right
@@ -313,7 +313,29 @@ body.appendChild(button);
 
 // 3. Add event handler
 button.addEventListener ("click", function() {
-  alert("Creating TTL file");
+  alert("This will create the TTL file. Click OK to confirm.");
+
+  // Test with write to console
+  for(var i = 0; i < links.length; i++) {
+    var obj = links[i];
+    if (obj.target.type =='URI') {
+     console.log(obj.source.id + " -- " + obj.linkLabel + " --> " + obj.target.id);
+    }
+    else{
+      if (obj.target.type =='INT') {
+        console.log(obj.source.id + ' -- ' + obj.linkLabel + ' --> "' + obj.target.id + '"^^xsd:integer');
+      }
+      else if (obj.target.type =='STRING') {
+        console.log(obj.source.id +' -- '+ obj.linkLabel+' --> "' + obj.target.id + '"^^xsd:string');
+      }
+    }
+  }
+
+
+
+
+
+  /*
   var writer = N3.Writer({ prefixes: { c: 'http://example.org/cartoons#' } });
   writer.addTriple('http://example.org/cartoons#Tom',
                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
@@ -328,6 +350,7 @@ button.addEventListener ("click", function() {
     var blob = new Blob([result], {type: "text/plain;charset=utf-8"});
     saveAs(blob, "WhiteBoardTriples.ttl");
   });
+*/
 
 });
 
