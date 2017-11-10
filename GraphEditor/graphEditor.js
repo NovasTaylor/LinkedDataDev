@@ -17,29 +17,9 @@ NOTE: LINKS
        R - NOT IN USE. Previous: toggled reflexivity on/off.
 
       CTRL + Left Mouse = Drag of node.
-TODO:
-      NODES:
-      Fix problem when a new node has the same name as existing node.
-        (detect and prevent use of existing node names)
-      Add ability to specify node type (URI, literal + type of literal) during
-         node creation.
-      Add ability to change/aedit all node properties.
-      Change node colour to be based on type: URI's all one color, literals as white?
+TODO: Task list tracked at
+      https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 
-      LINKS
-      Change Link text Display layer order to show ABOVE Links, nodes
-      Add boxes around link text display ?
-
-      INTERACTION
-      Add drag and drop positioning of NEW nodes. Currently is workin for existing nodes.
-        (set d.fixed = true for new nodes)
-      Change prompt boxes to custom prompts that remove "localhost:8000 says:"
-      Add Zoom as per:  https://bl.ocks.org/cjrd/6863459
-      Consider removal of cheesy whiteboard: replace with fine line rectangle
-        to increase screen realestate.
-      Add ability to edit link names (low priority: can delete, recreate instead)
-      OUTPUT
-      Add button to dump to JSON file
 -----------------------------------------------------------------------------*/
 "use strict";
 
@@ -323,6 +303,35 @@ function restart() {
   // Start force display
   force.start();
 }
+// Export TTL File
+var button = document.createElement("button");
+button.innerHTML = "Create TTL";
+
+// 2. Append somewhere
+var body = document.getElementsByTagName("body")[0];
+body.appendChild(button);
+
+// 3. Add event handler
+button.addEventListener ("click", function() {
+  alert("Creating TTL file");
+  var writer = N3.Writer({ prefixes: { c: 'http://example.org/cartoons#' } });
+  writer.addTriple('http://example.org/cartoons#Tom',
+                   'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+                   'http://example.org/cartoons#Cat');
+  writer.addTriple({
+    subject:   'http://example.org/cartoons#Tom',
+    predicate: 'http://example.org/cartoons#name',
+    object:    '"Tom"'
+  });
+  writer.end(function (error, result) {
+     console.log(result);
+    var blob = new Blob([result], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "WhiteBoardTriples.ttl");
+  });
+
+});
+
+
 
 function mousedown() {
 

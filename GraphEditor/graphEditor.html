@@ -3,6 +3,8 @@
 FILE: /LinkedDataDev/GraphEditor/graphEditor.html
 DESC: Editor to whiteboard nodes and relations for RDF
 REQ : D3js Version 3
+     n3JS for TTL Creation
+     FileSaveJS for output to local file system
 VIEW: http://localhost:8000/GraphEditor/GraphEditor.html
 SRC : Code based on block by Ross Kirsling http://bl.ocks.org/rkirsling/5001347
       and https://bl.ocks.org/cjrd/6863459
@@ -16,6 +18,9 @@ TODO:
     <meta charset="utf-8">
     <title>Directed Graph Editor</title>
     <link rel="stylesheet" href="/GraphEditor/graphEditor.css">
+    <script src="/d3/d3.v3.min.js"></script>
+    <script src="/GraphEditor/js/n3-browser.min.js"></script>
+    <script src="/GraphEditor/js/FileSaver.min.js"></script>
   </head>
   <style>
     body{
@@ -25,6 +30,5 @@ TODO:
   </style>
   <body>
   </body>
-  <script src="/d3/d3.v3.min.js"></script>
   <script src="/GraphEditor/graphEditor.js"></script>
 </html>

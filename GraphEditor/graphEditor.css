@@ -62,3 +62,19 @@ text.id {
   text-anchor: middle;
   font-weight: bold;
 }
+
+body {
+  padding: 20px;
+}
+button {
+  margin-top: 10px;
+  line-height: 30px;
+  font-weight: bold;
+  padding: 0 10px;
+  background: #72bcd4;
+  border-radius: 4px;
+  border: 2px solid black;
+}
+button:hover {
+  background: #99cfe0;
+}

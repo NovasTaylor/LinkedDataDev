@@ -31,3 +31,10 @@ Location: .../GraphEditor/js
 2. n3-browswer.min.js
 * Create TTL 
 * Test file: Test-N3-TTLCreation.html, output to console.log
+
+## Acknowledgements
+
+This project is constructed on a foundation provided by code authors from many diverse projects. Thanks to all of you for freely sharing your inspirational code and ideas.
+* Ross Kirsling. Directed Graph Editor  http://bl.ocks.org/rkirsling/5001347
+* Eli Grey for FileSave JS https://github.com/eligrey/FileSaver.js/
+* The countless heros on StackOverflow who donate their time and expertise. 
