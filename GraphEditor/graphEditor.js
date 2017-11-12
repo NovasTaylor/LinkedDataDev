@@ -23,6 +23,9 @@ TODO: Task list tracked at
 -----------------------------------------------------------------------------*/
 "use strict";
 
+// Prevent context menu
+document.addEventListener('contextmenu', event => event.preventDefault());
+
 // set up the SVG
 var width  = 1400,
   height = 600,
