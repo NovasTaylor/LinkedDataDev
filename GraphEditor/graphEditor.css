@@ -68,6 +68,8 @@ body {
   padding: 20px;
 }
 button {
+  position: absolute;
+  bottom: 0; /* position top or bottom of screen*/
   margin-top: 10px;
   line-height: 30px;
   font-weight: bold;
@@ -78,4 +80,9 @@ button {
 }
 button:hover {
   background: #99cfe0;
+}
+
+.whiteboard{
+  fill: #fafafa;
+  stroke: black;
 }

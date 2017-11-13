@@ -62,10 +62,28 @@ var force = d3.layout.force()
   .charge(-500)
   .on('tick', tick);
 
-//TODO: Change this to an svg.append. as-is, it interferes with draw of background
-// rect or background img.
-// See filter effects at: https://www.w3.org/TR/SVG/filters.html
-svg.html('<defs><filter x="-0.1" y="0" width="1.2" height="1" id="solid"><feFlood flood-color="white"/><feComposite in="SourceGraphic"/></filter></defs>');
+
+var rect = svg.append("rect")
+  .attr("x", 1)
+  .attr("y", 0)
+  .attr("width", 1200)
+  .attr("height", 600)
+  .attr("class", "whiteboard");
+
+// Def for background of link text as a Filter effect as per:
+// https://www.w3.org/TR/SVG/filters.html
+// Converted from original svg.html to D3JS syntax
+// svg.html('<defs><filter x="-0.1" y="0" width="1.2" height="1" id="solid"><feFlood flood-color="white"/><feComposite in="SourceGraphic"/></filter></defs>');
+var linkTextBack = svg.append('svg:defs').append('svg:filter')
+  .attr("x", "-0.1")
+  .attr("y", "0")
+  .attr("width", "1.2")
+  .attr("height", "1")
+  .attr("id", "solid");
+linkTextBack.append('feFlood')
+    .attr("flood-color", "white");
+linkTextBack.append('feComposite')
+    .attr("in", "SourceGraphic");
 
 // Define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
