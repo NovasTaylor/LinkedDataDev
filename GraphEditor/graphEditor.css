@@ -52,10 +52,11 @@ text {
 
 /* text for link labels */
 .linkLabel{
-    font: 14px sans-serif;
-    /* font-weight: bold; */
-    fill: #000058;
-    /* stroke: #000058; */
+  color: #333333;
+  flood-color: #FFFFFF;
+  flood-opacity:1;
+  font: 14px sans-serif;
+  text-anchor: middle;
 }
 
 text.id {

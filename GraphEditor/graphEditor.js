@@ -32,22 +32,14 @@ var width  = 1400,
   colors = d3.scale.category10();
 
 var nodeRadius = 50,
- backOffTarget = nodeRadius+5, // back the arrow away from the node center
- linkLength    = 300;
+  backOffTarget = nodeRadius+5, // back the arrow away from the node center
+  linkLength    = 300;
 
-var svg = d3.select('body')
-  .append('svg')
+var svg = d3.select('body').append('svg')
   .attr('width', width)
   .attr('height', height);
 
-  svg.append("image")
-    .attr("xlink:href", "/graphEditor/img/whiteboard.png")
-    .attr("x", -240)
-    .attr("y", 0)
-    .attr("width", "100%")
-    .attr("height", "100%");
-
-// set up initial nodes and links
+// Set up initial nodes and links
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
 //  - links are always source -to--> target of dragging. Edge directions can be reset using L, R.
 var nodes = [
@@ -69,6 +61,11 @@ var force = d3.layout.force()
   .linkDistance(linkLength)
   .charge(-500)
   .on('tick', tick);
+
+//TODO: Change this to an svg.append. as-is, it interferes with draw of background
+// rect or background img.
+// See filter effects at: https://www.w3.org/TR/SVG/filters.html
+svg.html('<defs><filter x="-0.1" y="0" width="1.2" height="1" id="solid"><feFlood flood-color="white"/><feComposite in="SourceGraphic"/></filter></defs>');
 
 // Define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
@@ -136,12 +133,18 @@ function tick() {
   // Link text positioning.
   // TODO: Add classes. Add rotation??
   linkText
-    .attr("x", function(d){
-      return ((d.source.x+d.target.x)/2);
-      })
-    .attr("y", function(d){
-      return ( ( (d.source.y + d.target.y)/2) -5 );
-      });
+    .attr("transform", function(d) { // calc angle for label
+      var angle = Math.atan((d.source.y - d.target.y) / (d.source.x - d.target.x)) * 180 / Math.PI;
+      return 'translate(' + [((d.source.x + d.target.x) / 2), ((d.source.y + d.target.y) / 2)] + ')rotate(' + angle + ')';
+    });
+//OLDE SHITE FOLLOWS
+    //  .attr("x", function(d){
+//      return ((d.source.x+d.target.x)/2);
+//      })
+//    .attr("y", function(d){
+//      return ( ( (d.source.y + d.target.y)/2) -5 );
+//      });
+// END OLDE SHITE
 
   circle.attr('transform', function(d) {
       return 'translate(' + d.x + ',' + d.y + ')'
@@ -163,10 +166,10 @@ function restart() {
   // Add new links
   path.enter().append('svg:path')
     .attr('class', 'link')
-    .classed('selected', function(d) { return d === selected_link; })
+    .classed('selected',   function(d) { return d === selected_link; })
     .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-    .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
-    .on('mousedown', function(d) {
+    .style('marker-end',   function(d) { return d.right ? 'url(#end-arrow)' : ''; })
+    .on('mousedown',       function(d) {
       if(d3.event.ctrlKey) return;
 
       // Select link
@@ -178,13 +181,14 @@ function restart() {
     });
 
 // Link text values
-   linkText = linkText.data(links);
-   linkText.enter().append("text")
-     .text(function(d){
-       return d.linkLabel;
-     })
-     .attr("class", "linkLabel")
-   ;
+    linkText = linkText.data(links);
+    linkText.enter().append("text")
+      .attr("filter", "url(#solid)")
+      .attr("class", "linkLabel")
+      .attr("dy", 5)        // adjust label down into line center
+      .text(function(d){
+        return d.linkLabel;
+      });
 
   // Remove old links
   path.exit().remove();
@@ -390,10 +394,8 @@ function mousedown() {
 
 function mousemove() {
   if(!mousedown_node) return;
-
   // Update drag line
   drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
-
   restart();
 }
 
