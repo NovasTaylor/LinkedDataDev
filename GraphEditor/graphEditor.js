@@ -389,23 +389,36 @@ function mousedown() {
   // Insert new node at point
   let addNode = true;
   let vertex_id = "vertex";
+  let currentIDs = nodes.map(function(o){return o.id})
   while (addNode && vertex_id) {
     vertex_id = prompt("Please enter term", vertex_id);
-    if (vertex_id) { // Allow cancel of node creation with no null node created!
-      let currentIDs = nodes.map(function(o){return o.id})
-      if (!currentIDs.some(function(item){ return item === vertex_id })) {
-        var point = d3.mouse(this),
-            node = {id: vertex_id};
-        node.x = point[0];
-        node.y = point[1];
-        node.fixed = true;
-        node.type = 'URI'; //TODO Need to set this during node creation to URI,STRING, INT, etc.
-        nodes.push(node);
-        restart();
-        addNode = false;
-      } else {
-        alert("ID already exists");
-      }
+    switch (addNode) {
+      // If cancel is pressed, exit while loop
+      case vertex_id === null:
+        addNode = false
+        break
+      // If vertex_id is empty string (""), assign value to vertex_id so that the prompt is shown again
+      case vertex_id.length === 0:
+        alert("Term cannot be empty");
+        vertex_id = "vertex";
+        break
+      case vertex_id.length > 0:
+        if (!currentIDs.some(function(item){ return item === vertex_id })) {
+          var point = d3.mouse(this),
+              node = {id: vertex_id};
+          node.x = point[0];
+          node.y = point[1];
+          node.fixed = true;
+          node.type = 'URI'; //TODO Need to set this during node creation to URI,STRING, INT, etc.
+          nodes.push(node);
+          restart();
+          addNode = false;
+        } else {
+          alert("ID already exists");
+        }
+        break
+      default:
+        break
     }
   }
 }
