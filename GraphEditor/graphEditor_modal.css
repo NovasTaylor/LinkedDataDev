@@ -1,0 +1,187 @@
+svg {
+  background-color: #FFF;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  border: 5px solid red;
+  float: left;
+}
+
+svg:not(.active):not(.ctrl) {
+  cursor: crosshair;
+}
+
+path.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 4px;
+  cursor: default;
+}
+
+svg:not(.active):not(.ctrl) path.link {
+  cursor: pointer;
+}
+
+path.link.selected {
+  stroke-dasharray: 10, 2;
+}
+
+path.link.dragline {
+  pointer-events: none;
+}
+
+path.link.hidden {
+  stroke-width: 0;
+}
+
+circle.node {
+  stroke-width: 1.5px;
+  cursor: pointer;
+}
+
+circle.node.reflexive {
+  stroke: #000 !important;
+  stroke-width: 2.5px;
+}
+
+text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+/* text for link labels */
+.linkLabel{
+  color: #333333;
+  flood-color: #FFFFFF;
+  flood-opacity:1;
+  font: 14px sans-serif;
+  text-anchor: middle;
+}
+
+text.id {
+  text-anchor: middle;
+  font-weight: bold;
+}
+
+body {
+  padding: 20px;
+}
+button {
+  /*position: absolute;*/
+  /*bottom: 0; */
+  margin-top: 10px;
+  line-height: 30px;
+  font-weight: bold;
+  padding: 0 10px;
+  background: #72bcd4;
+  border-radius: 4px;
+  border: 2px solid black;
+}
+button:hover {
+  background: #99cfe0;
+}
+
+.whiteboard{
+  fill: #fafafa;
+  stroke: black;
+}
+
+/*------------
+ * Modal stuff
+ *------------*/
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Could be more or less, depending on screen size */
+}
+
+.ok_button,
+.cancel_button,
+.close_button {
+  /*position: absolute;*/
+  /*bottom: 0; */
+  margin-top: 10px;
+  line-height: 30px;
+  font-weight: bold;
+  padding: 0 10px;
+  background: #72bcd4;
+  border-radius: 4px;
+  border: 2px solid black;
+}
+.ok_button:hover,
+.cancel_button:hover,
+.close_button:hover {
+  background: #99cfe0;
+}
+
+
+/* The OK Button */
+/*.ok_button {
+    color: #aaa;
+    float: left;
+    font-size: 28px;
+    font-weight: bold;
+    border: 1px solid #888;
+}
+*/
+/*.ok_button:hover,
+.ok_button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+
+}
+*/
+/* The Close Button */
+/*.close_button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    border: 1px solid #888;
+}
+*/
+/*.close_button:hover,
+.close_button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+*/
+/* The Cancel Button */
+/*.cancel_button {
+    color: #aaa;
+    float: middle;
+    font-size: 28px;
+    font-weight: bold;
+    border: 1px solid #888;
+}
+*/
+/*.cancel_button:hover,
+.cancel_button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+
+}
+*/
