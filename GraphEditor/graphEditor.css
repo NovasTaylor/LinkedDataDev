@@ -6,7 +6,7 @@ svg {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
-  border: 5px solid red;
+  border: 5px solid #d8d8d8;
   float: left;
 }
 

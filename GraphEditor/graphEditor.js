@@ -43,6 +43,11 @@ var svg = bodyElement.append('svg')
   .attr('width', width)
   .attr('height', height);
 
+
+
+
+
+
 // let dynamicContent = bodyElement.append('div').attr("border","10px");
 let dynamicTable = bodyElement.append('table')
 let thead = dynamicTable.append("thead")
@@ -57,7 +62,7 @@ thead.append("tr")
 let tableEmpty = true
 
 function updateTable(data,columns) {
-  // Convert node properties to list with key-value pairs ( e.x. key:property, value: property-value. E.g. key: ID, value: VERTEX) 
+  // Convert node properties to list with key-value pairs ( e.x. key:property, value: property-value. E.g. key: ID, value: VERTEX)
   let keyValuePairs = [], item;
 
   for (let type in data) {
@@ -401,7 +406,7 @@ let modalAddButton = document.getElementById('add_button');
 
 // Create the button that opens the modal message
 let showMessageButton = document.createElement("button");
-showMessageButton.innerHTML = "Show message";
+showMessageButton.innerHTML = "Help";
 
 // Create the button that shows the properties
 let showPropertiesButton = document.createElement("button");
@@ -449,7 +454,9 @@ showPropertiesButton.addEventListener ("click", function() {
 
 showMessageButton.addEventListener ("click", function() {
   // modalMessage.innerHTML = JSON.stringify(selected_node)
-  modalMessage.innerHTML = "I'm just showing a message"
+  modalMessage.innerHTML = "<b>HELP</b><br>" +
+    "Zoom  - NOT YET IMPLEMENTED<br>" +
+    "Pan   - NOT YET IMPLEMENTED<br>"
   modalDiv.style.display = "block";
 });
 
@@ -516,7 +523,6 @@ createTTLButton.addEventListener ("click", function() {
 
 
 function mousedown() {
-
   //RK Active only works in WebKit?
   svg.classed('active', true);
   if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;

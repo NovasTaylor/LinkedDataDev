@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!-----------------------------------------------------------------------------
+ FILE : ThreeRect-OnClickDiv.html
+ DESCR: Edit properties displayed in a shape.
+        NOTE: No update/exit() functionality so X  value for position is never
+        updated on the screen even though it is updaetd in the array.
+ SAUCE:
+ VIEW :
+ INPUT:
+ OUT  :
+ NOTES:
+
+TODO: :
+------------------------------------------------------------------------------>
+<meta charset="utf-8">
+<body>
+<head>
+<script src="/d3/d3.v3.min.js"></script>
+</head>
+<style>
+#rectInfo {
+    background-color: white;
+    position: relative;
+    padding: 10px;
+    width: 230px;
+    height:100px;
+    border: 2px;
+    outline: grey solid thin;
+  }
+.formLabel{
+  font-family: courier;
+}
+</style>
+
+<html>
+<body>
+<div id="rectInfo" style="opacity:0">
+<!-- Rect info will appear here -->
+</div>
+<script>
+
+var rectInfoActive = false;
+var rectData = [
+  { "label":"one",   "x": 100, "y": 50,  "height": 100, "width":120, "color" : "green" },
+  { "label":"two",   "x": 250, "y": 50,  "height": 100, "width": 120, "color" : "purple"},
+  { "label":"three", "x": 400, "y": 50,  "height": 100, "width": 120, "color" : "red"}
+];
+
+var svg = d3.select("body").append("svg")
+  .attr("width", 600)
+  .attr("height", 200);
+
+var rects = svg.selectAll("rect")
+  .data(rectData)
+  .enter();
+
+rects.append("rect")
+  .attr("x",     function (d)  { return d.x; })
+  .attr("y",     function (d)  { return d.y; })
+  .attr("height", function (d) { return d.height; })
+  .attr("width",  function (d) { return d.width; })
+  .style("fill",  function(d)  { return d.color; })
+  .on('mouseover', function(d){
+    var rectSelection = d3.select(this)
+    .style({opacity:'0.5'})})
+  .on('mouseout', function(d){
+    var rectSelection = d3.select(this)
+    .style({opacity:'1'})})
+  .on("click", function(d){
+
+   if (rectInfoActive == true){
+     // clicked a node while previous info block displayed
+     d3.selectAll("input").remove();
+     d3.selectAll(".formEle").remove();
+     d3.select("#rectInfo").style("opacity", 0);
+   }
+
+    console.log("You clicked rectangle: " + d.label)
+    console.log ("X position: " + d.x)
+    console.log ("Y position: " + d.y)
+
+    d3.select("#rectInfo").style("opacity", 1);
+
+    // Form displayed in /div becomes visible onclick of a rect.
+    // submit button clears the form. No data update yet.
+    var infoForm = d3.select("#rectInfo").append("form")
+      .attr("id", "foo")
+      .attr("action", "javascript:submitForm();")
+      .attr("method", "post")
+      .attr("class", "formEle");
+
+    infoForm.append("text")
+      .attr("class", "formLabel")
+      .text("Label: ");
+
+    infoForm.append("input")
+      .attr("name", "Label")
+      .attr("size", "15")
+      .attr("type", "text")
+      .attr("value", d.label)
+      .attr("class", "formEle");
+    infoForm.append("br")
+      .attr("class", "formEle");
+
+    infoForm.append("text")
+      .attr("class", "formLabel")
+      .text("X pos: ");
+
+    infoForm.append("input")
+      .attr("name", "xPos")
+      .attr("size", "4")
+      .attr("type", "text")
+      .attr("value", d.x)
+      .attr("class", "formEle");
+    infoForm.append("br")
+      .attr("class", "formEle");
+
+    infoForm.append("text")
+      .attr("class", "formLabel")
+      .text("Y pos: ");
+    infoForm.append("input")
+      .attr("name", "yPos")
+      .attr("size", "4")
+      .attr("type", "text")
+      .attr("value", d.y)
+      .attr("class", "formEle");
+
+    infoForm.append("br")
+      .attr("class", "formEle");
+
+    // when update is clicked, clear the div (for now)
+    infoForm.append("input")
+      .attr("name", "yPos")
+      .attr("type", "submit")
+      .attr("value", "Submit/Hide")
+      .attr("class", "formEle");
+
+    rectInfoActive = true;
+  });
+// END OF FORM
+
+// Rectangle Label
+rects.append("text")
+  .style("fill", "black")
+  .attr("dy", ".35em")
+  .attr("x", function(d) { return d.x +10;})
+  .attr("y", function(d) { return d.y +10;})
+  .text(function(d) { return "Label: " + d.label });
+
+// Misc functions -------------------------------------------------------------
+// clearTheForm ----
+// Clear the form and input values. This will later become the Update function
+//  that will update changed values back into the JSON array.
+function submitForm(){
+  //alert("Value" + d.x)
+  d3.selectAll("input").remove();
+  d3.selectAll(".formEle").remove();
+  d3.select("#rectInfo").style("opacity", 0);
+}
+</script>
+</body>
+</html>
