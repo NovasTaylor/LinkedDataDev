@@ -24,20 +24,85 @@ TODO: Task list tracked at
 "use strict";
 
 // Prevent context menu
-document.addEventListener('contextmenu', event => event.preventDefault());
+// document.addEventListener('contextmenu', event => event.preventDefault());
 
 // set up the SVG
 var width  = 1400,
   height = 600,
   colors = d3.scale.category10();
 
+width = window.innerWidth*0.6
+height = window.innerHeight*0.6
+
 var nodeRadius = 50,
   backOffTarget = nodeRadius+5, // back the arrow away from the node center
   linkLength    = 300;
 
-var svg = d3.select('body').append('svg')
+let bodyElement = d3.select('body')
+var svg = bodyElement.append('svg')
   .attr('width', width)
   .attr('height', height);
+
+// let dynamicContent = bodyElement.append('div').attr("border","10px");
+let dynamicTable = bodyElement.append('table')
+let thead = dynamicTable.append("thead")
+let tbody = dynamicTable.append("tbody")
+
+thead.append("tr")
+  .selectAll('th')
+  .data(["key","value"]).enter()
+  .append("th")
+  .text(function (column) { return column; });
+
+let tableEmpty = true
+
+function updateTable(data,columns) {
+  // Convert node properties to list with key-value pairs ( e.x. key:property, value: property-value. E.g. key: ID, value: VERTEX) 
+  let keyValuePairs = [], item;
+
+  for (let type in data) {
+      item = {};
+      item.key = type;
+      item.value = data[type];
+      keyValuePairs.push(item);
+  }
+
+  // create a row for each key-value pair in the data
+  var rows = tbody.selectAll('tr')
+        .data(keyValuePairs, function (d) { return d.value; })
+
+  rows.enter()
+      .append('tr');
+
+// create a cell in each row for each column (i.e. key, value)
+  var cells = rows.selectAll('td')
+    .data(function (row) {
+      return columns.map(function (column) {
+        return {column: column, value: row[column]};
+      });
+    })
+
+  // Add the cells
+  cells.enter()
+    .append('td')
+    .text(function (d) { return d.value; });
+
+  // Remove old rows and columns
+  rows.exit().remove();
+  cells.exit().remove();
+
+}
+
+// let theData = [
+//   {"key":"hejID","value":"thevaluehej"}
+// ]
+// updateTable(theData,["key","value"])
+
+
+    // .attr("width","100")
+    // .attr("heigth","100")
+    // .attr("border","10px")
+    // .text("hejsan");
 
 // Set up initial nodes and links
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
@@ -63,12 +128,12 @@ var force = d3.layout.force()
   .on('tick', tick);
 
 
-var rect = svg.append("rect")
-  .attr("x", 1)
-  .attr("y", 0)
-  .attr("width", 1200)
-  .attr("height", 600)
-  .attr("class", "whiteboard");
+// var rect = svg.append("rect")
+//   .attr("x", 1)
+//   .attr("y", 0)
+//   .attr("width", 1200)
+//   .attr("height", 600)
+//   .attr("class", "whiteboard");
 
 // Def for background of link text as a Filter effect as per:
 // https://www.w3.org/TR/SVG/filters.html
@@ -328,16 +393,86 @@ function restart() {
   // Start force display
   force.start();
 }
+// Get the modal
+let modalDiv = document.getElementById('myModal');
+// let dynamicContent = document.getElementById('dynamic-content');
+let modalMessage = document.getElementById('modal-message');
+let modalAddButton = document.getElementById('add_button');
+
+// Create the button that opens the modal message
+let showMessageButton = document.createElement("button");
+showMessageButton.innerHTML = "Show message";
+
+// Create the button that shows the properties
+let showPropertiesButton = document.createElement("button");
+showPropertiesButton.innerHTML = "Show properties";
+
+// Get the <span> element that closes the modal
+var cancelButton = document.getElementsByClassName("cancel_button")[0];
+var okButton = document.getElementsByClassName("ok_button")[0];
+var close = document.getElementsByClassName("close")[0];
+// alert(JSON.stringify(close))
+
 // Export TTL File
-var button = document.createElement("button");
-button.innerHTML = "Create TTL";
+var createTTLButton = document.createElement("button");
+createTTLButton.innerHTML = "Create TTL";
 
 // 2. Append somewhere
 var body = document.getElementsByTagName("body")[0];
-body.appendChild(button);
+body.appendChild(createTTLButton);
+body.appendChild(showPropertiesButton);
+body.appendChild(showMessageButton);
+
+showPropertiesButton.addEventListener ("click", function() {
+  // for (var key in selected_node) {
+  //   if (selected_node.hasOwnProperty(key)) {
+      // let theDomElement = document.createElement("div")
+      // theDomElement.setAttribute("style","float:left;clear:left;padding:10px 10px;border:10px;")
+      // let thePair = document.createTextNode(key + " -> " + selected_node[key])
+      // theDomElement.appendChild(thePair)
+      // dynamicContent.appendChild(theDomElement)
+      // console.log(key + " -> " + selected_node[key]);
+  //   }
+  // }
+  if (!selected_node && !selected_link) {
+    alert("Please select a node or link")
+    return;
+  }
+  if (selected_node) {
+    updateTable(selected_node,["key","value"])
+
+  }
+  if (selected_link) {
+    updateTable(selected_link,["key","value"])
+  }
+});
+
+showMessageButton.addEventListener ("click", function() {
+  // modalMessage.innerHTML = JSON.stringify(selected_node)
+  modalMessage.innerHTML = "I'm just showing a message"
+  modalDiv.style.display = "block";
+});
+
+// modalAddButton.addEventListener ("click", function() {
+//   let p = document.createElement("p")
+//   p.innerHTML ="hopps"
+//   dynamicContent.appendChild(p);
+// });
+
+cancelButton.addEventListener ("click", function() {
+  modalDiv.style.display = "none";
+  return false
+  // while (dynamicContent.firstChild) {
+  //     dynamicContent.removeChild(dynamicContent.firstChild);
+  // }
+});
+okButton.addEventListener ("click", function() {
+  modalDiv.style.display = "none";
+  return true
+});
 
 // 3. Add event handler
-button.addEventListener ("click", function() {
+createTTLButton.addEventListener ("click", function() {
   alert("This will create the TTL file. Click OK to confirm.");
 
   // Set the prefixes
