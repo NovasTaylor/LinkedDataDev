@@ -38,15 +38,18 @@ var nodeRadius = 50,
   backOffTarget = nodeRadius+5, // back the arrow away from the node center
   linkLength    = 300;
 
+/* NEW SHITE */
+var zoom = d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoomed);
+
 let bodyElement = d3.select('body')
 var svg = bodyElement.append('svg')
   .attr('width', width)
-  .attr('height', height);
-
-
-
-
-
+  .attr('height', height)
+  /* NEW SHITE */
+  .append("g")
+     .call(zoom)
+  .append("g")
+  ;
 
 // let dynamicContent = bodyElement.append('div').attr("border","10px");
 let dynamicTable = bodyElement.append('table')
@@ -98,17 +101,6 @@ function updateTable(data,columns) {
 
 }
 
-// let theData = [
-//   {"key":"hejID","value":"thevaluehej"}
-// ]
-// updateTable(theData,["key","value"])
-
-
-    // .attr("width","100")
-    // .attr("heigth","100")
-    // .attr("border","10px")
-    // .text("hejsan");
-
 // Set up initial nodes and links
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
 //  - links are always source -to--> target of dragging. Edge directions can be reset using L, R.
@@ -131,14 +123,6 @@ var force = d3.layout.force()
   .linkDistance(linkLength)
   .charge(-500)
   .on('tick', tick);
-
-
-// var rect = svg.append("rect")
-//   .attr("x", 1)
-//   .attr("y", 0)
-//   .attr("width", 1200)
-//   .attr("height", 600)
-//   .attr("class", "whiteboard");
 
 // Def for background of link text as a Filter effect as per:
 // https://www.w3.org/TR/SVG/filters.html
@@ -225,15 +209,6 @@ function tick() {
       var angle = Math.atan((d.source.y - d.target.y) / (d.source.x - d.target.x)) * 180 / Math.PI;
       return 'translate(' + [((d.source.x + d.target.x) / 2), ((d.source.y + d.target.y) / 2)] + ')rotate(' + angle + ')';
     });
-//OLDE SHITE FOLLOWS
-    //  .attr("x", function(d){
-//      return ((d.source.x+d.target.x)/2);
-//      })
-//    .attr("y", function(d){
-//      return ( ( (d.source.y + d.target.y)/2) -5 );
-//      });
-// END OLDE SHITE
-
   circle.attr('transform', function(d) {
       return 'translate(' + d.x + ',' + d.y + ')'
   })
@@ -311,6 +286,7 @@ function restart() {
       return d3.rgb(colors(d.id))
       .darker()
       .toString(); })
+
     .on('mouseover', function(d) {
         if(!mousedown_node || d === mousedown_node) return;
         // enlarge target node
@@ -666,6 +642,58 @@ function keyup() {
     svg.classed('ctrl', false);
   }
 }
+/* NEW SHITE */
+function zoomed() {
+    svg.attr("transform",
+        "translate(" + zoom.translate() + ")" +
+        "scale(" + zoom.scale() + ")"
+    );
+}
+
+function interpolateZoom (translate, scale) {
+    var self = this;
+    return d3.transition().duration(350).tween("zoom", function () {
+        var iTranslate = d3.interpolate(zoom.translate(), translate),
+            iScale = d3.interpolate(zoom.scale(), scale);
+        return function (t) {
+            zoom
+                .scale(iScale(t))
+                .translate(iTranslate(t));
+            zoomed();
+        };
+    });
+}
+function zoomClick() {
+    var clicked = d3.event.target,
+        direction = 1,
+        factor = 0.2,
+        target_zoom = 1,
+        center = [width / 2, height / 2],
+        extent = zoom.scaleExtent(),
+        translate = zoom.translate(),
+        translate0 = [],
+        l = [],
+        view = {x: translate[0], y: translate[1], k: zoom.scale()};
+
+    d3.event.preventDefault();
+    direction = (this.id === 'zoom_in') ? 1 : -1;
+    target_zoom = zoom.scale() * (1 + factor * direction);
+
+    if (target_zoom < extent[0] || target_zoom > extent[1]) { return false; }
+
+    translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+    view.k = target_zoom;
+    l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+
+    view.x += center[0] - l[0];
+    view.y += center[1] - l[1];
+
+    interpolateZoom([view.x, view.y], view.k);
+}
+
+d3.selectAll('button').on('click', zoomClick);
+/* END NEW SHITE */
+
 
 // Start the App
 svg.on('mousedown', mousedown)
