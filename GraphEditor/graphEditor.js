@@ -32,24 +32,27 @@ var width  = 1400,
   colors = d3.scale.category10();
 
 width = window.innerWidth*0.6
-height = window.innerHeight*0.6
+//height = window.innerHeight*0.6
 
 var nodeRadius = 50,
   backOffTarget = nodeRadius+5, // back the arrow away from the node center
   linkLength    = 300;
 
-/* NEW SHITE */
-var zoom = d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoomed);
+/* Zoom extent of -2 allows zoom out smaller than original */
+var zoom = d3.behavior.zoom().scaleExtent([-2, 2]).on("zoom", zoomed);
 
 let bodyElement = d3.select('body')
 var svg = bodyElement.append('svg')
   .attr('width', width)
   .attr('height', height)
-  /* NEW SHITE */
+  ;
+
+/*
   .append("g")
      .call(zoom)
   .append("g")
-  ;
+  */
+;
 
 // let dynamicContent = bodyElement.append('div').attr("border","10px");
 let dynamicTable = bodyElement.append('table')
@@ -105,9 +108,9 @@ function updateTable(data,columns) {
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
 //  - links are always source -to--> target of dragging. Edge directions can be reset using L, R.
 var nodes = [
-  {id: 'STUDY1',  x:500, y:100, fixed:true, type: 'URI'},
-  {id: 'TREAT1',  x:350, y:300, fixed:true, type: 'URI'},
-  {id: 'PERSON1', x:200, y:100, fixed:true, type: 'URI'}
+  {id: 'STUDY1',  x:500, y:200, fixed:true, type: 'URI'},
+  {id: 'TREAT1',  x:350, y:400, fixed:true, type: 'URI'},
+  {id: 'PERSON1', x:200, y:200, fixed:true, type: 'URI'}
   ],
   links = [
     {source: nodes[0], target: nodes[1], left: false, right: true ,linkLabel: 'treatmentArm'},
@@ -374,6 +377,7 @@ function restart() {
   // Start force display
   force.start();
 }
+
 // Get the modal
 let modalDiv = document.getElementById('myModal');
 // let dynamicContent = document.getElementById('dynamic-content');
@@ -431,8 +435,10 @@ showPropertiesButton.addEventListener ("click", function() {
 showMessageButton.addEventListener ("click", function() {
   // modalMessage.innerHTML = JSON.stringify(selected_node)
   modalMessage.innerHTML = "<b>HELP</b><br>" +
-    "Zoom  - NOT YET IMPLEMENTED<br>" +
-    "Pan   - NOT YET IMPLEMENTED<br>"
+    "<table>" +
+    "<tr><td>Drag node</td><td>CTRL + left mouse button</td></tr>" +
+    "</table>"
+
   modalDiv.style.display = "block";
 });
 
@@ -691,9 +697,8 @@ function zoomClick() {
     interpolateZoom([view.x, view.y], view.k);
 }
 
-d3.selectAll('button').on('click', zoomClick);
+d3.selectAll('button.zoom').on('click', zoomClick);
 /* END NEW SHITE */
-
 
 // Start the App
 svg.on('mousedown', mousedown)
