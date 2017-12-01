@@ -42,6 +42,13 @@ circle.node {
   cursor: pointer;
 }
 
+/* testing, not working : need to change selection mechm. */
+circle.node.selected {
+  stroke-dasharray: 10, 2;
+}
+
+
+
 circle.node.reflexive {
   stroke: #000 !important;
   stroke-width: 2.5px;
@@ -72,7 +79,21 @@ body {
   margin-top: 0px;
 }
 
-/* Ensure buttons on top with high z-index */
+/* TESTING NODE COLORS NOT CURRENTLY IMPLEMENTED */
+.default{
+  fill:white;
+}
+
+.male{
+  fill:blue;
+}
+
+.female{
+  fill:red;
+}
+
+/* Zoom buttons
+Ensure buttons on top with high z-index */
 .zoom{
   position:relative;
   z-index: 900;
@@ -84,7 +105,6 @@ body {
   text-align: center;
   line-height: 20px;
   background-color: #d8d8d8;
-
 }
 .zoom.in{
   left: 15px;
@@ -93,17 +113,19 @@ body {
   left: 25px;
 }
 
+/* Help Box */
 .help th,tr,td {
     /* border: 1px solid gray; */
     border:none;
 }
 .help td:nth-child(1){
-  width:100px;
-  font-weight: normal;
+  width:300px;
+  font-weight:normal;
 }
 .help td:nth-child(2){
-  width:300px;
+  width:500px;
   font-weight: bold;
+  bgcolor: #d2f8d2;
   font-family: courier;
 }
 

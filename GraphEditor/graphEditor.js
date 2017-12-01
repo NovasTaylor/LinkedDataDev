@@ -28,13 +28,13 @@ TODO: Task list tracked at
 
 // set up the SVG
 var width  = 1400,
-  height = 600,
+  height = 900,
   colors = d3.scale.category10();
 
 width = window.innerWidth*0.6
 //height = window.innerHeight*0.6
 
-var nodeRadius = 50,
+var nodeRadius = 40,
   backOffTarget = nodeRadius+5, // back the arrow away from the node center
   linkLength    = 300;
 
@@ -44,15 +44,7 @@ var zoom = d3.behavior.zoom().scaleExtent([-2, 2]).on("zoom", zoomed);
 let bodyElement = d3.select('body')
 var svg = bodyElement.append('svg')
   .attr('width', width)
-  .attr('height', height)
-  ;
-
-/*
-  .append("g")
-     .call(zoom)
-  .append("g")
-  */
-;
+  .attr('height', height);
 
 // let dynamicContent = bodyElement.append('div').attr("border","10px");
 let dynamicTable = bodyElement.append('table')
@@ -108,14 +100,56 @@ function updateTable(data,columns) {
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
 //  - links are always source -to--> target of dragging. Edge directions can be reset using L, R.
 var nodes = [
-  {id: 'STUDY1',  x:500, y:200, fixed:true, type: 'URI'},
-  {id: 'TREAT1',  x:350, y:400, fixed:true, type: 'URI'},
-  {id: 'PERSON1', x:200, y:200, fixed:true, type: 'URI'}
+  {n:0, id: 'PRODUCT1',
+    nodePrefix:"ldw",
+    type: 'URI',
+    nodeFill:"white",
+    x:500, y:60,
+    fixed:true,
+    comment:""},
+  {n:1, id: 'Serum 114',
+    nodePrefix:"",
+    type: 'STRING',
+    nodeFill:"white",
+    x:700, y:60,
+    fixed:true,
+    comment:""},
+  {n:2, id: 'F',
+    nodePrefix:"",
+    type: 'URI',
+    nodeFill:"#e6add8",
+    x:100, y:400,
+    fixed:true,
+    comment:""},
+  {n:3, id: 'C16576',
+    nodePrefix:"",
+    type: 'URI',
+    nodeFill:"#c6cbcd",
+    x:100, y:600,
+    fixed:true,
+    comment:"NCI code"},
+  {n:4, id: 'M',
+    nodePrefix:"ldw",
+    type: 'URI',
+    nodeFill:"#add8e6",
+    x:200, y:400,
+    fixed:true,
+    comment:"male"},
+  {n:5, id: 'C20197',
+    nodePrefix:"",
+    type: 'URI',
+    nodeFill:"#c6cbcd",
+    x:200, y:600,
+    fixed:true,
+    comment:"NCI Code"}
   ],
   links = [
-    {source: nodes[0], target: nodes[1], left: false, right: true ,linkLabel: 'treatmentArm'},
-    {source: nodes[2], target: nodes[1], left: false, right: true, linkLabel: 'treatment'},
-    {source: nodes[2], target: nodes[0], left: false, right: true, linkLabel: 'enrolledIn'}
+    {source: nodes[0], target: nodes[1],
+      linkLabel: 'label', linkPrefix:"", left: false, right: true },
+    {source: nodes[2], target: nodes[3],
+      linkLabel: 'nciCode', linkPrefix:"", left: false, right: true},
+    {source: nodes[4], target: nodes[5],
+      linkLabel: 'nciCode', linkPrefix:"", left: false, right: true}
   ];
 
 // Initialize D3 force layout
@@ -269,27 +303,34 @@ function restart() {
 
   // Change to base node color on node type using class/CSS
   circle.selectAll('circle')
-    .style('fill', function(d) { return (d === selected_node) ?
-      d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
-    });
-
+   /* Change a selected node to fill-white with brigher(15) and dashed stroke */
+   .style('fill', function(d) { return (d === selected_node) ?
+       d3.rgb(colors(d.id)).brighter(15).toString() : colors(d.id);
+      })
+   .style('stroke-dasharray', function(d) { return (d === selected_node) ?
+          ("3, 3") : ("0, 0");
+         })
+      ;
   // Add new nodes
   var g = circle.enter().append('svg:g');
 
   g.append('svg:circle')
     .attr('class', 'node')
     .attr('r', nodeRadius)
-    // Node is selected. Hook in to this code to display/edit node text and type
+    .style('fill', 'white')
+    .style('stroke', "black")
     .style('fill', function(d) {
       return (d === selected_node) ? d3.rgb(colors(d.id))
       .brighter()
       .toString() : colors(d.id);
-    })
-    .style('stroke', function(d) {
-      return d3.rgb(colors(d.id))
-      .darker()
-      .toString(); })
+      })
 
+/*
+.style('stroke', function(d) {
+  if (d === selcted_node) ? return d3.rgb(colors(d.id))
+  .darker()
+  .toString(); })
+*/
     .on('mouseover', function(d) {
         if(!mousedown_node || d === mousedown_node) return;
         // enlarge target node
@@ -435,10 +476,12 @@ showPropertiesButton.addEventListener ("click", function() {
 showMessageButton.addEventListener ("click", function() {
   // modalMessage.innerHTML = JSON.stringify(selected_node)
   modalMessage.innerHTML = "<b>HELP</b><br>" +
-    "<table>" +
+    "<table cellspacing='10px' class='help'>" +
     "<tr><td>Drag node</td><td>CTRL + left mouse button</td></tr>" +
+    "<tr><td>Delete node</td><td>Select node, DEL key</td></tr>" +
+    "<tr><td>Delete link</td><td>Select link, DEL key</td></tr>" +
+    "<tr><td>Reset Whiteboard</td><td>Reload browser window. <font color='red'>All your work will be lost!</font></td></tr>" +
     "</table>"
-
   modalDiv.style.display = "block";
 });
 
