@@ -115,14 +115,14 @@ var nodes = [
     fixed:true,
     comment:""},
   {n:2, id: 'F',
-    nodePrefix:"",
+    nodePrefix:"ldw",
     type: 'URI',
     nodeFill:"#e6add8",
     x:100, y:400,
     fixed:true,
     comment:""},
   {n:3, id: 'C16576',
-    nodePrefix:"",
+    nodePrefix:"sdtmterm",
     type: 'URI',
     nodeFill:"#c6cbcd",
     x:100, y:600,
@@ -136,7 +136,7 @@ var nodes = [
     fixed:true,
     comment:"male"},
   {n:5, id: 'C20197',
-    nodePrefix:"",
+    nodePrefix:"sdtmterm",
     type: 'URI',
     nodeFill:"#c6cbcd",
     x:200, y:600,
@@ -145,11 +145,11 @@ var nodes = [
   ],
   links = [
     {source: nodes[0], target: nodes[1],
-      linkLabel: 'label', linkPrefix:"", left: false, right: true },
+      linkLabel: 'label', linkPrefix:"foo", left: false, right: true },
     {source: nodes[2], target: nodes[3],
-      linkLabel: 'nciCode', linkPrefix:"", left: false, right: true},
+      linkLabel: 'nciCode', linkPrefix:"sdtmterm", left: false, right: true},
     {source: nodes[4], target: nodes[5],
-      linkLabel: 'nciCode', linkPrefix:"", left: false, right: true}
+      linkLabel: 'nciCode', linkPrefix:"sdtmterm", left: false, right: true}
   ];
 
 // Initialize D3 force layout
