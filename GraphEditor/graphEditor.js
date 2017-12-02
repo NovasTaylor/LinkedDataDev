@@ -62,8 +62,9 @@ let tableEmpty = true
 function updateTable(data,columns) {
   // Convert node properties to list with key-value pairs ( e.x. key:property, value: property-value. E.g. key: ID, value: VERTEX)
   let keyValuePairs = [], item;
+  let loopKeys = selected_node ? {"id":1,"nodePrefix":1,"type":1} : {"linkLabel":1,"linkPrefix":1}
 
-  for (let type in data) {
+ for (let type in loopKeys) {
       item = {};
       item.key = type;
       item.value = data[type];
