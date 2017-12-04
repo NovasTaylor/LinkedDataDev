@@ -21,34 +21,34 @@ TODO:
     <script src="/d3/d3.v3.min.js"></script>
     <script src="/GraphEditor/js/n3-browser.min.js"></script>
     <script src="/GraphEditor/js/FileSaver.min.js"></script>
+
   </head>
   <body>
-
-    <!-- Zoom buttons -->
-    <div id="zoomBtn">
-      <button class="zoom in"  id="zoom_in"  type="zoomButton">+</button>
-      <button class="zoom out" id="zoom_out" type="zoomButton">-</button>
-    </div>
-
-    <!-- The Modal -->
-    <div id="myModal" class="modal">
-      <!-- Modal content -->
-      <div class="modal-content">
-        <p id="modal-message">Some text in the Modal..</p>
-        <div id="modal_buttons">
-          <span class="ok_button">OK</span>
-          <span class="cancel_button">Cancel</span>
-          <!-- <span class="close_button">Close</span> -->
+    <div class="wrapper">
+      <div class="box graphRegion" id="whiteboard">
+        <!-- Zoom buttons -->
+        <div id="zoomBtn">
+          <button class="zoom in"  id="zoom_in"  type="zoomButton">+</button>
+          <button class="zoom out" id="zoom_out" type="zoomButton">-</button>
         </div>
+        <script src="/GraphEditor/graphEditor.js"></script>
+        <!-- Graph inserted here -->
       </div>
-    </div>
 
+      <div class= "box infoRegion" id="info" style="opacity:0">
+        <!-- Information box for nodes and links -->
+        <p><i>Add Child div for info</i></p>
+      </div>
+
+      <div class= "box buttonRegion" id="buttons">
+         <p>buttons here</p>
+      </div>
+     <div class= "box rightBottRegion">
+       <p><i>empty for now</i></p>
+     </div>
+    </div>
     <div id="whiteboard">
-      <script src="/GraphEditor/graphEditor.js"></script>
-    </div>
-
-    <div id="sidebarFooter">
-      <!--sidebar footer here, if any -->
+     <!-- graph whiteboard goes here -->
     </div>
   </body>
 </html>

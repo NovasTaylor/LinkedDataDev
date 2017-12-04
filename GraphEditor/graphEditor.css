@@ -144,105 +144,43 @@ button {
 button:hover {
   background: #99cfe0;
 }
-
 .whiteboard{
   fill: #fafafa;
   stroke: black;
 }
 
-/*------------
- * Modal stuff
- *------------*/
-/* The Modal (background) */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+/*---- Grid layout ----------------------------------------------------------*/
+* {
+  box-sizing: border-box;
 }
-
-/* Modal Content/Box */
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 50%; /* Could be more or less, depending on screen size */
+/* grVisRBot not currently used for anything */
+.wrapper {
+  display: grid;
+  grid-gap: 1px;
+  grid-template-columns: 900px 200px;
+  grid-template-rows: 200px 50px 350px;
+  background-color: gray;
+  color: #fff;
 }
-
-.ok_button,
-.cancel_button,
-.close_button {
-  /*position: absolute;*/
-  /*bottom: 0; */
-  margin-top: 10px;
-  line-height: 30px;
-  font-weight: bold;
-  padding: 0 10px;
-  background: #72bcd4;
-  border-radius: 4px;
-  border: 2px solid black;
+.box {
+  background-color: white;
+  color: #000000;
+  border-radius: 1px;
+  padding: 5px;
 }
-.ok_button:hover,
-.cancel_button:hover,
-.close_button:hover {
-  background: #99cfe0;
+.graphRegion{
+  grid-column: 1;
+  grid-row: 1 / 4;
 }
-
-
-/* The OK Button */
-/*.ok_button {
-    color: #aaa;
-    float: left;
-    font-size: 28px;
-    font-weight: bold;
-    border: 1px solid #888;
+.infoRegion{
+  grid-column: 2;
+  grid-row: 1;
 }
-*/
-/*.ok_button:hover,
-.ok_button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-
+.buttonRegion{
+  grid-column: 2;
+  grid-row: 2;
 }
-*/
-/* The Close Button */
-/*.close_button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    border: 1px solid #888;
+.rightBottRegion{
+  grid-column: 2;
+  grid-row: 3;
 }
-*/
-/*.close_button:hover,
-.close_button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-*/
-/* The Cancel Button */
-/*.cancel_button {
-    color: #aaa;
-    float: middle;
-    font-size: 28px;
-    font-weight: bold;
-    border: 1px solid #888;
-}
-*/
-/*.cancel_button:hover,
-.cancel_button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-
-}
-*/
