@@ -6,6 +6,8 @@ VIEW: http://localhost:8000/GraphEditor/GraphEditor.html
 SRC : http://bl.ocks.org/rkirsling/5001347
 IN  :
 OUT : WhiteBoardTriples.TTL
+DEV: Using this file for value edit code: C:\_sandbox\d3\Examples\forms\ThreeRect-OnClickDiv.html
+DEVTODO: Change D, <backspace> to other keys. Intereferes with editing of the values in the DIV!
 NOTE: LINKS
         Changing Link Direction Arrows. With Link selected:
         R - arrow to right
@@ -287,7 +289,7 @@ function restart() {
         d3.select(this).attr('transform', '');
     })
     .on('mousedown', function(d) {
-
+//** WIP HERE --------------------------------------------------------------
        // This is the mousedown on a node.
       var self = this;
       // console.log(self);
@@ -298,25 +300,54 @@ function restart() {
 
       var labelText = div.append("p")
         .text("Label: ");
-      var labelInput = labelText.append("input")
+      var idInput = labelText.append("input")
         .attr("size", "15")
         .attr("type", "text")
         .attr("value", d.id);
+/*TW out for DEV until TEXT update is working
+     //PREFIX
+      var prefixText = div.append("p")
+        .text("Prefix: ");
+      var prefixInput = prefixText.append("input")
+        .attr("size", "15")
+        .attr("type", "text")
+        .attr("value", d.prefix);
+     /TYPE
+      var typeText = div.append("p")
+        .text("Type: ");
+      var typeInput = typeText.append("input")
+        .attr("size", "15")
+        .attr("type", "text")
+        .attr("value", d.type);
+*/
+      var button = div.append("button")
+        .text("Update/Hide")
+        .on("click", function() {
+/*TW OUT FOR TESTING
+          d3.select(self)
+            .attr("prefix", function(d) {return d.prefix = +prefixInput.node().value })
+            .attr("type", function(d)   {return d.type = +typeInput.node().value});
+*/
+          d3.select("#text" + i)
+            .text(function(d) {
+              return "Label: " + (d.id = idInput.node().value);
+          })
+/*TW OUT FOR DEV!
+          /*
+          .attr("text", function(d) {
+              return d.prefix = +prefixInput.node().value
+          })
+          .attr("text", function(d) {
+              return d.type = +typeInput.node().value
+            })
+          */
+            ;
 
-        var labelText = div.append("p")
-          .text("Prefix: ");
-        var labelInput = labelText.append("input")
-          .attr("size", "15")
-          .attr("type", "text")
-          .attr("value", d.prefix);
-
-          var labelText = div.append("p")
-            .text("Type: ");
-          var labelInput = labelText.append("input")
-            .attr("size", "15")
-            .attr("type", "text")
-            .attr("value", d.type);
-
+      d3.select("#rectInfo").selectAll("*").remove();
+      d3.select("#rectInfo").style("opacity", 0);
+    })
+          //  rectInfoActive = true;
+//** END WIP -------------------
 
         if(d3.event.ctrlKey) return;
         // select node
