@@ -6,8 +6,6 @@ VIEW: http://localhost:8000/GraphEditor/GraphEditor.html
 SRC : http://bl.ocks.org/rkirsling/5001347
 IN  :
 OUT : WhiteBoardTriples.TTL
-DEV: Using this file for value edit code: C:\_sandbox\d3\Examples\forms\ThreeRect-OnClickDiv.html
-DEVTODO: Change D, <backspace> to other keys. Intereferes with editing of the values in the DIV!
 NOTE: LINKS
         Changing Link Direction Arrows. With Link selected:
         R - arrow to right
@@ -36,58 +34,109 @@ var width  = 1400,
 width = window.innerWidth*0.6
 //height = window.innerHeight*0.6
 
-//var infoActive = false;  //TW change remove rect part.
-
 var nodeRadius = 40,
   backOffTarget = nodeRadius+5, // back the arrow away from the node center
   linkLength    = 300;
 
+/* Zoom extent of -2 allows zoom out smaller than original */
+var zoom = d3.behavior.zoom().scaleExtent([-2, 2]).on("zoom", zoomed);
 
-var svg = d3.select("#whiteboard").append("svg")
+let bodyElement = d3.select('body')
+var svg = bodyElement.append('svg')
   .attr('width', width)
   .attr('height', height);
+
+// let dynamicContent = bodyElement.append('div').attr("border","10px");
+let dynamicTable = bodyElement.append('table')
+let thead = dynamicTable.append("thead")
+let tbody = dynamicTable.append("tbody")
+
+thead.append("tr")
+  .selectAll('th')
+  .data(["key","value"]).enter()
+  .append("th")
+  .text(function (column) { return column; });
+
+let tableEmpty = true
+
+function updateTable(data,columns) {
+  // Convert node properties to list with key-value pairs ( e.x. key:property, value: property-value. E.g. key: ID, value: VERTEX)
+  let keyValuePairs = [], item;
+
+  for (let type in data) {
+      item = {};
+      item.key = type;
+      item.value = data[type];
+      keyValuePairs.push(item);
+  }
+
+  // create a row for each key-value pair in the data
+  var rows = tbody.selectAll('tr')
+        .data(keyValuePairs, function (d) { return d.value; })
+
+  rows.enter()
+      .append('tr');
+
+// create a cell in each row for each column (i.e. key, value)
+  var cells = rows.selectAll('td')
+    .data(function (row) {
+      return columns.map(function (column) {
+        return {column: column, value: row[column]};
+      });
+    })
+
+  // Add the cells
+  cells.enter()
+    .append('td')
+    .text(function (d) { return d.value; });
+
+  // Remove old rows and columns
+  rows.exit().remove();
+  cells.exit().remove();
+
+}
 
 // Set up initial nodes and links
 //  - nodes are known by 'id', not by index in array. Re-inforces they must be unique URIs
 //  - links are always source -to--> target of dragging. Edge directions can be reset using L, R.
 var nodes = [
   {n:0, id: 'PRODUCT1',
-    prefix:"ldw",
+    nodePrefix:"ldw",
     type: 'URI',
     nodeFill:"white",
     x:500, y:60,
     fixed:true,
     comment:""},
   {n:1, id: 'Serum 114',
-    prefix:"--NONE--",
+    nodePrefix:"",
     type: 'STRING',
     nodeFill:"white",
     x:700, y:60,
     fixed:true,
     comment:""},
   {n:2, id: 'F',
-    prefix:"ldw",
+    nodePrefix:"ldw",
     type: 'URI',
     nodeFill:"#e6add8",
     x:100, y:400,
     fixed:true,
     comment:""},
   {n:3, id: 'C16576',
-    prefix:"sdtmterm",
+    nodePrefix:"sdtmterm",
     type: 'URI',
     nodeFill:"#c6cbcd",
     x:100, y:600,
     fixed:true,
     comment:"NCI code"},
   {n:4, id: 'M',
-    prefix:"ldw",
+    nodePrefix:"ldw",
     type: 'URI',
     nodeFill:"#add8e6",
     x:200, y:400,
     fixed:true,
     comment:"male"},
   {n:5, id: 'C20197',
-    prefix:"sdtmterm",
+    nodePrefix:"sdtmterm",
     type: 'URI',
     nodeFill:"#c6cbcd",
     x:200, y:600,
@@ -96,11 +145,11 @@ var nodes = [
   ],
   links = [
     {source: nodes[0], target: nodes[1],
-      linkLabel: 'label', prefix:"foo", left: false, right: true },
+      linkLabel: 'label', linkPrefix:"foo", left: false, right: true },
     {source: nodes[2], target: nodes[3],
-      linkLabel: 'nciCode', prefix:"sdtmterm", left: false, right: true},
+      linkLabel: 'nciCode', linkPrefix:"sdtmterm", left: false, right: true},
     {source: nodes[4], target: nodes[5],
-      linkLabel: 'nciCode', prefix:"sdtmterm", left: false, right: true}
+      linkLabel: 'nciCode', linkPrefix:"sdtmterm", left: false, right: true}
   ];
 
 // Initialize D3 force layout
@@ -276,6 +325,12 @@ function restart() {
       .toString() : colors(d.id);
       })
 
+/*
+.style('stroke', function(d) {
+  if (d === selcted_node) ? return d3.rgb(colors(d.id))
+  .darker()
+  .toString(); })
+*/
     .on('mouseover', function(d) {
         if(!mousedown_node || d === mousedown_node) return;
         // enlarge target node
@@ -286,71 +341,7 @@ function restart() {
         // unenlarge target node
         d3.select(this).attr('transform', '');
     })
-    //TW added i for use in text return later!
-    .on('mousedown', function(d, i) {
-//** WIP HERE --------------------------------------------------------------
-       // This is the mousedown on a node.
-      var self = this;
-      // console.log(self);
-      d3.select("#info").style("opacity", 1);
-      // Parameter values from the rect are displayed in /div that becomes visible onclick of a rect.
-      // submit button clears the form. No data update yet.
-      var div = d3.select("#info")
-
-
-      var idText = div.append("p")
-        .text("Label: ");
-
-
-      var idInput = idText.append("input")
-        .attr("size", "15")
-        .attr("type", "text")
-        .attr("value", d.id);
-/*TW out for DEV until TEXT update is working
-     //PREFIX
-      var prefixText = div.append("p")
-        .text("Prefix: ");
-      var prefixInput = prefixText.append("input")
-        .attr("size", "15")
-        .attr("type", "text")
-        .attr("value", d.prefix);
-     /TYPE
-      var typeText = div.append("p")
-        .text("Type: ");
-      var typeInput = typeText.append("input")
-        .attr("size", "15")
-        .attr("type", "text")
-        .attr("value", d.type);
-*/
-      var button = div.append("button")
-        .text("Update/Hide")
-        .on("click", function() {
-
-          d3.select(self);
-/*TW OUT FOR TESTING
-            .attr("prefix", function(d) {return d.prefix = +prefixInput.node().value })
-            .attr("type", function(d)   {return d.type = +typeInput.node().value});
-*/
-          d3.select("#text" + i)
-            .text(function(d) {
-              return "Label: " + (d.id = idInput.node().value);  })
-/*TW OUT FOR DEV!
-          /*
-          .attr("text", function(d) {
-              return d.prefix = +prefixInput.node().value
-          })
-          .attr("text", function(d) {
-              return d.type = +typeInput.node().value
-            })
-          */
-            ;
-
-      d3.select("#info").selectAll("*").remove();
-      d3.select("#info").style("opacity", 0);
-    })
-          //  rectInfoActive = true;
-//** END WIP -------------------
-
+    .on('mousedown', function(d) {
         if(d3.event.ctrlKey) return;
         // select node
         mousedown_node = d;
@@ -427,6 +418,135 @@ function restart() {
   // Start force display
   force.start();
 }
+
+// Get the modal
+let modalDiv = document.getElementById('myModal');
+// let dynamicContent = document.getElementById('dynamic-content');
+let modalMessage = document.getElementById('modal-message');
+let modalAddButton = document.getElementById('add_button');
+
+// Create the button that opens the modal message
+let showMessageButton = document.createElement("button");
+showMessageButton.innerHTML = "Help";
+
+// Create the button that shows the properties
+let showPropertiesButton = document.createElement("button");
+showPropertiesButton.innerHTML = "Show properties";
+
+// Get the <span> element that closes the modal
+var cancelButton = document.getElementsByClassName("cancel_button")[0];
+var okButton = document.getElementsByClassName("ok_button")[0];
+var close = document.getElementsByClassName("close")[0];
+// alert(JSON.stringify(close))
+
+// Export TTL File
+var createTTLButton = document.createElement("button");
+createTTLButton.innerHTML = "Create TTL";
+
+// 2. Append somewhere
+var body = document.getElementsByTagName("body")[0];
+body.appendChild(createTTLButton);
+body.appendChild(showPropertiesButton);
+body.appendChild(showMessageButton);
+
+showPropertiesButton.addEventListener ("click", function() {
+  // for (var key in selected_node) {
+  //   if (selected_node.hasOwnProperty(key)) {
+      // let theDomElement = document.createElement("div")
+      // theDomElement.setAttribute("style","float:left;clear:left;padding:10px 10px;border:10px;")
+      // let thePair = document.createTextNode(key + " -> " + selected_node[key])
+      // theDomElement.appendChild(thePair)
+      // dynamicContent.appendChild(theDomElement)
+      // console.log(key + " -> " + selected_node[key]);
+  //   }
+  // }
+  if (!selected_node && !selected_link) {
+    alert("Please select a node or link")
+    return;
+  }
+  if (selected_node) {
+    updateTable(selected_node,["key","value"])
+
+  }
+  if (selected_link) {
+    updateTable(selected_link,["key","value"])
+  }
+});
+
+showMessageButton.addEventListener ("click", function() {
+  // modalMessage.innerHTML = JSON.stringify(selected_node)
+  modalMessage.innerHTML = "<b>HELP</b><br>" +
+    "<table cellspacing='10px' class='help'>" +
+    "<tr><td>Drag node</td><td>CTRL + left mouse button</td></tr>" +
+    "<tr><td>Delete node</td><td>Select node, DEL key</td></tr>" +
+    "<tr><td>Delete link</td><td>Select link, DEL key</td></tr>" +
+    "<tr><td>Reset Whiteboard</td><td>Reload browser window. <font color='red'>All your work will be lost!</font></td></tr>" +
+    "</table>"
+  modalDiv.style.display = "block";
+});
+
+// modalAddButton.addEventListener ("click", function() {
+//   let p = document.createElement("p")
+//   p.innerHTML ="hopps"
+//   dynamicContent.appendChild(p);
+// });
+
+cancelButton.addEventListener ("click", function() {
+  modalDiv.style.display = "none";
+  return false
+  // while (dynamicContent.firstChild) {
+  //     dynamicContent.removeChild(dynamicContent.firstChild);
+  // }
+});
+okButton.addEventListener ("click", function() {
+  modalDiv.style.display = "none";
+  return true
+});
+
+// 3. Add event handler
+createTTLButton.addEventListener ("click", function() {
+  alert("This will create the TTL file. Click OK to confirm.");
+
+  // Set the prefixes
+  var writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#' } });
+  // Test with write to console
+  for(var i = 0; i < links.length; i++) {
+    var obj = links[i];
+    // Prefixes are hard-coded.
+    // All values are currently URI's
+    if (obj.target.type =='URI') {
+      writer.addTriple('ldw:' + obj.source.id,
+                       'ldw:' + obj.linkLabel,
+                       'ldw:' + obj.target.id);
+
+     // console.log(obj.source.id + " -- " + obj.linkLabel + " --> " + obj.target.id);
+    }
+    else{
+    // Literal values are enquoted with use of '"'
+      if (obj.target.type =='INT') {
+        writer.addTriple('ldw:' + obj.source.id,
+                         'ldw:' + obj.linkLabel,
+                         '"'+ obj.target.id + '"^^xsd:integer');
+        // console.log(obj.source.id + ' -- ' + obj.linkLabel + ' --> "' + obj.target.id + '"^^xsd:integer');
+      }
+      else if (obj.target.type =='STRING') {
+        writer.addTriple('ldw:' + obj.source.id,
+                         'ldw:' + obj.linkLabel,
+                         '"'+ obj.target.id + '"^^xsd:string');
+        //console.log(obj.source.id +' -- '+ obj.linkLabel+' --> "' + obj.target.id + '"^^xsd:string');
+      }
+    }
+  }
+  // Write out to file
+  writer.end(function (error, result) {
+     console.log(result);
+    var blob = new Blob([result], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "WhiteBoardTriples.ttl");
+  });
+});
+
+
+
 function mousedown() {
   //RK Active only works in WebKit?
   svg.classed('active', true);
@@ -517,9 +637,8 @@ function keydown() {
 
   if(!selected_node && !selected_link) return;
   switch(d3.event.keyCode) {
-    //case 8: // backspace
-    //case 46: // delete
-    case 192: // temporarily coded to tilde for deletes. Later: anohter combo
+    case 8: // backspace
+    case 46: // delete
       if(selected_node) {
           nodes.splice(nodes.indexOf(selected_node), 1);
           spliceLinksForNode(selected_node);
@@ -547,19 +666,7 @@ function keydown() {
       restart();
       break;
     case 82: // R
-        if(selected_link) {
-            // set link direction to right only
-            selected_link.left = false;
-            selected_link.right = true;
-        }
-        restart();
-        break;
-
-
-     case 69: // E
       if(selected_node) {
-         infoActive = true;   //TW
-
           // Was used to toggle node reflexivity. Not in use for simplified graph
           // All other reflexive code removed
           // selected_node.reflexive = !selected_node.reflexive;
@@ -584,6 +691,57 @@ function keyup() {
     svg.classed('ctrl', false);
   }
 }
+/* NEW SHITE */
+function zoomed() {
+    svg.attr("transform",
+        "translate(" + zoom.translate() + ")" +
+        "scale(" + zoom.scale() + ")"
+    );
+}
+
+function interpolateZoom (translate, scale) {
+    var self = this;
+    return d3.transition().duration(350).tween("zoom", function () {
+        var iTranslate = d3.interpolate(zoom.translate(), translate),
+            iScale = d3.interpolate(zoom.scale(), scale);
+        return function (t) {
+            zoom
+                .scale(iScale(t))
+                .translate(iTranslate(t));
+            zoomed();
+        };
+    });
+}
+function zoomClick() {
+    var clicked = d3.event.target,
+        direction = 1,
+        factor = 0.2,
+        target_zoom = 1,
+        center = [width / 2, height / 2],
+        extent = zoom.scaleExtent(),
+        translate = zoom.translate(),
+        translate0 = [],
+        l = [],
+        view = {x: translate[0], y: translate[1], k: zoom.scale()};
+
+    d3.event.preventDefault();
+    direction = (this.id === 'zoom_in') ? 1 : -1;
+    target_zoom = zoom.scale() * (1 + factor * direction);
+
+    if (target_zoom < extent[0] || target_zoom > extent[1]) { return false; }
+
+    translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+    view.k = target_zoom;
+    l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+
+    view.x += center[0] - l[0];
+    view.y += center[1] - l[1];
+
+    interpolateZoom([view.x, view.y], view.k);
+}
+
+d3.selectAll('button.zoom').on('click', zoomClick);
+/* END NEW SHITE */
 
 // Start the App
 svg.on('mousedown', mousedown)

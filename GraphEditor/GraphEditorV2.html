@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<!-----------------------------------------------------------------------------
+ $HeadURL: file:///C:/SVNLocalRepos/d3/Examples/forms/TwoNode-NewJSON.html $
+ $Rev: 1092 $
+ $Date: 2017-12-05 14:40:45 -0500 (Tue, 05 Dec 2017) $
+ $Author: U041939 $
+ -----------------------------------------------------------------------------
+ DESCR: Edit node properties
+ SAUCE:
+ VIEW :
+ INPUT:
+ OUT  :
+ NOTES:
+
+TODO: :
+------------------------------------------------------------------------------>
+<meta charset="utf-8">
+<body>
+<head>
+<script src="/d3/d3/d3.v3.min.js"></script>
+<link rel="stylesheet" href="/graphEditor/GraphEditorV2.css">
+</head>
+<style>
+</style>
+
+<html>
+<body>
+  <div class="wrapper">
+    <div class="box" id="whiteboard">
+      <!-- Graph inserted here -->
+    </div>
+
+    <div class= "box" id="info" style="opacity:0">
+      <!-- Information box for nodes and links -->
+    </div>
+
+    <div class= "box" id="buttons">
+       <p>[TTL] [HELP]</p>
+    </div>
+   <div class= "box rightBottRegion">
+     <p><i>empty for now</i></p>
+   </div>
+  </div>
+  <div id="whiteboard">
+   <!-- graph whiteboard goes here -->
+  </div>
+
+<script>
+var  nodes = [
+  {n:0, id: 'PRODUCT1',
+   label: 'PRODUCT1',
+    prefix:"ldw",
+    type: 'URI',
+    nodeFill:"white",
+    x:20, y:100,
+    fixed:true,
+    comment:""},
+  {n:1, id: 'Serum 114',
+    label: 'Serum 114',
+    prefix:"--NONE--",
+    type: 'STRING',
+    nodeFill:"white",
+    x:100, y:100,
+    fixed:true,
+    comment:""}
+  ],
+  edges = [
+    {source: nodes[0], target: nodes[1],
+      label: 'relation', prefix:'foo', left: false, right: true }
+  ];
+
+var infoActive = false;
+var w = 900,
+    h = 400;
+
+var svg = d3.select("#whiteboard").append("svg")
+  .attr("width", w)
+  .attr("height", h);
+// Build the arrow for RDF Triple
+svg.append("defs")
+  .selectAll("marker")
+  .data(["end"])      // Different link/path types can be defined here
+  .enter().append("marker")    // This section adds in the arrows
+  .attr("id", String)
+  .attr("viewBox", "0 -5 10 10")
+  .attr("refX", 5)  // Increase this number to back the arrow away from the target node
+  .attr("refY", 0)
+  .attr("fill", "#756bb1")
+  .attr("stroke", "white")
+  .attr("markerWidth", 2.5)  // Arrow height
+  .attr("markerHeight", 2.5) // Arrow width
+  .attr("orient", "auto")
+  .append("svg:path")
+  .attr("d", "M0,-5L10,0L0,5");
+
+var force = d3.layout.force()
+  .nodes(nodes)
+  .links(edges)
+  .gravity(.05)
+  .charge(-180)
+  .linkDistance(100)
+  .size([w, h])
+  .start();
+
+var drag = force.drag()
+  .on("dragstart", dragstart);
+
+// Relationship lines
+var links = svg.selectAll("reLine")
+  .data(edges)
+  .enter()
+  .append("line")
+  .attr("id",function(d,i){return 'edge'+i})
+  .attr("class", "edges")
+  .attr("marker-end", "url(#end)")
+  .on('mouseover', function(d){
+    var nodeSelection = d3.select(this).style({opacity:'0.5'});
+   })
+  .on('mouseout', function(d){
+    var nodeSelection= d3.select(this).style({opacity:'1.0',})
+  });
+
+// var nodes = svg.selectAll("g.node")
+var circles = svg.selectAll("g.node")
+  .data(nodes)
+  .enter()
+  .append("g")
+  .attr("class", "node")
+  //.on("dblclick", dblclick)
+  .call(drag);
+
+circles.append("circle")
+  .attr("r", 50)
+  .attr("class", function(d,i){return d.class})
+  // Mousover Node - highlight node by fading the node colour during mouseover
+  .on('mouseover', function(d){
+    var nodeSelection = d3.select(this).style({opacity:'0.5'});
+  })
+  //Mouseout Node  - bring node back to full colour
+  .on('mouseout', function(d){
+    var nodeSelection= d3.select(this).style({opacity:'1.0',})
+  })
+//---- Double CLICK NODE TO EDIT ---------------------------------------------------//
+  // .on("click", function(d, i){
+  .on("dblclick", function(d, i){
+    console.log("clicked");
+    var self = this;
+
+    if (infoActive == true) {
+      // clicked a node while previous info block displayed
+      d3.selectAll("input").remove();
+      //d3.selectAll(".formEle").remove();
+      d3.select("#info").selectAll("*").remove();
+      d3.select("#info").style("opacity", 0);
+    }
+    d3.select("#info").style("opacity", 1);
+
+    var div = d3.select("#info")
+
+    var labelText = div.append("p")
+      .text("Label: ");
+    var labelInput = labelText.append("input")
+      .attr("size", "15")
+      .attr("type", "text")
+      .attr("value", d.label);
+
+      var prefixText = div.append("p")
+        .text("Prefix: ");
+      var prefixInput = prefixText.append("input")
+        .attr("size", "15")
+        .attr("type", "text")
+        .attr("value", d.prefix);
+
+        var typeText = div.append("p")
+          .text("Type: ");
+        var typeInput = typeText.append("input")
+          .attr("size", "15")
+          .attr("type", "text")
+          .attr("value", d.type);
+   //console.log("labelInput: " +labelInput.node().value);
+   //---- UPDATE BUTTON -----------------------------------------------------//
+    var button = div.append("button")
+      .text("Update/Hide")
+      .on("click", function() {
+          d3.select("#nodeText" + i)
+            .text(function(d) {
+              return (d.label = labelInput.node().value); })
+          ;
+          d3.select("#prefixText" + i)
+            .text(function(d) {
+              return (d.prefix = prefixInput.node().value); })
+          ;
+          d3.select("#typeText" + i)
+            .text(function(d) {
+              return (d.type = typeInput.node().value); })
+          ;
+
+
+          // Clean up the info window
+          d3.select("#info").selectAll("*").remove();
+          d3.select("#info").style("opacity", 0);
+        })
+
+    infoActive = true;
+  });
+//---- END NODE CLICK -------------------------------------------------------//
+// dx sets how close to the node the label appears
+circles.append("text")
+  .attr("class", function(d,i){return 'nodeText'})
+  // Need unique ID for each nodeText value in order to update it from the info window
+  .attr("id", function(d, i) {return("nodeText"+i) ; })
+  .attr("text-anchor", "middle")
+  .text(function(d) { return d.label; }) ;
+
+//TW NEW SHITE
+circles.append("prefixText")
+  // Create Unique prefixText ID for the node
+  .attr("id", function(d, i) {return("prefixText"+i) ; });
+
+circles.append("typeText")
+  // Create Unique prefixText ID for the node
+  .attr("id", function(d, i) {return("typeText"+i) ; });
+//TW END NEW SHITE
+
+var edgepaths = svg.selectAll(".edgepath")
+  .data(edges)
+  .enter()
+  .append('path')
+    .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+      'class':'edgepath',
+      'id':function(d,i) {return 'edgepath'+i}
+  })
+  .style("pointer-events", "none");
+
+  // dx : the starting distance of the label from the source node
+var edgelabels = svg.selectAll(".edgelabel")
+  .data(edges).enter()
+  .append('text')
+    .attr({'class':'edgeLabel',
+      'id':function(d,i){return 'edgelabel'+i},
+      'dx':80,
+      'dy':-10
+    });
+
+edgelabels.append('textPath')
+  .attr('xlink:href',function(d,i) {return '#edgepath'+i})
+  .style("pointer-events", "none")
+  .text(function(d,i){return d.label});
+
+force.on("tick", function() {
+  links.attr("x1", function(d) {return d.source.x; })
+    .attr("y1", function(d) {return d.source.y; })
+    .attr("x2", function(d) { return d.target.x-60;})  // Increase this value to move the edge away from node center.
+    // Coordinate with arrow size and placement.
+    .attr("y2", function(d) { return d.target.y;});
+    circles.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+    return path
+  });
+});
+
+// Set the "fixed" property of the dragged node to TRUE when a dragstart event is initiated,
+//   - removes "forces" from acting on that node and changing its position.
+function dragstart(d) {
+    d3.select(this).classed("fixed", d.fixed = true);
+}
+
+</script>
+</body>
+</html>
