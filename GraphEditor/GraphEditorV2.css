@@ -9,16 +9,41 @@
     font-weight: bold;
 }
 .node {
-    fill: white;
     font-size: 13px;
     font-weight:bold;
     stroke:black;
 }
+
+.node .string {
+  fill: #ff8989 ;
+}
+
+.node .uri {
+  fill: #bcf5bc ;
+}
+
+.node .misc {
+  fill: gray ;
+}
+
 .edgeLabel{
     fill:black;
     font-family: Serif, Georgia;
     font-size: 18pt;
     font-weight: bold;
+}
+/* text for link labels */
+.linkLabel{
+  color: #333333;
+  flood-color: #FFFFFF;
+  flood-opacity:1;
+  font: 14px sans-serif;
+  text-anchor: middle;
+}
+
+text.id {
+  text-anchor: middle;
+  font-weight: bold;
 }
 
 /*---- grid -----------------------------------------------------------------*/
@@ -29,8 +54,8 @@
 .wrapper {
   display: grid;
   grid-gap: 1px;
-  grid-template-columns: 900px 200px;
-  grid-template-rows: 200px 50px 350px;
+  grid-template-columns: 1200px 300px;
+  grid-template-rows: 200px 50px 650px;
   background-color: gray;
   color: #fff;
 }
@@ -55,4 +80,21 @@
 .help{
   grid-column: 2;
   grid-row: 3;
+}
+
+/* from V1 */
+/* Help Box */
+.help th,tr,td {
+    /* border: 1px solid gray; */
+    border:none;
+}
+.help td:nth-child(1){
+  width:300px;
+  font-weight:normal;
+}
+.help td:nth-child(2){
+  width:500px;
+  font-weight: bold;
+  bgcolor: #d2f8d2;
+  font-family: courier;
 }
