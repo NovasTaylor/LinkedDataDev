@@ -1,0 +1,58 @@
+.edges{
+    stroke: black;
+    stroke-width: 5;
+}
+.nodeText{
+    fill:#000000;
+    font-family: Serif, Georgia;
+    font-size: 24px;
+    font-weight: bold;
+}
+.node {
+    fill: white;
+    font-size: 13px;
+    font-weight:bold;
+    stroke:black;
+}
+.edgeLabel{
+    fill:black;
+    font-family: Serif, Georgia;
+    font-size: 18pt;
+    font-weight: bold;
+}
+
+/*---- grid -----------------------------------------------------------------*/
+* {
+  box-sizing: border-box;
+}
+/* grVisRBot not currently used for anything */
+.wrapper {
+  display: grid;
+  grid-gap: 1px;
+  grid-template-columns: 900px 200px;
+  grid-template-rows: 200px 50px 350px;
+  background-color: gray;
+  color: #fff;
+}
+.box {
+  background-color: white;
+  color: #000000;
+  border-radius: 1px;
+  padding: 5px;
+}
+#whiteboard{
+  grid-column: 1;
+  grid-row: 1 / 4;
+}
+#info{
+  grid-column: 2;
+  grid-row: 1;
+}
+#buttons{
+  grid-column: 2;
+  grid-row: 2;
+}
+.help{
+  grid-column: 2;
+  grid-row: 3;
+}
