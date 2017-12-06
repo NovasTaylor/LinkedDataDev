@@ -15,9 +15,10 @@
 }
 
 .node .string {
-  fill: #ff8989 ;
+  fill:  #c5c5c5;
+  stroke: red;
+  stroke-width: 4;
 }
-
 .node .uri {
   fill: #bcf5bc ;
 }
@@ -40,7 +41,6 @@
   font: 14px sans-serif;
   text-anchor: middle;
 }
-
 text.id {
   text-anchor: middle;
   font-weight: bold;
@@ -54,7 +54,7 @@ text.id {
 .wrapper {
   display: grid;
   grid-gap: 1px;
-  grid-template-columns: 1200px 300px;
+  grid-template-columns: 910px 300px;
   grid-template-rows: 200px 50px 650px;
   background-color: gray;
   color: #fff;

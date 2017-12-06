@@ -18,8 +18,8 @@ NOTE: LINKS
        R - NOT IN USE. Previous: toggled reflexivity on/off.
 
       CTRL + Left Mouse = Drag of node.
-TODO: Task list tracked at
-      https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
+TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
+      Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
 
 -----------------------------------------------------------------------------*/
 "use strict";
@@ -38,16 +38,53 @@ var  nodes = [
     type: 'STRING',
     x:700, y:60,
     fixed:true,
-    comment:""}
+    comment:""},
+  {n:2, id: 'F',
+      label: 'F',
+      prefix:"ldw",
+      type: 'URI',
+      nodeFill:"#e6add8",
+      x:100, y:400,
+      fixed:true,
+      comment:""},
+    {n:3, id: 'C16576',
+      label: 'C16576',
+      prefix:"sdtmterm",
+      type: 'URI',
+      nodeFill:"#c6cbcd",
+      x:100, y:600,
+      fixed:true,
+      comment:"NCI code"},
+    {n:4, id: 'M',
+      label: 'M',
+      prefix:"ldw",
+      type: 'URI',
+      nodeFill:"#add8e6",
+      x:200, y:400,
+      fixed:true,
+      comment:"male"},
+    {n:5, id: 'C20197',
+      label: 'C20197',
+      prefix:"sdtmterm",
+      type: 'URI',
+      nodeFill:"#c6cbcd",
+      x:200, y:600,
+      fixed:true,
+      comment:"NCI Code"}
   ],
   edges = [
     {source: nodes[0], target: nodes[1],
-      label: 'label', prefix:'foo', left: false, right: true }
+      label: 'label', prefix:'foo', left: false, right: true },
+    {source: nodes[2], target: nodes[3],
+      linkLabel: 'nciCode', prefix:"sdtmterm", left: false, right: true},
+    {source: nodes[4], target: nodes[5],
+      linkLabel: 'nciCode', prefix:"sdtmterm", left: false, right: true}
   ];
 
 var infoActive = false;
 var w = 900,
-    h = 400;
+    h = 1100,
+    nodeRadius = 40;
 
 var svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
@@ -63,15 +100,16 @@ svg.append("defs")
   .selectAll("marker")
   .data(["end"])      // Different link/path types can be defined here
   .enter().append("marker")    // Append arrow marker
+  //TODO Move size and colouring to CSS
   .attr({'id':String,
     'viewBox': '0 -5 10 10',
-    'refX':5,
-    'refY': 0,
-    'fill':'black',
-    'stroke':'white',
-    'markerWidth':2.5,
+    'refX':    5,
+    'refY':    0,
+    'fill':    'black',
+    'stroke':  'white',
+    'markerWidth':  2.5,
     'markerHeight': 2.5,
-    'orient':'auto'
+    'orient': 'auto'
   })
   .append("svg:path")
   .attr("d", "M0,-5L10,0L0,5");
@@ -83,20 +121,23 @@ var force = d3.layout.force()
   .size([w, h])
   .start();
 
-  // Def for background of link text as a Filter effect as per:
-  // https://www.w3.org/TR/SVG/filters.html
-  // Converted from original svg.html to D3JS syntax
-  // svg.html('<defs><filter x="-0.1" y="0" width="1.2" height="1" id="solid"><feFlood flood-color="white"/><feComposite in="SourceGraphic"/></filter></defs>');
-  var linkTextBack = svg.append('svg:defs').append('svg:filter')
-    .attr("x", "-0.1")
-    .attr("y", "0")
-    .attr("width", "1.2")
-    .attr("height", "1")
-    .attr("id", "solid");
-  linkTextBack.append('feFlood')
-      .attr("flood-color", "white");
-  linkTextBack.append('feComposite')
-      .attr("in", "SourceGraphic");
+// Def for background of link text as a Filter effect as per:
+// https://www.w3.org/TR/SVG/filters.html
+// Converted from original svg.html to D3JS syntax
+// svg.html('<defs><filter x="-0.1" y="0" width="1.2" height="1" id="solid"><feFlood flood-color="white"/><feComposite in="SourceGraphic"/></filter></defs>');
+var linkTextBack = svg.append('svg:defs').append('svg:filter')
+  .attr({
+    'x':      -0.1,
+    'y':      0,
+    'width':  1.2,
+    'height': 1,
+    'id':     'solid' });
+
+linkTextBack.append('feFlood')
+  .attr("flood-color", "white");
+
+linkTextBack.append('feComposite')
+  .attr("in", "SourceGraphic");
 
 var drag = force.drag()
   .on("dragstart", dragstart);
@@ -106,9 +147,11 @@ var links = svg.selectAll("reLine")
   .data(edges)
   .enter()
   .append("line")
-  .attr("id",function(d,i){return 'edge'+i})
-  .attr("class", "edges")
-  .attr("marker-end", "url(#end)")
+  .attr({
+    'id': function(d,i){return 'edge'+i},
+    'class': 'edges',
+    'marker-end': 'url(#end)'
+  })
   .on('mouseover', function(d){
     var nodeSelection = d3.select(this).style({opacity:'0.5'});
    })
@@ -126,7 +169,7 @@ var circles = svg.selectAll("g.node")
   .call(drag);
 
 circles.append("circle")
-  .attr("r", 50)
+  .attr("r", nodeRadius)
   .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
   .attr("class", function(d,i){
     if (d.type == "STRING"){ return "string";}
@@ -156,27 +199,34 @@ circles.append("circle")
     d3.select("#info").style("opacity", 1);  // Display edit div
 
     var div = d3.select("#info")  // Selet div for appending
-
+    // LABEL
     var labelText = div.append("p")
       .text("Label: ");
     var labelInput = labelText.append("input")
-      .attr("size", "15")
-      .attr("type", "text")
-      .attr("value", d.label);
+      .attr({
+        'size': '15',
+        'type': 'text',
+        'value': d.label
+      });
 
+    // PREFIX
     var prefixText = div.append("p")
         .text("Prefix: ");
     var prefixInput = prefixText.append("input")
-        .attr("size", "15")
-        .attr("type", "text")
-        .attr("value", d.prefix);
-
+      .attr({
+        'size': '15',
+        'type': 'text',
+        'value': d.prefix
+      });
+    //TYPE
     var typeText = div.append("p")
-          .text("Type: ");
+      .text("Type: ");
     var typeInput = typeText.append("input")
-          .attr("size", "15")
-          .attr("type", "text")
-          .attr("value", d.type);
+      .attr({
+          'size':   15,
+          'type':  'text',
+          'value':  d.type
+        });
    //console.log("labelInput: " +labelInput.node().value);
    //---- UPDATE BUTTON -----------------------------------------------------//
     var button = div.append("button")
@@ -193,18 +243,11 @@ circles.append("circle")
             .classed("string", false)  // remove the class
             .classed("uri", false)  // remove the class
             .classed(typeInput.node().value.toLowerCase(), true)
-              ;
+          ;
           d3.select("#prefixText" + i)
-            .text(function(d) {
-              return (d.prefix = prefixInput.node().value); })
-          ;
+            .text(function(d) {return (d.prefix = prefixInput.node().value); });
           var foo = d3.select("#typeText" + i)
-            .text(function(d) {
-              return (d.type = typeInput.node().value); })
-
-          //   .attr("class", function(d) {
-          //    return ( toLowerCase(d.type = typeInput.node().value)); } )
-          ;
+            .text(function(d) {return (d.type = typeInput.node().value); });
           // Clean up the info window
           d3.select("#info").selectAll("*").remove();
           d3.select("#info").style("opacity", 0);
@@ -214,12 +257,14 @@ circles.append("circle")
   }); // End of dblClick
 //---- END NODE CLICK -------------------------------------------------------//
 // dx sets how close to the node the label appears
+// Need unique ID for each nodeText value in order to update it from the info window
 circles.append("text")
-  .attr("class", function(d){return 'nodeText'})
-  // Need unique ID for each nodeText value in order to update it from the info window
-  .attr("id", function(d, i) {return("nodeText"+i) ; })
-  .attr("text-anchor", "middle")
-  .attr("class", "nodeLabel")
+  .attr({
+    'class':       function(d){return 'nodeText'},
+    'id':          function(d, i) {return("nodeText"+i) ; },
+    'text-anchor': 'middle',
+    'class':        'nodeLabel'
+  })
   .text(function(d) { return d.label; }) ;
 
 // Create unique IDS for the PREFIX and TYPE text for updating from the info boxE
