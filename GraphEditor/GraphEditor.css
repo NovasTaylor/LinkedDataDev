@@ -1,4 +1,4 @@
-.edges{
+.edge{
     stroke: black;
     stroke-width: 5;
 }
@@ -27,18 +27,12 @@
   fill: gray ;
 }
 
-.edgeLabel{
-    fill:black;
-    font-family: Serif, Georgia;
-    font-size: 18pt;
-    font-weight: bold;
-}
 /* text for link labels */
-.linkLabel{
+.egeLabel{
   color: #333333;
   flood-color: #FFFFFF;
   flood-opacity:1;
-  font: 14px sans-serif;
+  font: 18pt sans-serif;
   text-anchor: middle;
 }
 text.id {

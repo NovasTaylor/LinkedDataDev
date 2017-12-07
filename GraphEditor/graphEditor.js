@@ -1,26 +1,15 @@
 /*-----------------------------------------------------------------------------
-FILE: /LinkedDataDev/GraphEditor/GraphEditorV2.js
-DESC: Called from graphEditorV2.html
+FILE: /LinkedDataDev/GraphEditor/GraphEditor.js
+DESC: Called from GraphEditor.html
 REQ :
 VIEW: http://localhost:8000/GraphEditor/GraphEditor.html
-SRC : http://bl.ocks.org/rkirsling/5001347
+SRC :
 IN  :
-OUT : TBD: WhiteBoardTriples.TTL
+OUT :
 DEV:
-NOTE: LINKS
-        Changing Link Direction Arrows. With Link selected:
-        R - arrow to right
-        L - arrow to left
-        B - arrow in BOTh directions (remove for course?)
-
-       NODES
-       With node selected:
-       R - NOT IN USE. Previous: toggled reflexivity on/off.
-
-      CTRL + Left Mouse = Drag of node.
+NOTE:
 TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
       Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
-
 -----------------------------------------------------------------------------*/
 "use strict";
 
@@ -76,12 +65,12 @@ var  nodes = [
     {source: nodes[0], target: nodes[1],
       label: 'label', prefix:'foo', left: false, right: true },
     {source: nodes[2], target: nodes[3],
-      linkLabel: 'nciCode', prefix:"sdtmterm", left: false, right: true},
+      edgelabel: 'nciCode', prefix:"sdtmterm", left: false, right: true},
     {source: nodes[4], target: nodes[5],
-      linkLabel: 'nciCode', prefix:"sdtmterm", left: false, right: true}
+      edgelabel: 'nciCode', prefix:"sdtmterm", left: false, right: true}
   ];
 
-var infoActive = false;
+var infoActive = false;  // opacity flag for info editing box
 var w = 900,
     h = 1100,
     nodeRadius = 40;
@@ -98,7 +87,7 @@ var svg = d3.select("#whiteboard").append("svg")
 */
 svg.append("defs")
   .selectAll("marker")
-  .data(["end"])      // Different link/path types can be defined here
+  .data(["arrowhead"])      // Different link/path types can be defined here
   .enter().append("marker")    // Append arrow marker
   //TODO Move size and colouring to CSS
   .attr({'id':String,
@@ -112,7 +101,9 @@ svg.append("defs")
     'orient': 'auto'
   })
   .append("svg:path")
-  .attr("d", "M0,-5L10,0L0,5");
+    .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+    .attr('fill', 'black')
+    .attr('stroke','black');  // move to CSS
 
 // Initialize D3 force layout
 var force = d3.layout.force()
@@ -143,14 +134,14 @@ var drag = force.drag()
   .on("dragstart", dragstart);
 
 // Relationship lines
-var links = svg.selectAll("reLine")
+var links = svg.selectAll("line")
   .data(edges)
   .enter()
   .append("line")
   .attr({
     'id': function(d,i){return 'edge'+i},
-    'class': 'edges',
-    'marker-end': 'url(#end)'
+    'class': 'edge',
+    'marker-end': 'url(#arrowhead)'
   })
   .on('mouseover', function(d){
     var nodeSelection = d3.select(this).style({opacity:'0.5'});
@@ -159,7 +150,6 @@ var links = svg.selectAll("reLine")
     var nodeSelection= d3.select(this).style({opacity:'1.0',})
   });
 
-// var nodes = svg.selectAll("g.node")
 var circles = svg.selectAll("g.node")
   .data(nodes)
   .enter()
@@ -278,39 +268,56 @@ var edgepaths = svg.selectAll(".edgepath")
   .data(edges)
   .enter()
   .append('path')
-    .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-      'class':'edgepath',
-      'id':function(d,i) {return 'edgepath'+i}
+  .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+         'class':'edgepath',
+         'fill-opacity':0,
+         'stroke-opacity':0,
+         'id':function(d,i) {return 'edgepath'+i}
   })
   .style("pointer-events", "none");
 
-  // dx : the starting distance of the label from the source node
-var linkLabel = svg.selectAll(".linkLabel")
+// dx : the starting distance of the label from the source node
+var edgelabels = svg.selectAll(".edgelabel")
   .data(edges).enter()
   .append('text')
-    .attr({'class':'linkLabel',
-      'id':function(d,i){return 'linkLabel'+i},
+    .attr({'class':'edgeLabel',
+      'id':function(d,i){return 'edgelabel'+i},
       'dx':80,
       'filter': 'url(#solid)',
       'dy':5
     });
 
-linkLabel.append('textPath')
+edgelabels.append('textPath')
   .attr('xlink:href',function(d,i) {return '#edgepath'+i})
   .style("pointer-events", "none")
   .text(function(d,i){return d.label});  // may need i for reference later
 
 force.on("tick", function() {
-  links.attr("x1", function(d) {return d.source.x; })
+  links.attr("x1", function(d) {return d.source.x+nodeRadius; })
     .attr("y1", function(d) {return d.source.y; })
-    .attr("x2", function(d) { return d.target.x-60;})  // Increase this value to move the edge away from node center.
+    // Extra subtract in X2 to accomodate arrow
+    .attr("x2", function(d) { return d.target.x-(nodeRadius+8);})
     // Coordinate with arrow size and placement.
     .attr("y2", function(d) { return d.target.y;});
-    circles.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-    edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-    return path
+  //TW DIFFERS HERE
+  circles.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+    //console.log(d)
+    return path});
+
+/*ERROR
+  edgelabel.attr('transform',function(d,i){
+    if (d.target.x<d.source.x){
+      //bbox = this.getBBox();
+      //rx = bbox.x+bbox.width/2;
+      //ry = bbox.y+bbox.height/2;
+      return 'rotate(180 '+rx+' '+ry+')';
+    }
+    else {return 'rotate(0)';}
   });
+  */
 });
 
 // Set the "fixed" property of the dragged node to TRUE when a dragstart event is initiated,
