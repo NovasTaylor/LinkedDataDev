@@ -65,9 +65,9 @@ var  nodesData = [
     {source: nodesData[0], target: nodesData[1],
       label: 'label', prefix:'foo', left: false, right: true },
     {source: nodesData[2], target: nodesData[3],
-      edgelabel: 'nciCode', prefix:"sdtmterm", left: false, right: true},
+      label: 'nciCode', prefix:"sdtmterm", left: false, right: true},
     {source: nodesData[4], target: nodesData[5],
-      edgelabel: 'nciCode', prefix:"sdtmterm", left: false, right: true}
+      label: 'nciCode', prefix:"sdtmterm", left: false, right: true}
   ];
 
 var infoActive = false;  // opacity flag for info editing box
@@ -85,14 +85,14 @@ var svg = d3.select("#whiteboard").append("svg")
    markerHeight: Arrow height
    markerWidth: Arrow Width
 */
-svg.append("defs")
-  .selectAll("marker")
+svg.append('defs')
+  .selectAll('marker')
   .data(["arrowhead"])      // Different link/path types can be defined here
   .enter().append("marker")    // Append arrow marker
   //TODO Move size and colouring to CSS
   .attr({'id':String,
     'viewBox': '0 -5 10 10',
-    'refX':    5,
+    'refX':    nodeRadius+25,
     'refY':    0,
     'fill':    'black',
     'stroke':  'white',
@@ -166,13 +166,17 @@ nodes.append("circle")
     else if (d.type == "URI"){ return "uri"; }
     else {return "unspec";}
   })
+
   // Mousover Node - highlight node by fading the node colour during mouseover
   .on('mouseover', function(d){
-    var nodeSelection = d3.select(this).style({opacity:'0.5'});
+    //var nodeSelection = d3.select(this).style({opacity:'0.5'});
+    var nodeSelection = d3.select(this).attr({'r':nodeRadius+5});
   })
+
   //Mouseout Node  - bring node back to full colour
   .on('mouseout', function(d){
-    var nodeSelection= d3.select(this).style({opacity:'1.0',})
+    //  var nodeSelection= d3.select(this).style({opacity:'1.0',})
+    var nodeSelection = d3.select(this).attr({'r':nodeRadius});
   })
   //---- Double CLICK NODE TO EDIT ---------------------------------------------------//
   // .on("click", function(d, i){  // was prev. single click
@@ -293,10 +297,9 @@ edgelabels.append('textPath')
   .text(function(d,i){return d.label});  // may need i for reference later
 
 force.on("tick", function() {
-  links.attr("x1", function(d) {return d.source.x+nodeRadius; })
+  links.attr("x1", function(d) {return d.source.x; })
     .attr("y1", function(d) {return d.source.y; })
-    // Extra subtract in X2 to accomodate arrow
-    .attr("x2", function(d) { return d.target.x-(nodeRadius+8);})
+    .attr("x2", function(d) { return d.target.x;})
     // Coordinate with arrow size and placement.
     .attr("y2", function(d) { return d.target.y;});
 
