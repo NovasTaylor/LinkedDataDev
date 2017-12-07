@@ -13,7 +13,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 -----------------------------------------------------------------------------*/
 "use strict";
 
-var  nodes = [
+var  nodesData = [
   {n:0, id: 'PRODUCT1',
    label: 'PRODUCT1',
     prefix:"ldw",
@@ -61,12 +61,12 @@ var  nodes = [
       fixed:true,
       comment:"NCI Code"}
   ],
-  edges = [
-    {source: nodes[0], target: nodes[1],
+  edgesData = [
+    {source: nodesData[0], target: nodesData[1],
       label: 'label', prefix:'foo', left: false, right: true },
-    {source: nodes[2], target: nodes[3],
+    {source: nodesData[2], target: nodesData[3],
       edgelabel: 'nciCode', prefix:"sdtmterm", left: false, right: true},
-    {source: nodes[4], target: nodes[5],
+    {source: nodesData[4], target: nodesData[5],
       edgelabel: 'nciCode', prefix:"sdtmterm", left: false, right: true}
   ];
 
@@ -107,8 +107,8 @@ svg.append("defs")
 
 // Initialize D3 force layout
 var force = d3.layout.force()
-  .nodes(nodes)
-  .links(edges)
+  .nodes(nodesData)
+  .links(edgesData)
   .size([w, h])
   .start();
 
@@ -135,7 +135,7 @@ var drag = force.drag()
 
 // Relationship lines
 var links = svg.selectAll("line")
-  .data(edges)
+  .data(edgesData)
   .enter()
   .append("line")
   .attr({
@@ -150,15 +150,15 @@ var links = svg.selectAll("line")
     var nodeSelection= d3.select(this).style({opacity:'1.0',})
   });
 
-var circles = svg.selectAll("g.node")
-  .data(nodes)
+var nodes = svg.selectAll("g.node")
+  .data(nodesData)
   .enter()
   .append("g")
   .attr("class", "node")
   //.on("dblclick", dblclick)
   .call(drag);
 
-circles.append("circle")
+nodes.append("circle")
   .attr("r", nodeRadius)
   .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
   .attr("class", function(d,i){
@@ -248,7 +248,7 @@ circles.append("circle")
 //---- END NODE CLICK -------------------------------------------------------//
 // dx sets how close to the node the label appears
 // Need unique ID for each nodeText value in order to update it from the info window
-circles.append("text")
+nodes.append("text")
   .attr({
     'class':       function(d){return 'nodeText'},
     'id':          function(d, i) {return("nodeText"+i) ; },
@@ -258,14 +258,14 @@ circles.append("text")
   .text(function(d) { return d.label; }) ;
 
 // Create unique IDS for the PREFIX and TYPE text for updating from the info boxE
-circles.append("prefixText")
+nodes.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
-circles.append("typeText")
+nodes.append("typeText")
   .attr("id", function(d, i) {return("typeText"+i) ; });
 
 
 var edgepaths = svg.selectAll(".edgepath")
-  .data(edges)
+  .data(edgesData)
   .enter()
   .append('path')
   .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
@@ -278,7 +278,7 @@ var edgepaths = svg.selectAll(".edgepath")
 
 // dx : the starting distance of the label from the source node
 var edgelabels = svg.selectAll(".edgelabel")
-  .data(edges).enter()
+  .data(edgesData).enter()
   .append('text')
     .attr({'class':'edgeLabel',
       'id':function(d,i){return 'edgelabel'+i},
@@ -301,7 +301,7 @@ force.on("tick", function() {
     .attr("y2", function(d) { return d.target.y;});
 
   //TW DIFFERS HERE
-  circles.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     //console.log(d)
