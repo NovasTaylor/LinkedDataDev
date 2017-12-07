@@ -116,6 +116,7 @@ var force = d3.layout.force()
 // https://www.w3.org/TR/SVG/filters.html
 // Converted from original svg.html to D3JS syntax
 // svg.html('<defs><filter x="-0.1" y="0" width="1.2" height="1" id="solid"><feFlood flood-color="white"/><feComposite in="SourceGraphic"/></filter></defs>');
+/*TW temporary out for debugging only
 var linkTextBack = svg.append('svg:defs').append('svg:filter')
   .attr({
     'x':      -0.1,
@@ -130,11 +131,14 @@ linkTextBack.append('feFlood')
 linkTextBack.append('feComposite')
   .attr("in", "SourceGraphic");
 
+*/
+/*TW
 var drag = force.drag()
   .on("dragstart", dragstart);
+*/
 
 // Relationship lines
-var links = svg.selectAll("line")
+var edges = svg.selectAll("line")
   .data(edgesData)
   .enter()
   .append("line")
@@ -156,7 +160,9 @@ var nodes = svg.selectAll("g.node")
   .append("g")
   .attr("class", "node")
   //.on("dblclick", dblclick)
-  .call(drag);
+  // .call(drag);
+  .call(force.drag)
+  ;
 
 nodes.append("circle")
   .attr("r", nodeRadius)
@@ -282,22 +288,24 @@ var edgepaths = svg.selectAll(".edgepath")
 
 // dx : the starting distance of the label from the source node
 var edgelabels = svg.selectAll(".edgelabel")
-  .data(edgesData).enter()
+  .data(edgesData)
+  .enter()
   .append('text')
-    .attr({'class':'edgeLabel',
+  .style("pointer-events", "none") //TW NEW
+    .attr({'class':'edgelabel',
       'id':function(d,i){return 'edgelabel'+i},
       'dx':80,
-      'filter': 'url(#solid)',
-      'dy':5
+      'dy':0  // change to 5 to put inline with link
     });
+
 
 edgelabels.append('textPath')
   .attr('xlink:href',function(d,i) {return '#edgepath'+i})
   .style("pointer-events", "none")
-  .text(function(d,i){return d.label});  // may need i for reference later
+  .text(function(d,i){return d.label});
 
 force.on("tick", function() {
-  links.attr("x1", function(d) {return d.source.x; })
+  edges.attr("x1", function(d) {return d.source.x; })
     .attr("y1", function(d) {return d.source.y; })
     .attr("x2", function(d) { return d.target.x;})
     // Coordinate with arrow size and placement.
@@ -310,21 +318,29 @@ force.on("tick", function() {
     //console.log(d)
     return path});
 
-/*ERROR
-  edgelabel.attr('transform',function(d,i){
-    if (d.target.x<d.source.x){
-      //bbox = this.getBBox();
-      //rx = bbox.x+bbox.width/2;
-      //ry = bbox.y+bbox.height/2;
-      return 'rotate(180 '+rx+' '+ry+')';
-    }
-    else {return 'rotate(0)';}
-  });
-  */
+    edgelabels.attr('transform',function(d,i){
+        if (d.target.x<d.source.x){
+//ERROR HERE. look into this. and this.node()
+           // console.log("getBBox: " + this.getBBox())
+/*
+            bbox = this.getBBox();
+            bbox = edgelabels.node().getBBox();
+            rx = bbox.x+bbox.width/2;
+            ry = bbox.y+bbox.height/2;
+            return 'rotate(180 '+rx+' '+ry+')';
+*/
+            }
+        else {
+            return 'rotate(0)';
+            }
+    });
 });
+
 
 // Set the "fixed" property of the dragged node to TRUE when a dragstart event is initiated,
 //   - removes "forces" from acting on that node and changing its position.
+/*
 function dragstart(d) {
     d3.select(this).classed("fixed", d.fixed = true);
 }
+*/
