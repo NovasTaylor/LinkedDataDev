@@ -85,7 +85,7 @@ var force = d3.layout.force()
   .links(edgesData)
   .size([w, h])
   .start();
-
+//---- Edges
 var edges = svg.selectAll("line")
   .data(edgesData)
   .enter()
@@ -94,69 +94,9 @@ var edges = svg.selectAll("line")
     .attr('marker-end', 'url(#arrowhead)')
     //.attr('class', 'edge')
     .style("stroke", "#ccc")
-    .style("pointer-events", "none");
-/*TW
-  .on('mouseover', function(d){
-    var nodeSelection = d3.select(this).style({opacity:'0.5'});
-  })
-  .on('mouseout', function(d){
-    var nodeSelection= d3.select(this).style({opacity:'1.0',})
-  }) ;
-*/
-var nodes = svg.selectAll("g.node")
-  .data(nodesData)
-  .enter()
-  .append("g")
-    .attr("class", "node")
-    //.on("dblclick", dblclick)
-    // .call(drag);
-    .call(force.drag);
+    //.style("stroke-width", "3px")
+    //.style("stroke", "blue")
 
-    nodes.append("circle")
-      .attr("r", nodeRadius)
-      .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
-      .attr("class", function(d,i){
-        if (d.type == "STRING"){ return "string";}
-        else if (d.type == "URI"){ return "uri"; }
-        else {return "unspec";}
-      })
-
-      // Mousover Node - highlight node by fading the node colour during mouseover
-      .on('mouseover', function(d){
-        //var nodeSelection = d3.select(this).style({opacity:'0.5'});
-        var nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
-      })
-
-      //Mouseout Node  - bring node back to full colour
-      .on('mouseout', function(d){
-        //  var nodeSelection= d3.select(this).style({opacity:'1.0',})
-        var nodeSelection = d3.select(this).attr({'r':nodeRadius});
-      })
-      //---- Double CLICK NODE TO EDIT ---------------------------------------------------//
-
-
-
-      //.on("dblclick", function(d, i){
-      .on("dblclick", function(d, i){
-        infoEdit(d,i, "node");
-      });
-
-// dx sets how close to the node the label appears
-// Need unique ID for each nodeText value in order to update it from the info window
-nodes.append("text")
-  .attr({
-    'class':       function(d){return 'nodeText'},
-    'id':          function(d, i) {return("nodeText"+i) ; },
-    'text-anchor': 'middle',
-    'class':        'nodeLabel'
-  })
-  .text(function(d) { return d.label; }) ;
-
-// Create unique IDS for the PREFIX and TYPE text for updating from the info boxE
-nodes.append("prefixText")
-  .attr("id", function(d, i) {return("prefixText"+i) ; });
-nodes.append("typeText")
-  .attr("id", function(d, i) {return("typeText"+i) ; });
 var edgepaths = svg.selectAll(".edgepath")
   .data(edgesData)
   .enter()
@@ -166,24 +106,28 @@ var edgepaths = svg.selectAll(".edgepath")
          'fill-opacity':0,
          'stroke-opacity':0,
          'id':function(d,i) {return 'edgepath'+i}})
-  .style("pointer-events", "none");
-
+  .style("pointer-events", "none")
+  ;
 // dx : the starting distance of the label from the source node
 var edgelabels = svg.selectAll(".edgelabel")
   .data(edgesData).enter()
   .append('text')
-    .style("pointer-events", "none")
     .attr({'class':'edgelabel',
-      'id':function(d,i){return 'edgelabel'+i},
+      //
       'dx':80,
       'dy':-1  // change to 5 to put inline with link
     });
 
 edgelabels.append('textPath')
   .attr('xlink:href',function(d,i) {return '#edgepath'+i})
-  .style("pointer-events", "none")
-  .text(function(d,i){return d.label});
+  .attr('id', function(d,i){return 'edgelabel'+i})
+  .text(function(d,i){return d.label})
+  //---- Double click edge to edit ---------------------------------------------
+  .on("dblclick", function(d, i){
+     infoEdit(d,i, "edge");
+   });
 
+// Marker for end of edge
 svg.append('defs').append('marker')
   .attr({'id':'arrowhead',
     'viewBox': '-0 -5 10 10',
@@ -197,6 +141,61 @@ svg.append('defs').append('marker')
     .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
     .attr('fill', '#ccc')
     .attr('stroke','#ccc');
+
+//---- NODES ------------------------------------------------------------------
+var nodes = svg.selectAll("g.node")
+  .data(nodesData)
+  .enter()
+  .append("g")
+    .attr("class", "node")
+    .call(force.drag);
+
+nodes.append("circle")
+  .attr("r", nodeRadius)
+  .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
+  .attr("class", function(d,i){
+  if (d.type == "STRING"){ return "string";}
+    else if (d.type == "URI"){ return "uri"; }
+    else {return "unspec";}
+  })
+
+  // Mousover Node - highlight node by fading the node colour during mouseover
+  .on('mouseover', function(d){
+    //var nodeSelection = d3.select(this).style({opacity:'0.5'});
+    console.log("NODE MOUSEOVER");
+    var nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
+  })
+
+  //Mouseout Node  - bring node back to full colour
+  .on('mouseout', function(d){
+    //  var nodeSelection= d3.select(this).style({opacity:'1.0',})
+    var nodeSelection = d3.select(this).attr({'r':nodeRadius});
+  })
+  //---- Double click node to edit ---------------------------------------------
+  .on("dblclick", function(d, i){
+    infoEdit(d,i, "node");
+  });
+
+// dx sets how close to the node the label appears
+// Need unique ID for each nodeText value in order to update it from the info window
+nodes.append("text")
+  .attr({
+    'class':       function(d){return 'nodeText'},
+    'id':          function(d, i) {return("nodeText"+i) ; },
+    'text-anchor': 'middle',
+    'class':        'nodeLabel'
+  })
+  .text(function(d) { return d.label; }) ;
+
+// Create unique IDS for the PREFIX and TYPE text for updating from the info box
+//  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
+nodes.append("prefixText")
+  .attr("id", function(d, i) {return("prefixText"+i) ; });
+nodes.append("typeText")
+  .attr("id", function(d, i) {return("typeText"+i) ; });
+
+edges.append("prefixText")
+  .attr("id", function(d, i) {return("prefixText"+i) ; });
 
 force.on("tick", function() {
   edges.attr({"x1" : function(d) {return d.source.x; },
@@ -232,20 +231,25 @@ force.on("tick", function() {
    Currently only works for a node
 */
 function infoEdit(d, i, source){
-  console.log("infoEdit: " + source + " " + d.label);
+  console.log("You clicked a  " +source)
+  console.log("     infoEdit: " + source + " " + d.label);
   //console.log("clicked");
   var self = this;
 
   if (infoActive == true) {
-    // clicked a node while previous info block displayed
+    // clicked a node or link while previous info block displayed
     d3.selectAll("input").remove();
     d3.select("#info").selectAll("*").remove();
     d3.select("#info").style("opacity", 0);
   }
   d3.select("#info").style("opacity", 1);  // Display edit div
 
-  var div = d3.select("#info")  // Selet div for appending
-  // LABEL
+  var div = d3.select("#info");
+
+  div.append("p")
+  .text(function() { return("Edit " + source) });  // Selet div for appending
+
+  // LABEL  - both nodes and edge
   var labelText = div.append("p")
     .text("Label: ");
   var labelInput = labelText.append("input")
@@ -255,7 +259,7 @@ function infoEdit(d, i, source){
       'value': d.label
     });
 
-  // PREFIX
+  // PREFIX - both nodes and edges
   var prefixText = div.append("p")
       .text("Prefix: ");
   var prefixInput = prefixText.append("input")
@@ -264,40 +268,59 @@ function infoEdit(d, i, source){
       'type': 'text',
       'value': d.prefix
     });
-  //TYPE
-  var typeText = div.append("p")
-    .text("Type: ");
-  var typeInput = typeText.append("input")
-    .attr({
+  //TYPE - NODES only
+  if(source=="node"){
+    var typeText = div.append("p")
+      .text("Type: ");
+    var typeInput = typeText.append("input")
+      .attr({
         'size':   15,
         'type':  'text',
         'value':  d.type
       });
+  }
+
  //console.log("labelInput: " +labelInput.node().value);
  //---- UPDATE BUTTON -----------------------------------------------------//
   var button = div.append("button")
     .text("Update/Hide")
     .on("click", function() {
+      if(source=="node"){
+        console.log("Updating Node")
+        // Label
         d3.select("#nodeText" + i)
-          .text(function(d) {
-            return (d.label = labelInput.node().value); })
-        ;
-        // Change class of circle to match TYPE
+          .text(function(d) {return (d.label = labelInput.node().value); });
+        // Prefix
+        d3.select("#prefixText" + i)
+          .text(function(d) {return (d.prefix = prefixInput.node().value); });
+        // Type
+        d3.select("#typeText" + i)
+          .text(function(d) {return (d.type = typeInput.node().value); });
+        // Node Class
+        // Change class of circle to match TYPE so the node display will change
+        //   according to the node type
         d3.select("#circle" + i)
-           //Hang head in shame for this horrible kludge. Make this smarter.
-           //  detect exist class.If changed: Remove existing, update to new
+          //Hang head in shame for this horrible kludge. Make this smarter.
+          //  detect exist class.If changed: Remove existing, update to new
           .classed("string", false)  // remove the class
           .classed("uri", false)  // remove the class
           .classed(typeInput.node().value.toLowerCase(), true)
         ;
+
+      } // end of node UPDATE
+      if(source=="edge"){
+        console.log("Updating Edge")
+
+        d3.select("#edgelabel" + i)
+          .text(function(d)  {return (d.label = labelInput.node().value); });
+
         d3.select("#prefixText" + i)
           .text(function(d) {return (d.prefix = prefixInput.node().value); });
-        var foo = d3.select("#typeText" + i)
-          .text(function(d) {return (d.type = typeInput.node().value); });
-        // Clean up the info window
-        d3.select("#info").selectAll("*").remove();
-        d3.select("#info").style("opacity", 0);
-      })
+      }
+      // Clean up the info window after click of Hide/Update
+      d3.select("#info").selectAll("*").remove();
+      d3.select("#info").style("opacity", 0);
 
+ }) // end of click on update button
   infoActive = true;
 }
