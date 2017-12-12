@@ -86,23 +86,23 @@ var force = d3.layout.force()
   .size([w, h])
   .start();
 
-// Edgess
 var edges = svg.selectAll("line")
   .data(edgesData)
   .enter()
   .append("line")
-    .attr({
-      'id': function(d,i){return 'edge'+i},
-      'class': 'edge',
-      'marker-end': 'url(#arrowhead)'
-  })
+    .attr("id", function(d,i){return 'edge'+i})
+    .attr('marker-end', 'url(#arrowhead)')
+    //.attr('class', 'edge')
+    .style("stroke", "#ccc")
+    .style("pointer-events", "none");
+/*TW
   .on('mouseover', function(d){
     var nodeSelection = d3.select(this).style({opacity:'0.5'});
   })
   .on('mouseout', function(d){
     var nodeSelection= d3.select(this).style({opacity:'1.0',})
-  });
-
+  }) ;
+*/
 var nodes = svg.selectAll("g.node")
   .data(nodesData)
   .enter()
@@ -124,7 +124,7 @@ var nodes = svg.selectAll("g.node")
       // Mousover Node - highlight node by fading the node colour during mouseover
       .on('mouseover', function(d){
         //var nodeSelection = d3.select(this).style({opacity:'0.5'});
-        var nodeSelection = d3.select(this).attr({'r':nodeRadius+5});
+        var nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
       })
 
       //Mouseout Node  - bring node back to full colour
@@ -220,29 +220,6 @@ var nodes = svg.selectAll("g.node")
       .attr("id", function(d, i) {return("prefixText"+i) ; });
     nodes.append("typeText")
       .attr("id", function(d, i) {return("typeText"+i) ; });
-
-// Def for background of link text as a Filter effect as per:
-// https://www.w3.org/TR/SVG/filters.html
-// Converted from original svg.html to D3JS syntax
-// svg.html('<defs><filter x="-0.1" y="0" width="1.2" height="1" id="solid"><feFlood flood-color="white"/><feComposite in="SourceGraphic"/></filter></defs>');
-/*TW temporary out for debugging only
-var linkTextBack = svg.append('svg:defs').append('svg:filter')
-  .attr({
-    'x':      -0.1,
-    'y':      0,
-    'width':  1.2,
-    'height': 1,
-    'id':     'solid' });
-
-linkTextBack.append('feFlood')
-  .attr("flood-color", "white");
-
-linkTextBack.append('feComposite')
-  .attr("in", "SourceGraphic");
-
-*/
-
-
 var edgepaths = svg.selectAll(".edgepath")
   .data(edgesData)
   .enter()
@@ -251,64 +228,47 @@ var edgepaths = svg.selectAll(".edgepath")
          'class':'edgepath',
          'fill-opacity':0,
          'stroke-opacity':0,
-         'id':function(d,i) {return 'edgepath'+i}
-  })
+         'id':function(d,i) {return 'edgepath'+i}})
   .style("pointer-events", "none");
 
 // dx : the starting distance of the label from the source node
 var edgelabels = svg.selectAll(".edgelabel")
-  .data(edgesData)
-  .enter()
+  .data(edgesData).enter()
   .append('text')
-  .style("pointer-events", "none") //TW NEW
+    .style("pointer-events", "none")
     .attr({'class':'edgelabel',
       'id':function(d,i){return 'edgelabel'+i},
       'dx':80,
-      'dy':0  // change to 5 to put inline with link
+      'dy':-1  // change to 5 to put inline with link
     });
-
 
 edgelabels.append('textPath')
   .attr('xlink:href',function(d,i) {return '#edgepath'+i})
   .style("pointer-events", "none")
   .text(function(d,i){return d.label});
 
-
-
-  /* Arrow for Link
-     Must have id:String for display
-     refX: increase to back the arrow away from the target node
-     markerHeight: Arrow height
-     markerWidth: Arrow Width
-  */
-svg.append('defs')
-  //.data(["arrowhead"])      // Different link/path types can be defined here
-  //.enter()
-  .append("marker")    // Append arrow marker
-    //TODO Move size and colouring to CSS
-    .attr({'id':'arrowhead',
-      'viewBox': '0 -5 10 10',
-      'refX':    nodeRadius+25,
-      'refY':    0,
-      'fill':    'black',
-      'stroke':  'white',
-      'markerWidth':  2.5,
-      'markerHeight': 2.5,
-      'orient': 'auto'
-    })
-    .append("svg:path")
-      .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-      .attr('fill', 'black')
-      .attr('stroke','black');  // move to CSS
+svg.append('defs').append('marker')
+  .attr({'id':'arrowhead',
+    'viewBox': '-0 -5 10 10',
+    'refX':    nodeRadius+12,
+    'refY':    0,
+    'orient': 'auto',
+    'markerWidth':  10,
+    'markerHeight': 10,
+    'xoverflow':'visible'})
+  .append('svg:path')
+    .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+    .attr('fill', '#ccc')
+    .attr('stroke','#ccc');
 
 force.on("tick", function() {
-  edges.attr("x1", function(d) {return d.source.x; })
-    .attr("y1", function(d) {return d.source.y; })
-    .attr("x2", function(d) { return d.target.x;})
-    // Coordinate with arrow size and placement.
-    .attr("y2", function(d) { return d.target.y;});
+  edges.attr({"x1" : function(d) {return d.source.x; },
+    "y1": function(d) {return d.source.y; },
+    "x2": function(d) { return d.target.x;},
+    "y2": function(d) { return d.target.y;}
+  });
 
-  //TW DIFFERS HERE
+  // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
   nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
@@ -316,15 +276,10 @@ force.on("tick", function() {
     return path});
   edgelabels.attr('transform',function(d,i){
     if (d.target.x<d.source.x){
-//ERROR HERE. look into this. and this.node()
-
-// console.log("getBBox: " + this.getBBox())
-/*
-            bbox = this.getBBox();
-            rx = bbox.x+bbox.width/2;
-            ry = bbox.y+bbox.height/2;
+            var bbox = this.getBBox();
+            var rx = bbox.x+bbox.width/2;
+            var ry = bbox.y+bbox.height/2;
             return 'rotate(180 '+rx+' '+ry+')';
-*/
     }
     else {
       return 'rotate(0)';
