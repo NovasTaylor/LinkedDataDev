@@ -63,12 +63,41 @@ var svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
 
+// Icon to add node
+svg.append("svg:image")
+  .attr({
+         'x':5,
+         'y':5,
+         'width': 20,
+         'height': 24,
+         'xlink:href': '/GraphEditor/img/AddIcon.png'})
+  .on('mouseover', function(d){
+    console.log("Add a node")
+    var addIcon = d3.select(this)
+      .attr({
+        'width':25,
+        'height':29
+      });
+  })
+  .on('mouseout', function(d){
+    var addIcon = d3.select(this)
+      .attr({
+        'width':20,
+        'height':24
+      });
+  })
+  .on('click', function(d){ addNode();});
+
 // Initialize D3 force layout
 var force = d3.layout.force()
   .nodes(nodesData)
   .links(edgesData)
   .size([w, h])
-  .start();
+  //.start();
+  .on("tick", tick);
+
+restart();
+
 //---- Edges
 var edges = svg.selectAll("line")
   .data(edgesData)
@@ -181,7 +210,7 @@ nodes.append("typeText")
 edges.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
 
-force.on("tick", function() {
+function tick() {
   edges.attr({"x1" : function(d) {return d.source.x; },
     "y1": function(d) {return d.source.y; },
     "x2": function(d) { return d.target.x;},
@@ -205,10 +234,30 @@ force.on("tick", function() {
       return 'rotate(0)';
     }
   });
-});  // End on tick
+};  // End on tick
+/* restart()
+   See /Protoyping/addRemoveNodes.html for pattern
+*/
+function restart(){
+  // Nodes
+  //   Add
+  //node.enter() ....
+
+  // Remove nodes
+  //node.exit().remove();
+
+  // Edges
+  //   Add
+  //edges.enter()...
+  //   Remove
+  //edges.exit().remove
+
+  force.start();
+
+}
 
 //-----------------------------------------------------------------------------
-//---- Functions --------------------------------------------------------------
+//---- Additional Functions --------------------------------------------------------------
 
 /* infoEdit()
    Edit information for either a "node" or an "edge"
@@ -307,4 +356,22 @@ function infoEdit(d, i, source){
 
  }) // end of click on update button
   infoActive = true;
+}
+
+/* addNode()
+   Add a node
+*/
+
+function addNode(){
+  console.log("So you want to add a node!")
+  var newNode = {
+    label: 'New',
+    prefix: 'new',
+    type: 'new',
+    x:200, y:200,
+    fixed:true};
+    var n = nodesData.push(newNode);
+    console.log(newNode)
+    console.log(nodesData)
+    restart();
 }
