@@ -11,7 +11,7 @@ NOTE:
 TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
       Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
 -----------------------------------------------------------------------------*/
-"use strict";
+//"use strict";
 
 var  nodesData = [
   {n:0, id: 'PRODUCT1',
@@ -133,93 +133,30 @@ var nodes = svg.selectAll("g.node")
         var nodeSelection = d3.select(this).attr({'r':nodeRadius});
       })
       //---- Double CLICK NODE TO EDIT ---------------------------------------------------//
-      // .on("click", function(d, i){  // was prev. single click
+
+
+
+      //.on("dblclick", function(d, i){
       .on("dblclick", function(d, i){
-        console.log("clicked");
-        var self = this;
+        infoEdit(d,i, "node");
+      });
 
-        if (infoActive == true) {
-          // clicked a node while previous info block displayed
-          d3.selectAll("input").remove();
-          d3.select("#info").selectAll("*").remove();
-          d3.select("#info").style("opacity", 0);
-        }
-        d3.select("#info").style("opacity", 1);  // Display edit div
+// dx sets how close to the node the label appears
+// Need unique ID for each nodeText value in order to update it from the info window
+nodes.append("text")
+  .attr({
+    'class':       function(d){return 'nodeText'},
+    'id':          function(d, i) {return("nodeText"+i) ; },
+    'text-anchor': 'middle',
+    'class':        'nodeLabel'
+  })
+  .text(function(d) { return d.label; }) ;
 
-        var div = d3.select("#info")  // Selet div for appending
-        // LABEL
-        var labelText = div.append("p")
-          .text("Label: ");
-        var labelInput = labelText.append("input")
-          .attr({
-            'size': '15',
-            'type': 'text',
-            'value': d.label
-          });
-
-        // PREFIX
-        var prefixText = div.append("p")
-            .text("Prefix: ");
-        var prefixInput = prefixText.append("input")
-          .attr({
-            'size': '15',
-            'type': 'text',
-            'value': d.prefix
-          });
-        //TYPE
-        var typeText = div.append("p")
-          .text("Type: ");
-        var typeInput = typeText.append("input")
-          .attr({
-              'size':   15,
-              'type':  'text',
-              'value':  d.type
-            });
-       //console.log("labelInput: " +labelInput.node().value);
-       //---- UPDATE BUTTON -----------------------------------------------------//
-        var button = div.append("button")
-          .text("Update/Hide")
-          .on("click", function() {
-              d3.select("#nodeText" + i)
-                .text(function(d) {
-                  return (d.label = labelInput.node().value); })
-              ;
-              // Change class of circle to match TYPE
-              d3.select("#circle" + i)
-                 //Hang head in shame for this horrible kludge. Make this smarter.
-                 //  detect exist class.If changed: Remove existing, update to new
-                .classed("string", false)  // remove the class
-                .classed("uri", false)  // remove the class
-                .classed(typeInput.node().value.toLowerCase(), true)
-              ;
-              d3.select("#prefixText" + i)
-                .text(function(d) {return (d.prefix = prefixInput.node().value); });
-              var foo = d3.select("#typeText" + i)
-                .text(function(d) {return (d.type = typeInput.node().value); });
-              // Clean up the info window
-              d3.select("#info").selectAll("*").remove();
-              d3.select("#info").style("opacity", 0);
-            })
-
-        infoActive = true;
-      }); // End of dblClick
-    //---- END NODE CLICK -------------------------------------------------------//
-    // dx sets how close to the node the label appears
-    // Need unique ID for each nodeText value in order to update it from the info window
-    nodes.append("text")
-      .attr({
-        'class':       function(d){return 'nodeText'},
-        'id':          function(d, i) {return("nodeText"+i) ; },
-        'text-anchor': 'middle',
-        'class':        'nodeLabel'
-      })
-      .text(function(d) { return d.label; }) ;
-
-    // Create unique IDS for the PREFIX and TYPE text for updating from the info boxE
-    nodes.append("prefixText")
-      .attr("id", function(d, i) {return("prefixText"+i) ; });
-    nodes.append("typeText")
-      .attr("id", function(d, i) {return("typeText"+i) ; });
+// Create unique IDS for the PREFIX and TYPE text for updating from the info boxE
+nodes.append("prefixText")
+  .attr("id", function(d, i) {return("prefixText"+i) ; });
+nodes.append("typeText")
+  .attr("id", function(d, i) {return("typeText"+i) ; });
 var edgepaths = svg.selectAll(".edgepath")
   .data(edgesData)
   .enter()
@@ -285,4 +222,82 @@ force.on("tick", function() {
       return 'rotate(0)';
     }
   });
-});
+});  // End on tick
+
+//-----------------------------------------------------------------------------
+//---- Functions --------------------------------------------------------------
+
+/* infoEdit()
+   Edit information for either a "node" or an "edge"
+   Currently only works for a node
+*/
+function infoEdit(d, i, source){
+  console.log("infoEdit: " + source + " " + d.label);
+  //console.log("clicked");
+  var self = this;
+
+  if (infoActive == true) {
+    // clicked a node while previous info block displayed
+    d3.selectAll("input").remove();
+    d3.select("#info").selectAll("*").remove();
+    d3.select("#info").style("opacity", 0);
+  }
+  d3.select("#info").style("opacity", 1);  // Display edit div
+
+  var div = d3.select("#info")  // Selet div for appending
+  // LABEL
+  var labelText = div.append("p")
+    .text("Label: ");
+  var labelInput = labelText.append("input")
+    .attr({
+      'size': '15',
+      'type': 'text',
+      'value': d.label
+    });
+
+  // PREFIX
+  var prefixText = div.append("p")
+      .text("Prefix: ");
+  var prefixInput = prefixText.append("input")
+    .attr({
+      'size': '15',
+      'type': 'text',
+      'value': d.prefix
+    });
+  //TYPE
+  var typeText = div.append("p")
+    .text("Type: ");
+  var typeInput = typeText.append("input")
+    .attr({
+        'size':   15,
+        'type':  'text',
+        'value':  d.type
+      });
+ //console.log("labelInput: " +labelInput.node().value);
+ //---- UPDATE BUTTON -----------------------------------------------------//
+  var button = div.append("button")
+    .text("Update/Hide")
+    .on("click", function() {
+        d3.select("#nodeText" + i)
+          .text(function(d) {
+            return (d.label = labelInput.node().value); })
+        ;
+        // Change class of circle to match TYPE
+        d3.select("#circle" + i)
+           //Hang head in shame for this horrible kludge. Make this smarter.
+           //  detect exist class.If changed: Remove existing, update to new
+          .classed("string", false)  // remove the class
+          .classed("uri", false)  // remove the class
+          .classed(typeInput.node().value.toLowerCase(), true)
+        ;
+        d3.select("#prefixText" + i)
+          .text(function(d) {return (d.prefix = prefixInput.node().value); });
+        var foo = d3.select("#typeText" + i)
+          .text(function(d) {return (d.type = typeInput.node().value); });
+        // Clean up the info window
+        d3.select("#info").selectAll("*").remove();
+        d3.select("#info").style("opacity", 0);
+      })
+
+  infoActive = true;
+}
