@@ -156,14 +156,14 @@ svg.append('defs').append('marker')
     .attr('stroke','#ccc');
 
 //---- NODES ------------------------------------------------------------------
-var nodes = svg.selectAll("g.node")
+var node = svg.selectAll("g.node")
   .data(nodesData)
   .enter()
   .append("g")
     .attr("class", "node")
     .call(force.drag);
 
-nodes.append("circle")
+node.append("circle")
   .attr("r", nodeRadius)
   .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
   .attr("class", function(d,i){
@@ -191,7 +191,7 @@ nodes.append("circle")
 
 // dx sets how close to the node the label appears
 // Need unique ID for each nodeText value in order to update it from the info window
-nodes.append("text")
+node.append("text")
   .attr({
     'class':       function(d){return 'nodeText'},
     'id':          function(d, i) {return("nodeText"+i) ; },
@@ -202,9 +202,9 @@ nodes.append("text")
 
 // Create unique IDS for the PREFIX and TYPE text for updating from the info box
 //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
-nodes.append("prefixText")
+node.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
-nodes.append("typeText")
+node.append("typeText")
   .attr("id", function(d, i) {return("typeText"+i) ; });
 
 edges.append("prefixText")
@@ -218,7 +218,7 @@ function tick() {
   });
 
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
-  nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     //console.log(d)
