@@ -22,6 +22,11 @@
   fill: gray ;
 }
 
+.node .unspec {
+  fill: yellow ;
+}
+
+
 /* text for link labels */
 .egeLabel{
   color: #333333;

@@ -7,7 +7,7 @@ SRC :
 IN  :
 OUT :
 DEV:
-NOTE:
+NOTE: Basing node addition on this: http://jsfiddle.net/Nivaldo/tUKh3/
 TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
       Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
 -----------------------------------------------------------------------------*/
@@ -94,12 +94,11 @@ var force = d3.layout.force()
   .links(edgesData)
   .size([w, h])
   //.start();
-  .on("tick", tick);
-
-restart();
+  .on("tick", tick)
+  .start();
 
 //---- Edges
-var edges = svg.selectAll("line")
+var edge = svg.selectAll("line")
   .data(edgesData)
   .enter()
   .append("line")
@@ -207,11 +206,11 @@ node.append("prefixText")
 node.append("typeText")
   .attr("id", function(d, i) {return("typeText"+i) ; });
 
-edges.append("prefixText")
+edge.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
 
 function tick() {
-  edges.attr({"x1" : function(d) {return d.source.x; },
+  edge.attr({"x1" : function(d) {return d.source.x; },
     "y1": function(d) {return d.source.y; },
     "x2": function(d) { return d.target.x;},
     "y2": function(d) { return d.target.y;}
@@ -235,26 +234,6 @@ function tick() {
     }
   });
 };  // End on tick
-/* restart()
-   See /Protoyping/addRemoveNodes.html for pattern
-*/
-function restart(){
-  // Nodes
-  //   Add
-  //node.enter() ....
-
-  // Remove nodes
-  //node.exit().remove();
-
-  // Edges
-  //   Add
-  //edges.enter()...
-  //   Remove
-  //edges.exit().remove
-
-  force.start();
-
-}
 
 //-----------------------------------------------------------------------------
 //---- Additional Functions --------------------------------------------------------------
@@ -358,6 +337,33 @@ function infoEdit(d, i, source){
   infoActive = true;
 }
 
+/*TW test */
+function update(){
+
+  // Update the nodes
+  node = svg.selectAll("g.node")
+    .data(nodesData);
+
+  // Enter any new nodes.
+node.enter().append("circle")
+  .attr("r", nodeRadius)
+  .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
+  .attr("class", function(d,i){
+  if (d.type == "STRING"){ return "string";}
+    else if (d.type == "URI"){ return "uri"; }
+    else {return "unspec";}
+  })
+  .call(force.drag);
+
+// Exit any old nodes.
+node.exit().remove();
+
+
+// Restart the force layout.
+force.start();
+
+}
+
 /* addNode()
    Add a node
 */
@@ -373,5 +379,6 @@ function addNode(){
     var n = nodesData.push(newNode);
     console.log(newNode)
     console.log(nodesData)
-    restart();
+    //restart();
+    update();
 }
