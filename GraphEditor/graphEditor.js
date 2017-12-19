@@ -344,24 +344,24 @@ function update(){
   node = svg.selectAll("g.node")
     .data(nodesData);
 
-  // Enter any new nodes.
-node.enter().append("circle")
-  .attr("r", nodeRadius)
-  .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
-  .attr("class", function(d,i){
-  if (d.type == "STRING"){ return "string";}
-    else if (d.type == "URI"){ return "uri"; }
-    else {return "unspec";}
-  })
+  // Add new nodes.
+  // node circles are WITHIN the <g> , so start with <g> and append the circle
+  node.enter()
+    .append("g")
+      .attr("class", "node")
+    .append("circle")
+      .attr("r", nodeRadius)
+      .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
+      .attr("class", function(d,i){
+        if (d.type == "STRING"){ return "string";}
+        else if (d.type == "URI"){ return "uri"; }
+        else {return "unspec";}
+      })
   .call(force.drag);
-
-// Exit any old nodes.
-node.exit().remove();
-
-
-// Restart the force layout.
-force.start();
-
+  // Exit any old nodes.
+  node.exit().remove();
+  // Restart the force layout.
+  force.start();
 }
 
 /* addNode()
