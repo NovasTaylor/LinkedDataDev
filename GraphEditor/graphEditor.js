@@ -281,10 +281,13 @@ function infoEdit(d, i, source){
       'value': d.prefix
     });
   //TYPE - NODES only
+  let typeText = ""
+  let typeInput = ""
+
   if(source=="node"){
-    let typeText = div.append("p")
+    typeText = div.append("p")
       .text("Type: ");
-    let typeInput = typeText.append("input")
+    typeInput = typeText.append("input")
       .attr({
         'size':   15,
         'type':  'text',
