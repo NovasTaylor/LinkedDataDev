@@ -357,7 +357,36 @@ function update(){
         else if (d.type == "URI"){ return "uri"; }
         else {return "unspec";}
       })
-  .call(force.drag);
+      //---- Double click node to edit -----------------------------------------
+      // For new nodes, this should allow the entry of label, type, and prefix...
+      .on("dblclick", function(d, i){
+        infoEdit(d,i, "node");
+      });
+
+
+      ;
+  // Add nodeText ID to each node. Adding the actual text label here with teh
+  //.text  causes problems with intial nodes.
+  node.append("text")
+    .attr({
+      'class':       function(d,i){return 'nodeText'},
+      'id':          function(d, i) {return("nodeText"+i) ; },
+      'text-anchor': 'middle',
+      'class':        'nodeLabel'
+    })
+
+    //  .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
+    ;
+
+  // Create unique IDS for the PREFIX and TYPE text for updating from the info box
+  //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
+  node.append("prefixText")
+    .attr("id", function(d, i) {return("prefixText"+i) ; });
+  node.append("typeText")
+    .attr("id", function(d, i) {return("typeText"+i) ; });
+
+  node.call(force.drag);
+
   // Exit any old nodes.
   node.exit().remove();
   // Restart the force layout.
