@@ -13,7 +13,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 -----------------------------------------------------------------------------*/
 "use strict";
 
-var  nodesData = [
+let  nodesData = [
   { label: 'PRODUCT1',
     prefix:"ldw",
     type: 'URI',
@@ -54,12 +54,12 @@ var  nodesData = [
       label: 'nciCode', prefix:"sdtmterm"}
   ];
 
-var infoActive = false;  // opacity flag for info editing box
-var w = 900,
+let infoActive = false;  // opacity flag for info editing box
+let w = 900,
     h = 1100,
     nodeRadius = 40;
 
-var svg = d3.select("#whiteboard").append("svg")
+let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
 
@@ -73,14 +73,14 @@ svg.append("svg:image")
          'xlink:href': '/GraphEditor/img/AddIcon.png'})
   .on('mouseover', function(d){
     console.log("Add a node")
-    var addIcon = d3.select(this)
+    let addIcon = d3.select(this)
       .attr({
         'width':25,
         'height':29
       });
   })
   .on('mouseout', function(d){
-    var addIcon = d3.select(this)
+    let addIcon = d3.select(this)
       .attr({
         'width':20,
         'height':24
@@ -89,7 +89,7 @@ svg.append("svg:image")
   .on('click', function(d){ addNode();});
 
 // Initialize D3 force layout
-var force = d3.layout.force()
+let force = d3.layout.force()
   .nodes(nodesData)
   .links(edgesData)
   .size([w, h])
@@ -98,7 +98,7 @@ var force = d3.layout.force()
   .start();
 
 //---- Edges
-var edge = svg.selectAll("line")
+let edge = svg.selectAll("line")
   .data(edgesData)
   .enter()
   .append("line")
@@ -109,7 +109,7 @@ var edge = svg.selectAll("line")
     //.style("stroke-width", "3px")
     //.style("stroke", "blue")
 
-var edgepaths = svg.selectAll(".edgepath")
+let edgepaths = svg.selectAll(".edgepath")
   .data(edgesData)
   .enter()
   .append('path')
@@ -121,7 +121,7 @@ var edgepaths = svg.selectAll(".edgepath")
   .style("pointer-events", "none")
   ;
 // dx : the starting distance of the label from the source node
-var edgelabels = svg.selectAll(".edgelabel")
+let edgelabels = svg.selectAll(".edgelabel")
   .data(edgesData).enter()
   .append('text')
     .attr({'class':'edgelabel',
@@ -155,7 +155,7 @@ svg.append('defs').append('marker')
     .attr('stroke','#ccc');
 
 //---- NODES ------------------------------------------------------------------
-var node = svg.selectAll("g.node")
+let node = svg.selectAll("g.node")
   .data(nodesData)
   .enter()
   .append("g")
@@ -173,15 +173,15 @@ node.append("circle")
 
   // Mousover Node - highlight node by fading the node colour during mouseover
   .on('mouseover', function(d){
-    //var nodeSelection = d3.select(this).style({opacity:'0.5'});
+    //let nodeSelection = d3.select(this).style({opacity:'0.5'});
     console.log("NODE MOUSEOVER");
-    var nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
+    let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
   })
 
   //Mouseout Node  - bring node back to full colour
   .on('mouseout', function(d){
-    //  var nodeSelection= d3.select(this).style({opacity:'1.0',})
-    var nodeSelection = d3.select(this).attr({'r':nodeRadius});
+    //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
+    let nodeSelection = d3.select(this).attr({'r':nodeRadius});
   })
   //---- Double click node to edit ---------------------------------------------
   .on("dblclick", function(d, i){
@@ -219,14 +219,14 @@ function tick() {
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
   node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-  edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+  edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     //console.log(d)
     return path});
   edgelabels.attr('transform',function(d,i){
     if (d.target.x<d.source.x){
-            var bbox = this.getBBox();
-            var rx = bbox.x+bbox.width/2;
-            var ry = bbox.y+bbox.height/2;
+            let bbox = this.getBBox();
+            let rx = bbox.x+bbox.width/2;
+            let ry = bbox.y+bbox.height/2;
             return 'rotate(180 '+rx+' '+ry+')';
     }
     else {
@@ -246,7 +246,7 @@ function infoEdit(d, i, source){
   console.log("You clicked a  " +source)
   console.log("     infoEdit: " + source + " " + d.label);
   //console.log("clicked");
-  var self = this;
+  let self = this;
 
   if (infoActive == true) {
     // clicked a node or link while previous info block displayed
@@ -256,15 +256,15 @@ function infoEdit(d, i, source){
   }
   d3.select("#info").style("opacity", 1);  // Display edit div
 
-  var div = d3.select("#info");
+  let div = d3.select("#info");
 
   div.append("p")
   .text(function() { return("Edit " + source) });  // Selet div for appending
 
   // LABEL  - both nodes and edge
-  var labelText = div.append("p")
+  let labelText = div.append("p")
     .text("Label: ");
-  var labelInput = labelText.append("input")
+  let labelInput = labelText.append("input")
     .attr({
       'size': '15',
       'type': 'text',
@@ -272,9 +272,9 @@ function infoEdit(d, i, source){
     });
 
   // PREFIX - both nodes and edges
-  var prefixText = div.append("p")
+  let prefixText = div.append("p")
       .text("Prefix: ");
-  var prefixInput = prefixText.append("input")
+  let prefixInput = prefixText.append("input")
     .attr({
       'size': '15',
       'type': 'text',
@@ -282,9 +282,9 @@ function infoEdit(d, i, source){
     });
   //TYPE - NODES only
   if(source=="node"){
-    var typeText = div.append("p")
+    let typeText = div.append("p")
       .text("Type: ");
-    var typeInput = typeText.append("input")
+    let typeInput = typeText.append("input")
       .attr({
         'size':   15,
         'type':  'text',
@@ -294,7 +294,7 @@ function infoEdit(d, i, source){
 
  //console.log("labelInput: " +labelInput.node().value);
  //---- UPDATE BUTTON -----------------------------------------------------//
-  var button = div.append("button")
+  let button = div.append("button")
     .text("Update/Hide")
     .on("click", function() {
       if(source=="node"){
@@ -399,13 +399,13 @@ function update(){
 
 function addNode(){
   console.log("So you want to add a node!")
-  var newNode = {
+  let newNode = {
     label: 'New',
     prefix: 'new',
     type: 'new',
     x:200, y:200,
     fixed:true};
-    var n = nodesData.push(newNode);
+    let n = nodesData.push(newNode);
     console.log(newNode)
     console.log(nodesData)
     //restart();
