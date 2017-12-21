@@ -283,16 +283,20 @@ function infoEdit(d, i, source){
   //TYPE - NODES only
   let typeText = ""
   let typeInput = ""
+  let typeSelect = ""
 
   if(source=="node"){
     typeText = div.append("p")
-      .text("Type: ");
-    typeInput = typeText.append("input")
-      .attr({
-        'size':   15,
-        'type':  'text',
-        'value':  d.type
-      });
+       .text("Type: ");
+    let typeData = ["URI","STRING"]
+    typeInput = typeText.append("select")
+        .attr('class','select')
+    typeSelect = typeInput.selectAll('option')
+        .data(typeData).enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .property("selected", function(g){ return g === d.type; })
+        ;
   }
 
  //console.log("labelInput: " +labelInput.node().value);
