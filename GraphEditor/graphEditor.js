@@ -340,7 +340,7 @@ function infoEdit(d, i, source){
   infoActive = true;
 
 //TW
-var delButton = div.append("button")
+let delButton = div.append("button")
   .text("Delete")
   .on("click", function() {
     if(source=="node"){
