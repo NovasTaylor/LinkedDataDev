@@ -348,13 +348,13 @@ var delButton = div.append("button")
       // must delete the node and any links attached to it (ingoing and outgoing)
   }
   if(source=="edge"){
-    console.log("So you want to DLETE an Edge!")
+    console.log("So you want to DELETE an Edge!")
   }
 });
 
 }
 
-/*TW test */
+
 function update(){
 
   // Update the nodes
