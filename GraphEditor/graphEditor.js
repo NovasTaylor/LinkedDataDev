@@ -338,6 +338,20 @@ function infoEdit(d, i, source){
 
  }) // end of click on update button
   infoActive = true;
+
+//TW
+var delButton = div.append("button")
+  .text("Delete")
+  .on("click", function() {
+    if(source=="node"){
+      console.log("So you want to DELETE a node!")
+      // must delete the node and any links attached to it (ingoing and outgoing)
+  }
+  if(source=="edge"){
+    console.log("So you want to DLETE an Edge!")
+  }
+});
+
 }
 
 /*TW test */
