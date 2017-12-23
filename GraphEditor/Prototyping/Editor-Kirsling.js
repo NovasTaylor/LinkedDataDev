@@ -311,8 +311,8 @@ function keydown() {
     case 8: // backspace
     case 46: // delete
       if(selected_node) {
-        nodes.splice(nodes.indexOf(selected_node), 1);
-        spliceLinksForNode(selected_node);
+        nodes.splice(nodes.indexOf(selected_node), 1); // Delete selected node from array
+        spliceLinksForNode(selected_node);  // Delete links attached to the selected node
       } else if(selected_link) {
         links.splice(links.indexOf(selected_link), 1);
       }

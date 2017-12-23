@@ -59,6 +59,21 @@ let w = 900,
     h = 1100,
     nodeRadius = 40;
 
+// mouse event vars as per Kirsling. only mousedown_node in use as of 2017-12-23
+let selected_node = null,
+  selected_edge = null,
+  mousedown_edge = null,
+  mousedown_node = null,
+  mouseup_node = null;
+
+//TW.  As per Kirsling. Not yet in use. Move to fnt area of code.
+function resetMouseVars() {
+  mousedown_node = null;
+  mouseup_node = null;
+  mousedown_edge = null;
+}
+
+
 let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
@@ -127,7 +142,7 @@ let edgelabels = svg.selectAll(".edgelabel")
     .attr({'class':'edgelabel',
       //
       'dx':80,
-      'dy':-1  // change to 5 to put inline with link
+      'dy':-1  // change to 5 to put inline with edge
     });
 
 edgelabels.append('textPath')
@@ -246,10 +261,10 @@ function infoEdit(d, i, source){
   console.log("You clicked a  " +source)
   console.log("     infoEdit: " + source + " " + d.label);
   //console.log("clicked");
-  let self = this;
+  let self = this; //TW : Unnecessary?
 
   if (infoActive == true) {
-    // clicked a node or link while previous info block displayed
+    // clicked a node or edge while previous info block displayed
     d3.selectAll("input").remove();
     d3.select("#info").selectAll("*").remove();
     d3.select("#info").style("opacity", 0);
@@ -348,11 +363,24 @@ let delButton = div.append("button")
   .text("Delete")
   .on("click", function() {
     if(source=="node"){
-      console.log("So you want to DELETE a node!")
-      // must delete the node and any links attached to it (ingoing and outgoing)
+    // select node
+    mousedown_node = d; //TW captures the node. Initialized to null as per Kirsling
+    selected_node = mousedown_node ;  //TW just playing here. Need to restructure ALL of this per Kirsling
+    console.log("D: ", d)
+    //let foo = indexOf(node());
+    console.log("So you want to DELETE a node!")
+    console.log("Selected_node: " , selected_node)
+      // must delete the node and any edge attached to it (ingoing and outgoing)
+    nodesData.splice(nodesData.indexOf(selected_node), 1); // Delete selected node from array
+    update();
   }
   if(source=="edge"){
     console.log("So you want to DELETE an Edge!")
+    mousedown_edge = d; //TW captures the edge.
+    selected_edge = mousedown_edge ;  //TW just playing here. Need to restructure ALL of this per Kirsling
+    console.log("Selected_edge: " , selected_edge)
+    edgesData.splice(edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
+    update();
   }
 });
 
@@ -361,7 +389,7 @@ let delButton = div.append("button")
 
 function update(){
 
-  // Update the nodes
+  // NODES update --------------------------------------------------------------
   node = svg.selectAll("g.node")
     .data(nodesData);
 
@@ -384,9 +412,7 @@ function update(){
         infoEdit(d,i, "node");
       });
 
-
-      ;
-  // Add nodeText ID to each node. Adding the actual text label here with teh
+  // Add nodeText ID to each node. Adding the actual text label here with the
   //.text  causes problems with intial nodes.
   node.append("text")
     .attr({
@@ -395,7 +421,6 @@ function update(){
       'text-anchor': 'middle',
       'class':        'nodeLabel'
     })
-
     //  .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
     ;
 
@@ -405,11 +430,16 @@ function update(){
     .attr("id", function(d, i) {return("prefixText"+i) ; });
   node.append("typeText")
     .attr("id", function(d, i) {return("typeText"+i) ; });
-
   node.call(force.drag);
-
   // Exit any old nodes.
   node.exit().remove();
+
+  //---- EDGES update ----------------------------------------------------------
+
+  // Add new links ..... TO BE ADDED
+
+
+
   // Restart the force layout.
   force.start();
 }
