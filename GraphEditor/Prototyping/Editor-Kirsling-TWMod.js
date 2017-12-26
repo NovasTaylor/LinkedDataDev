@@ -103,6 +103,7 @@ function tick() {
 
 // update graph (called when needed)
 function update() {
+  //---- LINKS 
   // path (link) group
   path = path.data(links);
 
@@ -131,6 +132,7 @@ function update() {
   // remove old links
   path.exit().remove();
 
+  //---- NODES 
   // circle (node) group
   // NB: the function arg is crucial here! nodes are known by id, not by index!
   circle = circle.data(nodes, function(d) { return d.id; });
