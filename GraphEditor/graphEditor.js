@@ -61,10 +61,10 @@ let w = 900,
 
 // mouse event vars as per Kirsling. only mousedown_node in use as of 2017-12-23
 let selected_node = null,
-  selected_edge = null,
-  mousedown_edge = null,
-  mousedown_node = null,
-  mouseup_node = null;
+  selected_edge   = null,
+  mousedown_edge  = null,
+  mousedown_node  = null,
+  mouseup_node    = null;
 
 //TW.  As per Kirsling. Not yet in use. Move to fnt area of code.
 function resetMouseVars() {
@@ -73,7 +73,6 @@ function resetMouseVars() {
   mousedown_edge = null;
 }
 
-
 let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
@@ -81,11 +80,11 @@ let svg = d3.select("#whiteboard").append("svg")
 // Icon to add node
 svg.append("svg:image")
   .attr({
-         'x':5,
-         'y':5,
-         'width': 20,
-         'height': 24,
-         'xlink:href': '/GraphEditor/img/AddIcon.png'})
+    'x':5,
+    'y':5,
+    'width': 20,
+    'height': 24,
+    'xlink:href': '/GraphEditor/img/AddIcon.png'})
   .on('mouseover', function(d){
     console.log("Add a node")
     let addIcon = d3.select(this)
@@ -108,9 +107,22 @@ let force = d3.layout.force()
   .nodes(nodesData)
   .links(edgesData)
   .size([w, h])
-  //.start();
-  .on("tick", tick)
-  .start();
+  .on("tick", tick);
+
+// Arrow marker for end of edge
+svg.append('defs').append('marker')
+  .attr({'id':'arrowhead',
+    'viewBox': '-0 -5 10 10',
+    'refX':    nodeRadius+12,
+    'refY':    0,
+    'orient': 'auto',
+    'markerWidth':  10,
+    'markerHeight': 10,
+    'xoverflow':'visible'})
+  .append('svg:path')
+    .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+    .attr('fill', '#ccc')
+    .attr('stroke','#ccc');
 
 //---- Edges
 let edge = svg.selectAll("line")
@@ -154,20 +166,6 @@ edgelabels.append('textPath')
      infoEdit(d,i, "edge");
    });
 
-// Marker for end of edge
-svg.append('defs').append('marker')
-  .attr({'id':'arrowhead',
-    'viewBox': '-0 -5 10 10',
-    'refX':    nodeRadius+12,
-    'refY':    0,
-    'orient': 'auto',
-    'markerWidth':  10,
-    'markerHeight': 10,
-    'xoverflow':'visible'})
-  .append('svg:path')
-    .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-    .attr('fill', '#ccc')
-    .attr('stroke','#ccc');
 
 //---- NODES ------------------------------------------------------------------
 let node = svg.selectAll("g.node")
@@ -205,6 +203,8 @@ node.append("circle")
 
 // dx sets how close to the node the label appears
 // Need unique ID for each nodeText value in order to update it from the info window
+
+// Removal of this means the nodes do not have text until edited.
 node.append("text")
   .attr({
     'class':       function(d){return 'nodeText'},
@@ -213,6 +213,7 @@ node.append("text")
     'class':        'nodeLabel'
   })
   .text(function(d) { return d.label; }) ;
+
 
 // Create unique IDS for the PREFIX and TYPE text for updating from the info box
 //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
@@ -249,6 +250,77 @@ function tick() {
     }
   });
 };  // End on tick
+
+function update(){
+  // NODES update --------------------------------------------------------------
+  node = svg.selectAll("g.node")
+    .data(nodesData);
+
+  // Add new nodes.
+  // node circles are WITHIN the <g> , so start with <g> and append the circle
+  node.enter()
+    .append("g")
+      .attr("class", "node")
+    .append("circle")
+      .attr("r", nodeRadius)
+      .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
+      .attr("class", function(d,i){
+        if (d.type == "STRING"){ return "string";}
+        else if (d.type == "URI"){ return "uri"; }
+        else {return "unspec";}
+      })
+      //---- Double click node to edit -----------------------------------------
+      // For new nodes, this should allow the entry of label, type, and prefix...
+      .on("dblclick", function(d, i){
+        infoEdit(d,i, "node");
+      })
+      .on('mouseover', function(d){
+        console.log("NODE MOUSEOVER");
+        let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
+      })
+      //Mouseout Node  - bring node back to full colour
+      .on('mouseout', function(d){
+        //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
+        let nodeSelection = d3.select(this).attr({'r':nodeRadius});
+      })
+
+      ;
+
+  // Add nodeText ID to each node. Adding the actual text label here with the
+  //.text  causes problems with intial nodes.
+  node.append("text")
+    .attr({
+      'class':       function(d,i){return 'nodeText'},
+      'id':          function(d, i) {return("nodeText"+i) ; },
+      'text-anchor': 'middle',
+      'class':        'nodeLabel'
+    })
+    //.text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
+      // after node text is changed, original and NEW overwrite.
+    ;
+
+  // Create unique IDS for the PREFIX and TYPE text for updating from the info box
+  //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
+  node.append("prefixText")
+    .attr("id", function(d, i) {return("prefixText"+i) ; });
+  node.append("typeText")
+    .attr("id", function(d, i) {return("typeText"+i) ; });
+  node.call(force.drag);
+  // Exit any old nodes.
+  node.exit().remove();
+
+  //---- EDGES update ----------------------------------------------------------
+
+  // Add new links ..... TO BE ADDED
+
+
+
+  // Start the force layout.
+  force.start();
+}  // end of update()
+
+
+
 
 //-----------------------------------------------------------------------------
 //---- Additional Functions --------------------------------------------------------------
@@ -387,63 +459,6 @@ let delButton = div.append("button")
 }
 
 
-function update(){
-
-  // NODES update --------------------------------------------------------------
-  node = svg.selectAll("g.node")
-    .data(nodesData);
-
-  // Add new nodes.
-  // node circles are WITHIN the <g> , so start with <g> and append the circle
-  node.enter()
-    .append("g")
-      .attr("class", "node")
-    .append("circle")
-      .attr("r", nodeRadius)
-      .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
-      .attr("class", function(d,i){
-        if (d.type == "STRING"){ return "string";}
-        else if (d.type == "URI"){ return "uri"; }
-        else {return "unspec";}
-      })
-      //---- Double click node to edit -----------------------------------------
-      // For new nodes, this should allow the entry of label, type, and prefix...
-      .on("dblclick", function(d, i){
-        infoEdit(d,i, "node");
-      });
-
-  // Add nodeText ID to each node. Adding the actual text label here with the
-  //.text  causes problems with intial nodes.
-  node.append("text")
-    .attr({
-      'class':       function(d,i){return 'nodeText'},
-      'id':          function(d, i) {return("nodeText"+i) ; },
-      'text-anchor': 'middle',
-      'class':        'nodeLabel'
-    })
-    //  .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
-    ;
-
-  // Create unique IDS for the PREFIX and TYPE text for updating from the info box
-  //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
-  node.append("prefixText")
-    .attr("id", function(d, i) {return("prefixText"+i) ; });
-  node.append("typeText")
-    .attr("id", function(d, i) {return("typeText"+i) ; });
-  node.call(force.drag);
-  // Exit any old nodes.
-  node.exit().remove();
-
-  //---- EDGES update ----------------------------------------------------------
-
-  // Add new links ..... TO BE ADDED
-
-
-
-  // Restart the force layout.
-  force.start();
-}
-
 /* addNode()
    Add a node
 */
@@ -462,3 +477,6 @@ function addNode(){
     //restart();
     update();
 }
+
+//---- App Start ---------------------------------------------------------------
+update();

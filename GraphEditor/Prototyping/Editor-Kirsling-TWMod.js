@@ -67,15 +67,15 @@ var path = svg.append('svg:g').selectAll('path'),
 
 // mouse event vars
 var selected_node = null,
-    selected_link = null,
-    mousedown_link = null,
+    selected_edge = null,
+    mousedown_edge = null,
     mousedown_node = null,
     mouseup_node = null;
 
 function resetMouseVars() {
   mousedown_node = null;
   mouseup_node = null;
-  mousedown_link = null;
+  mousedown_edge = null;
 }
 
 // update force layout (called automatically each iteration)
@@ -107,31 +107,29 @@ function update() {
   path = path.data(links);
 
   // update existing links
-  path.classed('selected', function(d) { return d === selected_link; })
+  path.classed('selected', function(d) { return d === selected_edge; })
     .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
     .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; });
-
 
   // add new links
   path.enter().append('svg:path')
     .attr('class', 'link')
-    .classed('selected', function(d) { return d === selected_link; })
+    .classed('selected', function(d) { return d === selected_edge; })
     .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
     .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
     .on('mousedown', function(d) {
       if(d3.event.ctrlKey) return;
 
       // select link
-      mousedown_link = d;
-      if(mousedown_link === selected_link) selected_link = null;
-      else selected_link = mousedown_link;
+      mousedown_edge = d;
+      if(mousedown_edge === selected_edge) selected_edge = null;
+      else selected_edge = mousedown_edge;
       selected_node = null;
       update();
     });
 
   // remove old links
   path.exit().remove();
-
 
   // circle (node) group
   // NB: the function arg is crucial here! nodes are known by id, not by index!
@@ -168,7 +166,7 @@ function update() {
       mousedown_node = d;
       if(mousedown_node === selected_node) selected_node = null;
       else selected_node = mousedown_node;
-      selected_link = null;
+      selected_edge = null;
 
       // reposition drag line
       drag_line
@@ -220,7 +218,7 @@ function update() {
       }
 
       // select new link
-      selected_link = link;
+      selected_edge = link;
       selected_node = null;
       update();
     });
@@ -246,7 +244,7 @@ function mousedown() {
   // because :active only works in WebKit?
   svg.classed('active', true);
 
-  if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;
+  if(d3.event.ctrlKey || mousedown_node || mousedown_edge) return;
 
   // insert new node at point
   var point = d3.mouse(this),
@@ -306,33 +304,33 @@ function keydown() {
     svg.classed('ctrl', true);
   }
 
-  if(!selected_node && !selected_link) return;
+  if(!selected_node && !selected_edge) return;
   switch(d3.event.keyCode) {
     case 8: // backspace
     case 46: // delete
       if(selected_node) {
         nodes.splice(nodes.indexOf(selected_node), 1); // Delete selected node from array
         spliceLinksForNode(selected_node);  // Delete links attached to the selected node
-      } else if(selected_link) {
-        links.splice(links.indexOf(selected_link), 1);
+      } else if(selected_edge) {
+        links.splice(links.indexOf(selected_edge), 1);
       }
-      selected_link = null;
+      selected_edge = null;
       selected_node = null;
       update();
       break;
     case 66: // B
-      if(selected_link) {
+      if(selected_edge) {
         // set link direction to both left and right
-        selected_link.left = true;
-        selected_link.right = true;
+        selected_edge.left = true;
+        selected_edge.right = true;
       }
       update();
       break;
     case 76: // L
-      if(selected_link) {
+      if(selected_edge) {
         // set link direction to left only
-        selected_link.left = true;
-        selected_link.right = false;
+        selected_edge.left = true;
+        selected_edge.right = false;
       }
       update();
       break;
@@ -340,10 +338,10 @@ function keydown() {
       if(selected_node) {
         // toggle node reflexivity
         selected_node.reflexive = !selected_node.reflexive;
-      } else if(selected_link) {
+      } else if(selected_edge) {
         // set link direction to right only
-        selected_link.left = false;
-        selected_link.right = true;
+        selected_edge.left = false;
+        selected_edge.right = true;
       }
       update();
       break;
