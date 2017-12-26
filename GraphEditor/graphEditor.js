@@ -14,32 +14,38 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 "use strict";
 
 let  nodesData = [
-  { label: 'PRODUCT1',
+  { id: 0,
+    label: 'PRODUCT1',
     prefix:"ldw",
     type: 'URI',
     x:500, y:60,
     fixed:true},
-  { label: 'Serum 114',
+  { id: 1,
+    label: 'Serum 114',
     prefix:"--NONE--",
     type: 'STRING',
     x:700, y:60,
     fixed:true},
-  { label: 'F',
+  { id: 2,
+    label: 'F',
     prefix:"ldw",
     type: 'URI',
     x:100, y:400,
     fixed:true},
-  { label: 'C16576',
+  { id: 3,
+    label: 'C16576',
     prefix:"sdtmterm",
     type: 'URI',
     x:100, y:600,
     fixed:true},
-  { label: 'M',
+  { id: 4,
+    label: 'M',
     prefix:"ldw",
     type: 'URI',
     x:200, y:400,
     fixed:true},
-  { label: 'C20197',
+  { id: 5,
+    label: 'C20197',
     prefix:"sdtmterm",
     type: 'URI',
     x:200, y:600,
@@ -124,6 +130,10 @@ svg.append('defs').append('marker')
     .attr('fill', '#ccc')
     .attr('stroke','#ccc');
 
+    // handles to link and node element groups
+    var path = svg.append('svg:g').selectAll('path'),
+        circle = svg.append('svg:g').selectAll('g');
+
 //---- Edges
 let edge = svg.selectAll("line")
   .data(edgesData)
@@ -167,7 +177,9 @@ edgelabels.append('textPath')
    });
 
 
+
 //---- NODES ------------------------------------------------------------------
+/*
 let node = svg.selectAll("g.node")
   .data(nodesData)
   .enter()
@@ -221,6 +233,7 @@ node.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
 node.append("typeText")
   .attr("id", function(d, i) {return("typeText"+i) ; });
+*/
 
 edge.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
@@ -233,7 +246,11 @@ function tick() {
   });
 
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
-  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  //node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  circle.attr('transform', function(d) {
+     return 'translate(' + d.x + ',' + d.y + ')';
+   });
 
   edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     //console.log(d)
@@ -252,6 +269,9 @@ function tick() {
 };  // End on tick
 
 function update(){
+
+
+/*
   // NODES update --------------------------------------------------------------
   node = svg.selectAll("g.node")
     .data(nodesData);
@@ -317,6 +337,69 @@ function update(){
 
   // Start the force layout.
   force.start();
+  */
+
+    //---- NODES
+    // circle (node) group
+    // NB: the function arg is crucial here! nodes are known by id, not by index!
+    circle = circle.data(nodesData, function(d) { return d.id; });
+
+    // update existing nodes (reflexive & selected visual states)
+    circle.selectAll('circle')
+      .style('fill', function(d) { return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
+
+
+    // add new nodes
+    var g = circle.enter().append('svg:g');
+    g.append('svg:circle')
+      .attr('class', 'node')
+      .attr("r", nodeRadius)
+      .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
+      .attr("class", function(d,i){
+        if (d.type == "STRING"){ return "node string";}
+        else if (d.type == "URI"){ return "node uri"; }
+        else {return "unspec";}
+      })
+      //---- Double click node to edit -----------------------------------------
+      // For new nodes, this should allow the entry of label, type, and prefix...
+      .on("dblclick", function(d, i){
+        infoEdit(d,i, "node");
+      })
+      .on('mouseover', function(d){
+        console.log("NODE MOUSEOVER");
+        let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
+      })
+      //Mouseout Node  - bring node back to full colour
+      .on('mouseout', function(d){
+        //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
+        let nodeSelection = d3.select(this).attr({'r':nodeRadius});
+      })
+
+    // show node IDs
+    g.append('svg:text')
+        .attr({
+          'class':       function(d,i){return 'nodeText'},
+          'id':          function(d, i) {return("nodeText"+i) ; },
+          'text-anchor': 'middle',
+          'class':        'nodeLabel'
+        })
+        .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
+
+    //force.drag: Later move into keydown function to differentiate between
+    // a drag and CTRL+Drag to create a new link (differs from Kersling)
+     circle.call(force.drag);
+
+    // remove old nodes
+    circle.exit().remove();
+
+    // set the graph in motion
+    force.start();
+
+
+
+
+
+
 }  // end of update()
 
 

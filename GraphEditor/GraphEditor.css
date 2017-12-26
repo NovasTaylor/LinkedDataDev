@@ -3,26 +3,26 @@
     stroke-width: 3;
 }
 
-.node {
+.nodeLabel {
   font: 18pt sans-serif;font-size: 13px;
   font-weight: bold;
 }
 
-.node .string {
+.node.string {
   fill:  #c5c5c5;
   stroke: red;
   stroke-width: 4;
 }
-.node .uri {
+.node.uri {
   fill: #bcf5bc ;
   stroke: black;
 }
 
-.node .misc {
+.node.misc {
   fill: gray ;
 }
 
-.node .unspec {
+.node.unspec {
   fill: yellow ;
 }
 
