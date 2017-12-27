@@ -65,12 +65,6 @@ let w = 900,
     h = 1100,
     nodeRadius = 40;
 
-// mouse event vars as per Kirsling. only mousedown_node in use as of 2017-12-23
-let selected_node = null,
-  selected_edge   = null,
-  mousedown_edge  = null,
-  mousedown_node  = null,
-  mouseup_node    = null;
 
 //TW.  As per Kirsling. Not yet in use. Move to fnt area of code.
 function resetMouseVars() {
@@ -83,7 +77,7 @@ let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
 
-// Icon to add node
+// Add node icon
 svg.append("svg:image")
   .attr({
     'x':5,
@@ -130,11 +124,23 @@ svg.append('defs').append('marker')
     .attr('fill', '#ccc')
     .attr('stroke','#ccc');
 
-    // handles to link and node element groups
-    var path = svg.append('svg:g').selectAll('path'),
-        circle = svg.append('svg:g').selectAll('g');
+//HK line displayed when dragging new nodes
+var drag_line = svg.append('svg:path')
+  .attr('class', 'link dragline hidden')
+  .attr('d', 'M0,0L0,0');
 
-//---- Edges
+//HK handles to link and node element groups
+var path = svg.append('svg:g').selectAll('path'),
+  circle = svg.append('svg:g').selectAll('g');
+//HK mouse event vars as per Kirsling. only mousedown_node in use as of 2017-12-23
+let selected_node = null,
+  selected_edge   = null,
+  mousedown_edge  = null,
+  mousedown_node  = null,
+  mouseup_node    = null;
+
+//TW---- Edges  (original code, works in this location but not for additions!)
+/* DO NOT DELETE YET....
 let edge = svg.selectAll("line")
   .data(edgesData)
   .enter()
@@ -178,24 +184,40 @@ edgelabels.append('textPath')
 
 edge.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
+  */
+// END OF EDGES DEFN
 
 function tick() {
+
+  //HK draw directed edges with proper padding from node centers
+  // TODO: Need to add-in path LABEL TEXT and their rotation!
+  path.attr('d', function(d) {
+    var deltaX = d.target.x - d.source.x,
+        deltaY = d.target.y - d.source.y,
+        dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+        normX = deltaX / dist,
+        normY = deltaY / dist,
+        sourcePadding = d.left ? 17 : 12,
+        targetPadding = d.right ? 17 : 12,
+        sourceX = d.source.x + (sourcePadding * normX),
+        sourceY = d.source.y + (sourcePadding * normY),
+        targetX = d.target.x - (targetPadding * normX),
+        targetY = d.target.y - (targetPadding * normY);
+    return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+  });
+
+
+/*TW ORIGINAL EDGE TICKING
+  DO NOT DELETE YET....
   edge.attr({"x1" : function(d) {return d.source.x; },
     "y1": function(d) {return d.source.y; },
     "x2": function(d) { return d.target.x;},
     "y2": function(d) { return d.target.y;}
   });
 
-  // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
-  //node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-
-  circle.attr('transform', function(d) {
-     return 'translate(' + d.x + ',' + d.y + ')';
-   });
-
   edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-    //console.log(d)
-    return path});
+    return path;
+  });
   edgelabels.attr('transform',function(d,i){
     if (d.target.x<d.source.x){
             let bbox = this.getBBox();
@@ -207,15 +229,90 @@ function tick() {
       return 'rotate(0)';
     }
   });
+*/
+
+
+  circle.attr('transform', function(d) {
+     return 'translate(' + d.x + ',' + d.y + ')';
+  });
 };  // End on tick
 
 function update(){
-/*
-
   //---- EDGES ----------------------------------------------------------------
-  // TO BE ADDED BEFORE Nodes so nodes will cover edges.
+  //TW ORIGINAL EDGE drawing and LABEL text.
+  // DO NOT DELETE yet
+  /*
+  let edge = svg.selectAll("line")
+    .data(edgesData)
+    .enter()
+    .append("line")
+      .attr("id", function(d,i){return 'edge'+i})
+      .attr('marker-end', 'url(#arrowhead)')
+      //.attr('class', 'edge')
+      .style("stroke", "#ccc")
+      //.style("stroke-width", "3px")
+      //.style("stroke", "blue")
 
+  let edgepaths = svg.selectAll(".edgepath")
+    .data(edgesData)
+    .enter()
+    .append('path')
+    .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+           'class':'edgepath',
+           'fill-opacity':0,
+           'stroke-opacity':0,
+           'id':function(d,i) {return 'edgepath'+i}})
+    .style("pointer-events", "none")
+    ;
+  // dx : the starting distance of the label from the source node
+  let edgelabels = svg.selectAll(".edgelabel")
+    .data(edgesData).enter()
+    .append('text')
+      .attr({'class':'edgelabel',
+        //
+        'dx':80,
+        'dy':-1  // change to 5 to put inline with edge
+      });
+  edgelabels.append('textPath')
+    .attr('xlink:href',function(d,i) {return '#edgepath'+i})
+    .attr('id', function(d,i){return 'edgelabel'+i})
+    .text(function(d,i){return d.label})
+    //---- Double click edge to edit ---------------------------------------------
+    .on("dblclick", function(d, i){
+       infoEdit(d,i, "edge");
+     });
+  edge.append("prefixText")
+    .attr("id", function(d, i) {return("prefixText"+i) ; });
   */
+  //HK new PATH script from HK
+  // path (link) group
+  //path = path.data(links);
+  path = path.data(edgesData);
+  // update existing links
+  path.classed('selected', function(d) { return d === selected_edge; })
+    //TW .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
+    //TW.style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
+    ;
+
+  // add new links
+  path.enter().append('svg:path')
+    .attr('class', 'link')
+    .classed('selected', function(d) { return d === selected_edge; })
+    //TW .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
+    //TW .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
+    .on('mousedown', function(d) {
+      if(d3.event.ctrlKey) return;
+
+      // select link
+      mousedown_edge = d;
+      if(mousedown_edge === selected_edge) selected_edge = null;
+      else selected_edge = mousedown_edge;
+      selected_node = null;
+      update();
+    });
+
+  // remove old links
+  path.exit().remove();
 
   //---- NODES -----------------------------------------------------------------
   // circle (node) group
@@ -242,12 +339,18 @@ function update(){
     })
     .on('mouseover', function(d){
       console.log("NODE MOUSEOVER");
-      let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
+      let nodeSelection = d3.select(this).attr({
+        'r':nodeRadius+5,
+        'fill-opacity':0.2,
+      }); //TW opacity  for testing only to see arrow on edge
     })
     //Mouseout Node  - bring node back to full colour
     .on('mouseout', function(d){
       //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
-      let nodeSelection = d3.select(this).attr({'r':nodeRadius});
+      let nodeSelection = d3.select(this).attr({
+        'r':nodeRadius,
+        'fill-opacity':1
+      }); //TW opacity  for testing only to see arrow on edge
     })
 
     // Node Label for visual identification
