@@ -286,20 +286,15 @@ function update(){
 
 }  // end of update()
 
+//------------------------------------------------------------------------------
+//---- Additional Functions ----------------------------------------------------
 
-
-
-//-----------------------------------------------------------------------------
-//---- Additional Functions --------------------------------------------------------------
-
-/* infoEdit()
-   Edit information for either a "node" or an "edge"
-   Currently only works for a node
+/*---- infoEdit()
+  Edit information for either a "node" or an "edge"
 */
 function infoEdit(d, i, source){
   console.log("You clicked a  " +source)
   console.log("     infoEdit: " + source + " " + d.label);
-  //console.log("clicked");
   let self = this; //TW : Unnecessary?
 
   if (infoActive == true) {
@@ -327,13 +322,14 @@ function infoEdit(d, i, source){
 
   // PREFIX - both nodes and edges
   let prefixText = div.append("p")
-      .text("Prefix: ");
+    .text("Prefix: ");
   let prefixInput = prefixText.append("input")
     .attr({
       'size': '15',
       'type': 'text',
       'value': d.prefix
     });
+
   //TYPE - NODES only
   let typeText = ""
   let typeInput = ""
@@ -341,20 +337,19 @@ function infoEdit(d, i, source){
 
   if(source=="node"){
     typeText = div.append("p")
-       .text("Type: ");
+      .text("Type: ");
     let typeData = ["URI","STRING", "INT"]
     typeInput = typeText.append("select")
-        .attr('class','select')
+      .attr('class','select')
     typeSelect = typeInput.selectAll('option')
-        .data(typeData).enter()
-        .append('option')
-        .text(function (d) { return d; })
-        .property("selected", function(g){ return g === d.type; })
-        ;
+      .data(typeData).enter()
+      .append('option')
+      .text(function (d) { return d; })
+      .property("selected", function(g){ return g === d.type; })
+    ;
   }
 
- //console.log("labelInput: " +labelInput.node().value);
- //---- UPDATE BUTTON -----------------------------------------------------//
+  //---- UPDATE BUTTON -----------------------------------------------------//
   let button = div.append("button")
     .text("Update/Hide")
     .on("click", function() {
@@ -373,66 +368,50 @@ function infoEdit(d, i, source){
         // Change class of circle to match TYPE so the node display will change
         //   according to the node type
         d3.select("#circle" + i)
-          //Hang head in shame for this horrible kludge. Make this smarter.
-          //  detect exist class.If changed: Remove existing, update to new
-//TW HERE
-
-          .classed("string", false)  // remove the class
-          .classed("uri", false)  // remove the class
-          .classed("unspec", false) // remove the class
-        .classed(typeInput.node().value.toLowerCase(), true)
+          .attr("class", "")  // Remove all classes (node, uri, string, int)
+          .attr("class", "node") // Add the node class back in.
+          .classed(typeInput.node().value.toLowerCase(), true) // add type class
         ;
-
       } // end of node UPDATE
       if(source=="edge"){
         console.log("Updating Edge")
-
         d3.select("#edgelabel" + i)
           .text(function(d)  {return (d.label = labelInput.node().value); });
-
         d3.select("#prefixText" + i)
           .text(function(d) {return (d.prefix = prefixInput.node().value); });
-      }
+      } // end of Edge update
       // Clean up the info window after click of Hide/Update
       d3.select("#info").selectAll("*").remove();
       d3.select("#info").style("opacity", 0);
-
- }) // end of click on update button
+    }) // end of click on update button
   infoActive = true;
-
-//TW
-let delButton = div.append("button")
-  .text("Delete")
-  .on("click", function() {
+  let delButton = div.append("button")
+    .text("Delete")
+    .on("click", function() {
     if(source=="node"){
-    // select node
-    mousedown_node = d; //TW captures the node. Initialized to null as per Kirsling
-    selected_node = mousedown_node ;  //TW just playing here. Need to restructure ALL of this per Kirsling
-    console.log("D: ", d)
-    //let foo = indexOf(node());
-    console.log("So you want to DELETE a node!")
-    console.log("Selected_node: " , selected_node)
-      // must delete the node and any edge attached to it (ingoing and outgoing)
-    nodesData.splice(nodesData.indexOf(selected_node), 1); // Delete selected node from array
-    update();
-  }
-  if(source=="edge"){
-    console.log("So you want to DELETE an Edge!")
-    mousedown_edge = d; //TW captures the edge.
-    selected_edge = mousedown_edge ;  //TW just playing here. Need to restructure ALL of this per Kirsling
-    console.log("Selected_edge: " , selected_edge)
-    edgesData.splice(edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
-    update();
-  }
-});
+      // select node
+      mousedown_node = d; //TW captures the node. Initialized to null as per Kirsling
+      selected_node = mousedown_node ;  //TW just playing here. Need to restructure ALL of this per Kirsling
+      console.log("D: ", d)
+      //let foo = indexOf(node());
+      console.log("So you want to DELETE a node!")
+      console.log("Selected_node: " , selected_node)
+        // must delete the node and any edge attached to it (ingoing and outgoing)
+      nodesData.splice(nodesData.indexOf(selected_node), 1); // Delete selected node from array
+      update();
+    }
+    if(source=="edge"){
+      console.log("So you want to DELETE an Edge!")
+      mousedown_edge = d; //TW captures the edge.
+      selected_edge = mousedown_edge ;  //TW just playing here. Need to restructure ALL of this per Kirsling
+      console.log("Selected_edge: " , selected_edge)
+      edgesData.splice(edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
+      update();
+    }
+  }); // end of del button
+} // end of infoEdit()
 
-}
-
-
-/* addNode()
-   Add a node
-*/
-
+//---- addNode()
 function addNode(){
   console.log("So you want to add a node!")
   let newNode = {
