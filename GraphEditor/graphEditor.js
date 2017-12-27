@@ -232,7 +232,8 @@ function update(){
     .attr("class", function(d,i){
       if (d.type == "STRING"){ return "node string";}
       else if (d.type == "URI"){ return "node uri"; }
-      else {return "node unspec";}
+      else if (d.type == "INT"){ return "node int"; }
+      else if (d.type == "UNSPEC"){ return "node unspec"; }
     })
     //---- Double click node to edit -----------------------------------------
     // Nodes: edit of label, type, and prefix...
@@ -341,7 +342,7 @@ function infoEdit(d, i, source){
   if(source=="node"){
     typeText = div.append("p")
        .text("Type: ");
-    let typeData = ["URI","STRING"]
+    let typeData = ["URI","STRING", "INT"]
     typeInput = typeText.append("select")
         .attr('class','select')
     typeSelect = typeInput.selectAll('option')
@@ -374,9 +375,12 @@ function infoEdit(d, i, source){
         d3.select("#circle" + i)
           //Hang head in shame for this horrible kludge. Make this smarter.
           //  detect exist class.If changed: Remove existing, update to new
+//TW HERE
+
           .classed("string", false)  // remove the class
           .classed("uri", false)  // remove the class
-          .classed(typeInput.node().value.toLowerCase(), true)
+          .classed("unspec", false) // remove the class
+        .classed(typeInput.node().value.toLowerCase(), true)
         ;
 
       } // end of node UPDATE
@@ -432,15 +436,14 @@ let delButton = div.append("button")
 function addNode(){
   console.log("So you want to add a node!")
   let newNode = {
-    label: 'New',
+    label: 'Newbie',
     prefix: 'new',
-    type: 'new',
+    type: 'UNSPEC',
     x:200, y:200,
     fixed:true};
     let n = nodesData.push(newNode);
     console.log(newNode)
     console.log(nodesData)
-    //restart();
     update();
 }
 

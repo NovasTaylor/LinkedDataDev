@@ -1,3 +1,7 @@
+// Modifications from original'
+// 1. Use of var names Edges instead of Links
+// 2. Drag to create link only when SHIFT + LEFT Mouse drag
+
 // set up SVG for D3
 var width  = 960,
     height = 500,
@@ -103,7 +107,7 @@ function tick() {
 
 // update graph (called when needed)
 function update() {
-  //---- LINKS 
+  //---- LINKS
   // path (link) group
   path = path.data(links);
 
@@ -132,7 +136,7 @@ function update() {
   // remove old links
   path.exit().remove();
 
-  //---- NODES 
+  //---- NODES
   // circle (node) group
   // NB: the function arg is crucial here! nodes are known by id, not by index!
   circle = circle.data(nodes, function(d) { return d.id; });
@@ -162,19 +166,25 @@ function update() {
       d3.select(this).attr('transform', '');
     })
     .on('mousedown', function(d) {
-      if(d3.event.ctrlKey) return;
+    //  if(d3.event.ctrlKey) return;
 
       // select node
-      mousedown_node = d;
+      mousedown_node = d; // The node you mousedowned on
       if(mousedown_node === selected_node) selected_node = null;
       else selected_node = mousedown_node;
       selected_edge = null;
 
-      // reposition drag line
-      drag_line
-        .style('marker-end', 'url(#end-arrow)')
-        .classed('hidden', false)
-        .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
+      // Drag to create link only when SHIFT + LEFT Mouse drag
+      if (d3.event.shiftKey) {
+        console.log("SHIFT PLUS MOUSDOWN!")
+        // reposition drag line
+        drag_line
+          .style('marker-end', 'url(#end-arrow)')
+          .classed('hidden', false)
+          .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
+
+      }
+
 
       update();
     })
