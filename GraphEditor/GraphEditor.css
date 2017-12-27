@@ -1,6 +1,6 @@
 /*---- from Kirsling follows -------------------------------------------------*/
 svg {
-  background-color: #FFF;
+  background-color: #fff;
   cursor: default;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -13,7 +13,7 @@ svg:not(.active):not(.ctrl) {
 }
 path.link {
   fill: none;
-  stroke: #000;
+  stroke: #ccc;
   stroke-width: 4px;
   cursor: default;
 }

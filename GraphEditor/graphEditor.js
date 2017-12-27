@@ -110,14 +110,14 @@ let force = d3.layout.force()
   .on("tick", tick);
 
 // Arrow marker for end of edge
-svg.append('defs').append('marker')
-  .attr({'id':'arrowhead',
+svg.append('svg:defs').append('svg:marker')
+  .attr({'id':'end-arrow',
     'viewBox': '-0 -5 10 10',
-    'refX':    nodeRadius+12,
+    'refX':    nodeRadius-7,
     'refY':    0,
     'orient': 'auto',
-    'markerWidth':  10,
-    'markerHeight': 10,
+    'markerWidth':  3.1,
+    'markerHeight': 3.1,
     'xoverflow':'visible'})
   .append('svg:path')
     .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
@@ -139,56 +139,7 @@ let selected_node = null,
   mousedown_node  = null,
   mouseup_node    = null;
 
-//TW---- Edges  (original code, works in this location but not for additions!)
-/* DO NOT DELETE YET....
-let edge = svg.selectAll("line")
-  .data(edgesData)
-  .enter()
-  .append("line")
-    .attr("id", function(d,i){return 'edge'+i})
-    .attr('marker-end', 'url(#arrowhead)')
-    //.attr('class', 'edge')
-    .style("stroke", "#ccc")
-    //.style("stroke-width", "3px")
-    //.style("stroke", "blue")
-
-let edgepaths = svg.selectAll(".edgepath")
-  .data(edgesData)
-  .enter()
-  .append('path')
-  .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-         'class':'edgepath',
-         'fill-opacity':0,
-         'stroke-opacity':0,
-         'id':function(d,i) {return 'edgepath'+i}})
-  .style("pointer-events", "none")
-  ;
-// dx : the starting distance of the label from the source node
-let edgelabels = svg.selectAll(".edgelabel")
-  .data(edgesData).enter()
-  .append('text')
-    .attr({'class':'edgelabel',
-      //
-      'dx':80,
-      'dy':-1  // change to 5 to put inline with edge
-    });
-
-edgelabels.append('textPath')
-  .attr('xlink:href',function(d,i) {return '#edgepath'+i})
-  .attr('id', function(d,i){return 'edgelabel'+i})
-  .text(function(d,i){return d.label})
-  //---- Double click edge to edit ---------------------------------------------
-  .on("dblclick", function(d, i){
-     infoEdit(d,i, "edge");
-   });
-
-edge.append("prefixText")
-  .attr("id", function(d, i) {return("prefixText"+i) ; });
-  */
-// END OF EDGES DEFN
-
 function tick() {
-
   //HK draw directed edges with proper padding from node centers
   // TODO: Need to add-in path LABEL TEXT and their rotation!
   path.attr('d', function(d) {
@@ -292,6 +243,7 @@ function update(){
   path.classed('selected', function(d) { return d === selected_edge; })
     //TW .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
     //TW.style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
+    .style('marker-end', 'url(#end-arrow)')
     ;
 
   // add new links
@@ -300,6 +252,7 @@ function update(){
     .classed('selected', function(d) { return d === selected_edge; })
     //TW .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
     //TW .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
+    .style('marker-end', 'url(#end-arrow)')
     .on('mousedown', function(d) {
       if(d3.event.ctrlKey) return;
 
