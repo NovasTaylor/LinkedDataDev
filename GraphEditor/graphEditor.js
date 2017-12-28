@@ -51,6 +51,7 @@ let  nodesData = [
     x:200, y:600,
     fixed:true}
   ],
+  lastNodeId = 5,
   edgesData = [
     {source: nodesData[0], target: nodesData[1],
       label: 'label', prefix:'foo'},
@@ -63,15 +64,7 @@ let  nodesData = [
 let infoActive = false;  // opacity flag for info editing box
 let w = 900,
     h = 1100,
-    nodeRadius = 40;
-
-
-//TW.  As per Kirsling. Not yet in use. Move to fnt area of code.
-function resetMouseVars() {
-  mousedown_node = null;
-  mouseup_node = null;
-  mousedown_edge = null;
-}
+    nodeRadius = 40; // also used to distance arrow from node
 
 let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
@@ -138,6 +131,12 @@ let selected_node = null,
   mousedown_edge  = null,
   mousedown_node  = null,
   mouseup_node    = null;
+//HK Not yet in use. Move to fnt area of code.
+function resetMouseVars() {
+  mousedown_node = null;
+  mouseup_node   = null;
+  mousedown_edge = null;
+}
 
 function tick() {
   //HK draw directed edges with proper padding from node centers
@@ -156,8 +155,6 @@ function tick() {
         targetY = d.target.y - (targetPadding * normY);
     return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
   });
-
-
 /*TW ORIGINAL EDGE TICKING
   DO NOT DELETE YET....
   edge.attr({"x1" : function(d) {return d.source.x; },
@@ -165,7 +162,6 @@ function tick() {
     "x2": function(d) { return d.target.x;},
     "y2": function(d) { return d.target.y;}
   });
-
   edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     return path;
   });
@@ -175,13 +171,9 @@ function tick() {
             let rx = bbox.x+bbox.width/2;
             let ry = bbox.y+bbox.height/2;
             return 'rotate(180 '+rx+' '+ry+')';
-    }
-    else {
-      return 'rotate(0)';
-    }
+    } else { return 'rotate(0)'; }
   });
 */
-
 
   circle.attr('transform', function(d) {
      return 'translate(' + d.x + ',' + d.y + ')';
@@ -241,17 +233,12 @@ function update(){
   path = path.data(edgesData);
   // update existing links
   path.classed('selected', function(d) { return d === selected_edge; })
-    //TW .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-    //TW.style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
-    .style('marker-end', 'url(#end-arrow)')
-    ;
+    .style('marker-end', 'url(#end-arrow)');
 
-  // add new links
+  // Add new links
   path.enter().append('svg:path')
     .attr('class', 'link')
     .classed('selected', function(d) { return d === selected_edge; })
-    //TW .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-    //TW .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
     .style('marker-end', 'url(#end-arrow)')
     .on('mousedown', function(d) {
       if(d3.event.ctrlKey) return;
@@ -304,7 +291,73 @@ function update(){
         'r':nodeRadius,
         'fill-opacity':1
       }); //TW opacity  for testing only to see arrow on edge
+
     })
+    //HK START NEW FROM HK
+    /*
+    .on('mousedown', function(d) {
+      // select node
+      mousedown_node = d; // The node you mousedowned on
+      if(mousedown_node === selected_node) selected_node = null;
+      else selected_node = mousedown_node;
+      selected_edge = null;
+
+      // Drag to create link only when SHIFT + LEFT Mouse drag
+      if (d3.event.shiftKey) {
+        console.log("SHIFT PLUS MOUSDOWN!")
+        // reposition drag line
+        drag_line
+          .style('marker-end', 'url(#end-arrow)')
+          .classed('hidden', false)
+          .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
+      }
+      update();
+    })
+    .on('mouseup', function(d) {
+      if(!mousedown_node) return;
+      // needed by FF
+      drag_line
+        .classed('hidden', true)
+        .style('marker-end', '');
+
+      // check for drag-to-self
+      //TW: Can remove??
+      mouseup_node = d;
+      if(mouseup_node === mousedown_node) { resetMouseVars(); return; }
+      // unenlarge target node
+      d3.select(this).attr('transform', '');
+
+      // add link to graph (update if exists)
+      // NB: links are strictly source < target; arrows separately specified by booleans
+      var source, target, direction;
+      if(mousedown_node.id < mouseup_node.id) {
+        source = mousedown_node;
+        target = mouseup_node;
+        direction = 'right';
+      } else {
+        source = mouseup_node;
+        target = mousedown_node;
+        direction = 'left';
+      }
+      var link;
+      link = links.filter(function(l) {
+        return (l.source === source && l.target === target);
+      })[0];
+
+      if(link) {
+        link[direction] = true;
+      } else {
+        link = {source: source, target: target, left: false, right: false};
+        link[direction] = true;
+        links.push(link);
+      }
+      // select new link
+      selected_edge = link;
+      selected_node = null;
+      update();
+    }); // end on mouseup
+    */
+    //HK END NEW FROM HK
 
     // Node Label for visual identification
     circle.append('svg:text')
@@ -329,21 +382,141 @@ function update(){
     // a drag and CTRL+Drag to create a new link (differs from Kersling)
      circle.call(force.drag);
 
-    // remove old nodes
+    // Remove old nodes
     circle.exit().remove();
 
     // set the graph in motion
     force.start();
-
-
-
-
-
-
 }  // end of update()
 
 //------------------------------------------------------------------------------
 //---- Additional Functions ----------------------------------------------------
+function mousedown() {
+  // prevent I-bar on drag
+  //d3.event.preventDefault();
+
+  // because :active only works in WebKit?
+  svg.classed('active', true);
+
+  if(d3.event.ctrlKey || mousedown_node || mousedown_edge) return;
+
+  // insert new node at point
+  var point = d3.mouse(this),
+      node = {id: ++lastNodeId, reflexive: false};
+  node.x = point[0];
+  node.y = point[1];
+  nodes.push(node);
+
+  update();
+}
+
+function mousemove() {
+  if(!mousedown_node) return;
+
+  // update drag line
+  drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+
+  update();
+}
+
+function mouseup() {
+  if(mousedown_node) {
+    // hide drag line
+    drag_line
+      .classed('hidden', true)
+      .style('marker-end', '');
+  }
+
+  // because :active only works in WebKit?
+  svg.classed('active', false);
+
+  // clear mouse event vars
+  resetMouseVars();
+}
+
+function spliceLinksForNode(node) {
+  var toSplice = links.filter(function(l) {
+    return (l.source === node || l.target === node);
+  });
+  toSplice.map(function(l) {
+    links.splice(links.indexOf(l), 1);
+  });
+}
+
+/*
+// only respond once per keydown
+var lastKeyDown = -1;
+
+function keydown() {
+  d3.event.preventDefault();
+
+  if(lastKeyDown !== -1) return;
+  lastKeyDown = d3.event.keyCode;
+
+  // ctrl
+  if(d3.event.keyCode === 17) {
+    circle.call(force.drag);
+    svg.classed('ctrl', true);
+  }
+
+  if(!selected_node && !selected_edge) return;
+  switch(d3.event.keyCode) {
+    case 8: // backspace
+    case 46: // delete
+      if(selected_node) {
+        nodes.splice(nodes.indexOf(selected_node), 1); // Delete selected node from array
+        spliceLinksForNode(selected_node);  // Delete links attached to the selected node
+      } else if(selected_edge) {
+        links.splice(links.indexOf(selected_edge), 1);
+      }
+      selected_edge = null;
+      selected_node = null;
+      update();
+      break;
+    case 66: // B
+      if(selected_edge) {
+        // set link direction to both left and right
+        selected_edge.left = true;
+        selected_edge.right = true;
+      }
+      update();
+      break;
+    case 76: // L
+      if(selected_edge) {
+        // set link direction to left only
+        selected_edge.left = true;
+        selected_edge.right = false;
+      }
+      update();
+      break;
+    case 82: // R
+      if(selected_node) {
+        // toggle node reflexivity
+        selected_node.reflexive = !selected_node.reflexive;
+      } else if(selected_edge) {
+        // set link direction to right only
+        selected_edge.left = false;
+        selected_edge.right = true;
+      }
+      update();
+      break;
+  }
+}
+*/
+/*
+function keyup() {
+  lastKeyDown = -1;
+
+  // ctrl
+  if(d3.event.keyCode === 17) {
+    circle
+      .on('mousedown.drag', null)
+      .on('touchstart.drag', null);
+    svg.classed('ctrl', false);
+  }
+}
+*/
+
 
 /*---- infoEdit()
   Edit information for either a "node" or an "edge"
@@ -483,4 +656,13 @@ function addNode(){
 }
 
 //---- App Start ---------------------------------------------------------------
+svg.on('mousedown', mousedown)
+  .on('mousemove', mousemove)
+  .on('mouseup', mouseup);
+
+//KEYDOWN/KEYUP detection causes inability to EDIT fields in infoEdit window.
+// Need to isolate this to the #whiteboard ONLY ??
+//d3.select(window)
+  //.on('keydown', keydown)
+  //.on('keyup', keyup);
 update();
