@@ -17,6 +17,11 @@
   fill: #bcf5bc ;
   stroke: black;
 }
+.node.int {
+  fill: #c1e1eC ; /* light blue */
+  stroke: red;
+  stroke-width: 4;
+}
 
 .node .misc {
   fill: gray ;

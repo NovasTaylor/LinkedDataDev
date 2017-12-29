@@ -267,7 +267,7 @@ function update(){
       .attr("class", function(d,i){
         if (d.type == "STRING"){ return "string";}
         else if (d.type == "URI"){ return "uri"; }
-        else {return "unspec";}
+        else if (d.type == "INT"){ return "int"; }
       })
       //---- Double click node to edit -----------------------------------------
       // For new nodes, this should allow the entry of label, type, and prefix...
@@ -375,7 +375,7 @@ function infoEdit(d, i, source){
   if(source=="node"){
     typeText = div.append("p")
        .text("Type: ");
-    let typeData = ["URI","STRING"]
+    let typeData = ["URI","STRING", "INT"]
     typeInput = typeText.append("select")
         .attr('class','select')
     typeSelect = typeInput.selectAll('option')
@@ -406,11 +406,10 @@ function infoEdit(d, i, source){
         // Change class of circle to match TYPE so the node display will change
         //   according to the node type
         d3.select("#circle" + i)
-          //Hang head in shame for this horrible kludge. Make this smarter.
-          //  detect exist class.If changed: Remove existing, update to new
-          .classed("string", false)  // remove the class
-          .classed("uri", false)  // remove the class
-          .classed(typeInput.node().value.toLowerCase(), true)
+          .attr("class", "")  // Remove all classes (node, uri, string, int)
+          .attr("class", "node") // Add the node class back in.
+          .classed(typeInput.node().value.toLowerCase(), true) // add type class
+       
         ;
 
       } // end of node UPDATE
