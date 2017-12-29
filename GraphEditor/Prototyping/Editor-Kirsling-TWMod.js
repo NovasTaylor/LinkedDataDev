@@ -118,7 +118,10 @@ function update() {
 
   // add new links
   edge.enter().append('svg:path')
-    .attr('class', 'link')
+    //.attr('class', 'link')
+      .style("stroke", "#ccc")
+      .style("stroke-width", "3px")
+
     .classed('selected', function(d) { return d === selected_edge; })
     .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
     .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
