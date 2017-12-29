@@ -57,12 +57,12 @@ svg.append('svg:defs').append('svg:marker')
     .attr('fill', '#000');
 
 // line displayed when dragging new nodes
-var drag_line = svg.append('svg:path')
-  .attr('class', 'link dragline hidden')
-  .attr('d', 'M0,0L0,0');
+//TWTemp var drag_line = svg.append('svg:path')
+//TWTemp  .attr('class', 'link dragline hidden')
+//TWTemp  .attr('d', 'M0,0L0,0');
 
 // handles to link and node element groups
-var path = svg.append('svg:g').selectAll('path'),
+var path = svg.append('svg:g').selectAll('edge'),
     circle = svg.append('svg:g').selectAll('g');
 
 // mouse event vars
@@ -81,7 +81,7 @@ function resetMouseVars() {
 // update force layout (called automatically each iteration)
 function tick() {
   // draw directed edges with proper padding from node centers
-  path.attr('d', function(d) {
+  edge.attr('d', function(d) {
     var deltaX = d.target.x - d.source.x,
         deltaY = d.target.y - d.source.y,
         dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
@@ -104,16 +104,16 @@ function tick() {
 // update graph (called when needed)
 function restart() {
   // path (link) group
-  path = path.data(links);
+  edge = edge.data(links);
 
   // update existing links
-  path.classed('selected', function(d) { return d === selected_link; })
+  edge.classed('selected', function(d) { return d === selected_link; })
     .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
     .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; });
 
 
   // add new links
-  path.enter().append('svg:path')
+  edge.enter().append('svg:path')
     .attr('class', 'link')
     .classed('selected', function(d) { return d === selected_link; })
     .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
@@ -130,7 +130,7 @@ function restart() {
     });
 
   // remove old links
-  path.exit().remove();
+  edge.exit().remove();
 
 
   // circle (node) group
