@@ -34,6 +34,20 @@ path.link.hidden {
   stroke-width: 0;
 }
 
+//TW NEW
+.edge{
+    stroke: gray;
+    stroke-width: 3;
+}
+
+/* NEW */
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 4px;
+  cursor: default;
+}
+
 /* NEW */
 edge.link {
   fill: none;

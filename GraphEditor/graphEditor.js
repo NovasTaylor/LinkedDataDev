@@ -7,7 +7,7 @@ SRC :
 IN  :
 OUT :
 DEV:
-NOTE: Basing node addition on this: http://jsfiddle.net/Nivaldo/tUKh3/
+NOTE: Basing node addition on: http://jsfiddle.net/Nivaldo/tUKh3/
 TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
       Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
 -----------------------------------------------------------------------------*/
@@ -178,6 +178,8 @@ function tick() {
   circle.attr('transform', function(d) {
      return 'translate(' + d.x + ',' + d.y + ')';
   });
+
+  update();
 };  // End on tick
 
 function update(){
@@ -254,7 +256,7 @@ function update(){
       if(mousedown_edge === selected_edge) selected_edge = null;
       else selected_edge = mousedown_edge;
       selected_node = null;
-      update();
+      //update();
     });
 
   // remove old links
@@ -366,13 +368,16 @@ function update(){
     //HK END NEW FROM HK
 
     // Node Label for visual identification
+
     circle.append('svg:text')
+  //  circle.selectAll('text')
       .attr({
         'class':       function(d,i){return 'nodeText'},
         'id':          function(d, i) {return("nodeText"+i) ; },
         'text-anchor': 'middle',
         'class':       'nodeLabel'
       })
+    //  .append("text")
       .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
 
     // Create unique IDS for the PREFIX and TYPE text for updating from the info box
@@ -398,22 +403,10 @@ function update(){
 //------------------------------------------------------------------------------
 //---- Additional Functions ----------------------------------------------------
 function mousedown() {
-  // prevent I-bar on drag
-  //d3.event.preventDefault();
-
-  // because :active only works in WebKit?
+  //HK because :active only works in WebKit?   ?TW function here?
   svg.classed('active', true);
-
   if(d3.event.ctrlKey || mousedown_node || mousedown_edge) return;
-
-  // insert new node at point
-  var point = d3.mouse(this),
-      node = {id: ++lastNodeId, reflexive: false};
-  node.x = point[0];
-  node.y = point[1];
-  nodes.push(node);
-
-  update();
+  //update();
 }
 
 function mousemove() {
@@ -422,7 +415,7 @@ function mousemove() {
   // update drag line
   drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
 
-  update();
+  //update();
 }
 
 function mouseup() {
@@ -530,7 +523,7 @@ function keyup() {
 function infoEdit(d, i, source){
   console.log("You clicked a  " +source)
   console.log("     infoEdit: " + source + " " + d.label);
-  let self = this; //TW : Unnecessary?
+  //let self = this; //TW : Unnecessary?
 
   if (infoActive == true) {
     // clicked a node or edge while previous info block displayed
@@ -589,11 +582,15 @@ function infoEdit(d, i, source){
     .text("Update/Hide")
     .on("click", function() {
       if(source=="node"){
-        console.log("Updating Node")
+        console.log("Update on Node: "+ i)
         // Label
+      d.label = labelInput.node().value;
+
         d3.select("#nodeText" + i)
-          .text(function(d) {return (d.label = labelInput.node().value); });
+        //.text("TEST")
+        .text(function(d) {return (d.label = labelInput.node().value); });
         // Prefix
+
         d3.select("#prefixText" + i)
           .text(function(d) {return (d.prefix = prefixInput.node().value); });
         // Type
@@ -647,18 +644,21 @@ function infoEdit(d, i, source){
 } // end of infoEdit()
 
 //---- addNode()
+// nodeID is incremented with each new node.
 function addNode(){
   console.log("So you want to add a node!")
   let newNode = {
+    id: ++lastNodeId,
     label: 'Newbie',
     prefix: 'new',
     type: 'UNSPEC',
     x:200, y:200,
     fixed:true};
-    let n = nodesData.push(newNode);
+    // let n = nodesData.push(newNode);
+    nodesData.push(newNode);
     console.log(newNode)
     console.log(nodesData)
-    update();
+    update();  // needed to add the node
 }
 
 //---- App Start ---------------------------------------------------------------

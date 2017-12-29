@@ -38,6 +38,7 @@ var force = d3.layout.force()
     .on('tick', tick)
 
 // define arrow markers for graph links
+
 svg.append('svg:defs').append('svg:marker')
     .attr('id', 'end-arrow')
     .attr('viewBox', '0 -5 10 10')
@@ -60,10 +61,12 @@ svg.append('svg:defs').append('svg:marker')
     .attr('d', 'M10,-5L0,0L10,5')
     .attr('fill', '#000');
 
+
 // line displayed when dragging new nodes
 var drag_line = svg.append('svg:path')
   .attr('class', 'link dragline hidden')
   .attr('d', 'M0,0L0,0');
+
 
 // handles to link and node element groups
 var edge = svg.append('svg:g').selectAll('edge'),
@@ -117,10 +120,11 @@ function update() {
     .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; });
 
   // add new links
-  edge.enter().append('svg:path')
-    //.attr('class', 'link')
-      .style("stroke", "#ccc")
-      .style("stroke-width", "3px")
+  //edge.enter().append('svg:path')
+  edge.enter().append('path')
+    .attr('class', 'link')
+    //  .style("stroke", "#ccc")
+    //  .style("stroke-width", "3px")
 
     .classed('selected', function(d) { return d === selected_edge; })
     .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
