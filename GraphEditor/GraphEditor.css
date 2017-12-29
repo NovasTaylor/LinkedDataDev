@@ -17,6 +17,12 @@
   fill: #bcf5bc ;
   stroke: black;
 }
+
+.node .uriont {
+  fill: #ffc862 ;
+  stroke: black;
+}
+
 .node.int {
   fill: #c1e1eC ; /* light blue */
   stroke: red;

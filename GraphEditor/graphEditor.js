@@ -14,37 +14,44 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 "use strict";
 
 let  nodesData = [
-  { label: 'PRODUCT1',
+  { id: 0,
+    label: 'PRODUCT1',
     prefix:"ldw",
     type: 'URI',
     x:500, y:60,
     fixed:true},
-  { label: 'Serum 114',
+  { id: 1,
+    label: 'Serum 114',
     prefix:"--NONE--",
     type: 'STRING',
     x:700, y:60,
     fixed:true},
-  { label: 'F',
+  { id: 2,
+    label: 'F',
     prefix:"ldw",
     type: 'URI',
     x:100, y:400,
     fixed:true},
-  { label: 'C16576',
+  { id: 3,
+    label: 'C16576',
     prefix:"sdtmterm",
-    type: 'URI',
+    type: 'URIONT',
     x:100, y:600,
     fixed:true},
-  { label: 'M',
+  { id: 4,
+    label: 'M',
     prefix:"ldw",
     type: 'URI',
     x:200, y:400,
     fixed:true},
-  { label: 'C20197',
+  { id: 5,
+    label: 'C20197',
     prefix:"sdtmterm",
-    type: 'URI',
+    type: 'URIONT',
     x:200, y:600,
     fixed:true}
   ],
+  lastNodeId = 5,
   edgesData = [
     {source: nodesData[0], target: nodesData[1],
       label: 'label', prefix:'foo'},
@@ -57,7 +64,7 @@ let  nodesData = [
 let infoActive = false;  // opacity flag for info editing box
 let w = 900,
     h = 1100,
-    nodeRadius = 40;
+    nodeRadius = 40; // also used to distance arrow from node
 
 // mouse event vars as per Kirsling. only mousedown_node in use as of 2017-12-23
 let selected_node = null,
@@ -77,7 +84,7 @@ let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
 
-// Icon to add node
+// Add node icon
 svg.append("svg:image")
   .attr({
     'x':5,
@@ -181,6 +188,8 @@ node.append("circle")
   .attr("class", function(d,i){
   if (d.type == "STRING"){ return "string";}
     else if (d.type == "URI"){ return "uri"; }
+    else if (d.type == "INT"){ return "int"; }
+    else if (d.type == "URIONT"){ return "uriont"; }
     else {return "unspec";}
   })
 
@@ -267,7 +276,7 @@ function update(){
       .attr("class", function(d,i){
         if (d.type == "STRING"){ return "string";}
         else if (d.type == "URI"){ return "uri"; }
-        else if (d.type == "INT"){ return "int"; }
+        else {return "unspec";}
       })
       //---- Double click node to edit -----------------------------------------
       // For new nodes, this should allow the entry of label, type, and prefix...
@@ -392,7 +401,7 @@ function infoEdit(d, i, source){
     .text("Update/Hide")
     .on("click", function() {
       if(source=="node"){
-        console.log("Updating Node")
+        console.log("Update on Node: "+ i)
         // Label
         d3.select("#nodeText" + i)
           .text(function(d) {return (d.label = labelInput.node().value); });
@@ -409,7 +418,7 @@ function infoEdit(d, i, source){
           .attr("class", "")  // Remove all classes (node, uri, string, int)
           .attr("class", "node") // Add the node class back in.
           .classed(typeInput.node().value.toLowerCase(), true) // add type class
-       
+
         ;
 
       } // end of node UPDATE
@@ -421,7 +430,7 @@ function infoEdit(d, i, source){
 
         d3.select("#prefixText" + i)
           .text(function(d) {return (d.prefix = prefixInput.node().value); });
-      }
+      } // end of Edge update
       // Clean up the info window after click of Hide/Update
       d3.select("#info").selectAll("*").remove();
       d3.select("#info").style("opacity", 0);
@@ -465,9 +474,10 @@ let delButton = div.append("button")
 function addNode(){
   console.log("So you want to add a node!")
   let newNode = {
-    label: 'New',
+    id: ++lastNodeId,
+    label: 'Newbie',
     prefix: 'new',
-    type: 'new',
+    type: 'UNSPEC',
     x:200, y:200,
     fixed:true};
     let n = nodesData.push(newNode);
