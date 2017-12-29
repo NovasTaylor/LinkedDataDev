@@ -11,14 +11,13 @@ svg {
 svg:not(.active):not(.ctrl) {
   cursor: crosshair;
 }
-
+/* old */
 path.link {
   fill: none;
   stroke: #000;
   stroke-width: 4px;
   cursor: default;
 }
-
 svg:not(.active):not(.ctrl) path.link {
   cursor: pointer;
 }
@@ -32,6 +31,28 @@ path.link.dragline {
 }
 
 path.link.hidden {
+  stroke-width: 0;
+}
+
+/* NEW */
+edge.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 4px;
+  cursor: default;
+}
+svg:not(.active):not(.ctrl) edge.link {
+  cursor: pointer;
+}
+edge.link.selected {
+  stroke-dasharray: 10,2;
+}
+
+edge.link.dragline {
+  pointer-events: none;
+}
+
+edge.link.hidden {
   stroke-width: 0;
 }
 
