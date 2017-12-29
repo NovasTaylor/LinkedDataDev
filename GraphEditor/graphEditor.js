@@ -123,7 +123,7 @@ var drag_line = svg.append('svg:path')
   .attr('d', 'M0,0L0,0');
 
 //HK handles to link and node element groups
-var path = svg.append('svg:g').selectAll('path'),
+var edge = svg.append('svg:g').selectAll('edge'),
   circle = svg.append('svg:g').selectAll('g');
 //HK mouse event vars as per Kirsling. only mousedown_node in use as of 2017-12-23
 let selected_node = null,
@@ -141,7 +141,7 @@ function resetMouseVars() {
 function tick() {
   //HK draw directed edges with proper padding from node centers
   // TODO: Need to add-in path LABEL TEXT and their rotation!
-  path.attr('d', function(d) {
+  edge.attr('d', function(d) {
     var deltaX = d.target.x - d.source.x,
         deltaY = d.target.y - d.source.y,
         dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
@@ -184,7 +184,7 @@ function update(){
   //---- EDGES ----------------------------------------------------------------
   //TW ORIGINAL EDGE drawing and LABEL text.
   // DO NOT DELETE yet
-  /*
+/*TW : Original Edge. delete after implment ID on new PATH
   let edge = svg.selectAll("line")
     .data(edgesData)
     .enter()
@@ -195,6 +195,8 @@ function update(){
       .style("stroke", "#ccc")
       //.style("stroke-width", "3px")
       //.style("stroke", "blue")
+;
+*/
 
   let edgepaths = svg.selectAll(".edgepath")
     .data(edgesData)
@@ -207,6 +209,7 @@ function update(){
            'id':function(d,i) {return 'edgepath'+i}})
     .style("pointer-events", "none")
     ;
+
   // dx : the starting distance of the label from the source node
   let edgelabels = svg.selectAll(".edgelabel")
     .data(edgesData).enter()
@@ -214,7 +217,7 @@ function update(){
       .attr({'class':'edgelabel',
         //
         'dx':80,
-        'dy':-1  // change to 5 to put inline with edge
+        'dy':-4  // change to 5 to put inline with edge
       });
   edgelabels.append('textPath')
     .attr('xlink:href',function(d,i) {return '#edgepath'+i})
@@ -224,19 +227,22 @@ function update(){
     .on("dblclick", function(d, i){
        infoEdit(d,i, "edge");
      });
+
+
+  /*
   edge.append("prefixText")
     .attr("id", function(d, i) {return("prefixText"+i) ; });
   */
   //HK new PATH script from HK
   // path (link) group
   //path = path.data(links);
-  path = path.data(edgesData);
+  edge = edge.data(edgesData);
   // update existing links
-  path.classed('selected', function(d) { return d === selected_edge; })
+  edge.classed('selected', function(d) { return d === selected_edge; })
     .style('marker-end', 'url(#end-arrow)');
 
   // Add new links
-  path.enter().append('svg:path')
+  edge.enter().append('svg:path')
     .attr('class', 'link')
     .classed('selected', function(d) { return d === selected_edge; })
     .style('marker-end', 'url(#end-arrow)')
@@ -252,7 +258,7 @@ function update(){
     });
 
   // remove old links
-  path.exit().remove();
+  edge.exit().remove();
 
   //---- NODES -----------------------------------------------------------------
   // circle (node) group
