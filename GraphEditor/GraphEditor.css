@@ -35,6 +35,9 @@
 
 .node .unspec {
   fill: yellow ;
+  stroke: red;
+  stroke-width: 4;
+  stroke-dasharray: 2;;
 }
 
 
