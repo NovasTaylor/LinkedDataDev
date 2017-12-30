@@ -62,11 +62,15 @@ let  nodesData = [
   ];
 
 let infoActive = false;  // opacity flag for info editing box
+
+// Start and end nodes when constructing a link
+let startNode=null ,
+    endNode = null;
 let w = 900,
     h = 1100,
     nodeRadius = 40; // also used to distance arrow from node
 
-// mouse event vars as per Kirsling. only mousedown_node in use as of 2017-12-23
+// mouse event settings  as per Kirsling. only mousedown_node in use as of 2017-12-23
 let selected_node = null,
   selected_edge   = null,
   mousedown_edge  = null,
@@ -220,7 +224,7 @@ function update(){
     //.style('fill', 'red'); //TW
 
   // add new nodeSelection
-  var g = circle.enter().append('svg:g');
+  let g = circle.enter().append('svg:g');
 
     g.append("svg:circle")
       .attr("class", "node")
@@ -237,6 +241,22 @@ function update(){
       .on("dblclick", function(d, i){
         infoEdit(d,i, "node");
       })
+      .on("click", function(d, i){
+        if (d3.event.shiftKey)  {
+            if (startNode===null){
+            startNode= i;
+            console.log("Setting Start Node as node ID: " + startNode);
+            // Call function here that sets source node id, listens for destination
+            }
+           else if (startNode !== null){
+             endNode= i;
+             console.log("Start Node: " + startNode + " End Node: " + endNode);
+             // Now reset
+             startNode = null;
+             endNode = null;
+           }
+
+        }})
       .on('mouseover', function(d){
         console.log("NODE MOUSEOVER");
         let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
