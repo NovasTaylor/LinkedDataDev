@@ -210,20 +210,6 @@ node.append("circle")
     infoEdit(d,i, "node");
   });
 
-// dx sets how close to the node the label appears
-// Need unique ID for each nodeText value in order to update it from the info window
-
-// Removal of this means the nodes do not have text until edited.
-node.append("text")
-  .attr({
-    'class':       function(d){return 'nodeText'},
-    'id':          function(d, i) {return("nodeText"+i) ; },
-    'text-anchor': 'middle',
-    'class':        'nodeLabel'
-  })
-  .text(function(d) { return d.label; }) ;
-
-
 // Create unique IDS for the PREFIX and TYPE text for updating from the info box
 //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
 node.append("prefixText")
@@ -261,6 +247,12 @@ function tick() {
 };  // End on tick
 
 function update(){
+
+  //---- EDGES update ----------------------------------------------------------
+
+  // Add new links ..... TO BE ADDED
+
+
   // NODES update --------------------------------------------------------------
   node = svg.selectAll("g.node")
     .data(nodesData);
@@ -304,7 +296,7 @@ function update(){
       'text-anchor': 'middle',
       'class':        'nodeLabel'
     })
-    //.text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
+    .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
       // after node text is changed, original and NEW overwrite.
     ;
 
@@ -317,12 +309,6 @@ function update(){
   node.call(force.drag);
   // Exit any old nodes.
   node.exit().remove();
-
-  //---- EDGES update ----------------------------------------------------------
-
-  // Add new links ..... TO BE ADDED
-
-
 
   // Start the force layout.
   force.start();
@@ -483,8 +469,7 @@ function addNode(){
     let n = nodesData.push(newNode);
     console.log(newNode)
     console.log(nodesData)
-    //restart();
-    update();
+    update();  // Adds node to the SVG
 }
 
 //---- App Start ---------------------------------------------------------------
