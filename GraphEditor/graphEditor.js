@@ -84,6 +84,8 @@ let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
 
+// Global Declare
+let circle = svg.append('svg:g').selectAll('g');
 // Add node icon
 svg.append("svg:image")
   .attr({
@@ -131,7 +133,7 @@ svg.append('defs').append('marker')
     .attr('fill', '#ccc')
     .attr('stroke','#ccc');
 
-//---- Edges
+//---- Edges TODO: MOVE INTO UPDATE() function
 let edge = svg.selectAll("line")
   .data(edgesData)
   .enter()
@@ -139,9 +141,7 @@ let edge = svg.selectAll("line")
     .attr("id", function(d,i){return 'edge'+i})
     .attr('marker-end', 'url(#arrowhead)')
     //.attr('class', 'edge')
-    .style("stroke", "#ccc")
-    //.style("stroke-width", "3px")
-    //.style("stroke", "blue")
+    .style("stroke", "#ccc");
 
 let edgepaths = svg.selectAll(".edgepath")
   .data(edgesData)
@@ -172,51 +172,6 @@ edgelabels.append('textPath')
   .on("dblclick", function(d, i){
      infoEdit(d,i, "edge");
    });
-
-
-//---- NODES ------------------------------------------------------------------
-let node = svg.selectAll("g.node")
-  .data(nodesData)
-  .enter()
-  .append("g")
-    .attr("class", "node")
-    .call(force.drag);
-
-node.append("circle")
-  .attr("r", nodeRadius)
-  .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
-  .attr("class", function(d,i){
-  if (d.type == "STRING"){ return "string";}
-    else if (d.type == "URI"){ return "uri"; }
-    else if (d.type == "INT"){ return "int"; }
-    else if (d.type == "URIONT"){ return "uriont"; }
-    else {return "unspec";}
-  })
-
-  // Mousover Node - highlight node by fading the node colour during mouseover
-  .on('mouseover', function(d){
-    //let nodeSelection = d3.select(this).style({opacity:'0.5'});
-    console.log("NODE MOUSEOVER");
-    let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
-  })
-
-  //Mouseout Node  - bring node back to full colour
-  .on('mouseout', function(d){
-    //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
-    let nodeSelection = d3.select(this).attr({'r':nodeRadius});
-  })
-  //---- Double click node to edit ---------------------------------------------
-  .on("dblclick", function(d, i){
-    infoEdit(d,i, "node");
-  });
-
-// Create unique IDS for the PREFIX and TYPE text for updating from the info box
-//  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
-node.append("prefixText")
-  .attr("id", function(d, i) {return("prefixText"+i) ; });
-node.append("typeText")
-  .attr("id", function(d, i) {return("typeText"+i) ; });
-
 edge.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
 
@@ -228,7 +183,7 @@ function tick() {
   });
 
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
-  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  circle.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     //console.log(d)
@@ -254,20 +209,27 @@ function update(){
 
 
   // NODES update --------------------------------------------------------------
-  node = svg.selectAll("g.node")
-    .data(nodesData);
+  //let node = svg.selectAll("g.node")
+//    .data(nodesData);
 
   // Add new nodes.
   // node circles are WITHIN the <g> , so start with <g> and append the circle
-  node.enter()
-    .append("g")
+  circle = circle.data(nodesData, function(d) { return d.id; });
+
+  circle.selectAll('circle');
+    //.style('fill', 'red'); //TW
+
+  // add new nodeSelection
+  var g = circle.enter().append('svg:g');
+
+    g.append("svg:circle")
       .attr("class", "node")
-    .append("circle")
       .attr("r", nodeRadius)
       .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
       .attr("class", function(d,i){
         if (d.type == "STRING"){ return "string";}
         else if (d.type == "URI"){ return "uri"; }
+        else if (d.type == "URIONT"){ return "uriont"; }
         else {return "unspec";}
       })
       //---- Double click node to edit -----------------------------------------
@@ -289,7 +251,7 @@ function update(){
 
   // Add nodeText ID to each node. Adding the actual text label here with the
   //.text  causes problems with intial nodes.
-  node.append("text")
+  circle.append("text")
     .attr({
       'class':       function(d,i){return 'nodeText'},
       'id':          function(d, i) {return("nodeText"+i) ; },
@@ -302,13 +264,13 @@ function update(){
 
   // Create unique IDS for the PREFIX and TYPE text for updating from the info box
   //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
-  node.append("prefixText")
+  circle.append("prefixText")
     .attr("id", function(d, i) {return("prefixText"+i) ; });
-  node.append("typeText")
+  circle.append("typeText")
     .attr("id", function(d, i) {return("typeText"+i) ; });
-  node.call(force.drag);
+  circle.call(force.drag);
   // Exit any old nodes.
-  node.exit().remove();
+  circle.exit().remove();
 
   // Start the force layout.
   force.start();
@@ -430,7 +392,7 @@ let delButton = div.append("button")
   .on("click", function() {
     if(source=="node"){
     // select node
-    mousedown_node = d; //TW captures the node. Initialized to null as per Kirsling
+    mousedown_node = d; //TW captures the node Initialized to null as per Kirsling
     selected_node = mousedown_node ;  //TW just playing here. Need to restructure ALL of this per Kirsling
     console.log("D: ", d)
     //let foo = indexOf(node());

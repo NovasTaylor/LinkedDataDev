@@ -8,32 +8,32 @@
   font-weight: bold;
 }
 
-.node .string {
+circle.string {
   fill:  #c5c5c5;
   stroke: red;
   stroke-width: 4;
 }
-.node .uri {
+circle.uri {
   fill: #bcf5bc ;
   stroke: black;
 }
 
-.node .uriont {
+circle.uriont {
   fill: #ffc862 ;
   stroke: black;
 }
 
-.node.int {
+circle.int {
   fill: #c1e1eC ; /* light blue */
   stroke: red;
   stroke-width: 4;
 }
 
-.node .misc {
+circle.misc {
   fill: gray ;
 }
 
-.node .unspec {
+circle.unspec {
   fill: yellow ;
   stroke: red;
   stroke-width: 4;
