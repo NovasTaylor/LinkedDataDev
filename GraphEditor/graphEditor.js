@@ -110,7 +110,7 @@ svg.append("svg:image")
     'height': 24,
     'xlink:href': '/GraphEditor/img/AddIcon.png'})
   .on('mouseover', function(d){
-    console.log("Add a node")
+    // console.log("Add a node")
     let addIcon = d3.select(this)
       .attr({
         'width':25,
@@ -193,6 +193,18 @@ edge.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
 */
 
+// NODE  creation
+circle.append("text")
+  .attr({
+    'class':       function(d,i){return 'nodeText'},
+    'id':          function(d, i) {return("nodeText"+i) ; },
+    'text-anchor': 'middle',
+    'class':        'nodeLabel'
+  })
+  .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
+    // after node text is changed, original and NEW overwrite.
+  ;
+
 function tick() {
   edge.attr({"x1" : function(d) {return d.source.x; },
     "y1": function(d) {return d.source.y; },
@@ -267,21 +279,30 @@ function update(){
       })
       .on("click", function(d, i){
         if (d3.event.shiftKey)  {
+          // No links allowed FROM INT/STRING literals
+          if(d.type === "STRING" || d.type === "INT"){
+            window.confirm("Links from " + d.type + " nodes are not allowed.");
+            return;
+          }
           d.pulse = !d.pulse;
           if (d.pulse) {
-            var selected_circles = d3.select(this);
-              pulsate(selected_circles);
-
-            }
-            if (startNode===null){
+            var selected_circle = d3.select(this);
+            console.log("SELECTED FOR LINK: ", d3.select(this))
+            pulsate(selected_circle);
+          }
+          if (startNode===null){
             startNode= i;
             console.log("Setting Start Node as node ID: " + startNode);
-            }
-           else if (startNode !== null){
-             endNode= i;
-             console.log("Start Node: " + startNode + " End Node: " + endNode);
+          }
+          // Only set endNode if it is not the same as the startNode.
+          else if (startNode !== null && startNode !== i){
+            endNode= i;
+            console.log("Start Node: " + startNode + " End Node: " + endNode);
             addEdge();
-           }
+            // Turn off pulsating after edge created.
+            d.pulse = false;
+
+          }
 
         }})
       .on('mouseover', function(d){
@@ -293,13 +314,13 @@ function update(){
         //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
         let nodeSelection = d3.select(this).attr({'r':nodeRadius});
       })
-
       ;
 
   // Add nodeText ID to each node. Adding the actual text label here with the
   //.text  causes problems with intial nodes.
   circle.append("text")
-    .attr({
+  //d3.selectAll("circle")
+      .attr({
       'class':       function(d,i){return 'nodeText'},
       'id':          function(d, i) {return("nodeText"+i) ; },
       'text-anchor': 'middle',
