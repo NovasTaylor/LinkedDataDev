@@ -216,6 +216,9 @@ function update() {
       } else {
         link = {source: source, target: target, left: false, right: false};
         link[direction] = true;
+        console.log("Link is:" + link);
+        console.log("Source: " + source);
+
         links.push(link);
       }
 

@@ -476,8 +476,8 @@ function addEdge(){
 
   let newEdge = {
     id: ++lastEdgeId,
-    source: [startNode],
-    target: [endNode],
+    source: nodesData[startNode],
+    target: nodesData[endNode],
     label: 'NEW',
     prefix: 'ldw'};
   let n = edgesData.push(newEdge);
