@@ -53,13 +53,23 @@ let  nodesData = [
   ],
   lastNodeId = 5,
   edgesData = [
-    {source: nodesData[0], target: nodesData[1],
-      label: 'label', prefix:'foo'},
-    {source: nodesData[2], target: nodesData[3],
-      label: 'nciCode', prefix:"sdtmterm"},
-    {source: nodesData[4], target: nodesData[5],
-      label: 'nciCode', prefix:"sdtmterm"}
-  ];
+    { id:0,
+      source: nodesData[0],
+      target: nodesData[1],
+      label: 'label',
+      prefix:'foo'},
+    { id:1,
+      source: nodesData[2],
+      target: nodesData[3],
+      label: 'nciCode',
+      prefix:"sdtmterm"},
+    { id:2,
+      source: nodesData[4],
+      target: nodesData[5],
+      label: 'nciCode',
+      prefix:"sdtmterm"}
+  ],
+  lastEdgeId = 2;
 
 let infoActive = false;  // opacity flag for info editing box
 
@@ -243,17 +253,20 @@ function update(){
       })
       .on("click", function(d, i){
         if (d3.event.shiftKey)  {
+          d.pulse = !d.pulse;
+          if (d.pulse) {
+            var selected_circles = d3.select(this);
+              pulsate(selected_circles);
+
+            }
             if (startNode===null){
             startNode= i;
             console.log("Setting Start Node as node ID: " + startNode);
-            // Call function here that sets source node id, listens for destination
             }
            else if (startNode !== null){
              endNode= i;
              console.log("Start Node: " + startNode + " End Node: " + endNode);
-             // Now reset
-             startNode = null;
-             endNode = null;
+            addEdge();
            }
 
         }})
@@ -440,7 +453,7 @@ let delButton = div.append("button")
 */
 
 function addNode(){
-  console.log("So you want to add a node!")
+  console.log("A node you wish to add!")
   let newNode = {
     id: ++lastNodeId,
     label: 'Newbie',
@@ -453,6 +466,58 @@ function addNode(){
     console.log(nodesData)
     update();  // Adds node to the SVG
 }
+/* addLink()
+   Add a link
+*/
+
+// ERROR: Need correct way to instead reference into the edgesData array!!
+function addEdge(){
+  console.log("A LINK you wish to add!")
+
+  let newEdge = {
+    id: ++lastEdgeId,
+    source: [startNode],
+    target: [endNode],
+    label: 'NEW',
+    prefix: 'ldw'};
+  let n = edgesData.push(newEdge);
+  // Reset flags
+  startNode = null,
+  endNode = null;
+  // RESET the flag for pulsing here!!
+  update();  // Adds node to the SVG
+}
+
+// Pulse a circle selected for linking
+function pulsate(selection) {
+  recursive_transitions();
+
+  function recursive_transitions() {
+    if (selection.data()[0].pulse) {
+      selection.transition()
+          .duration(500) // was 400
+          .attr("stroke-width", 2)
+          .attr("r", nodeRadius)
+          //.ease('sin-in')
+          .ease('sin')
+          .transition()
+          .duration(500) // was 800
+          .attr('stroke-width', 3)
+          .attr("r", nodeRadius + 10)
+          //.ease('bounce-in')
+          .ease('sin')
+          .each("end", recursive_transitions);
+    } else {
+      // transition back to normal
+      selection.transition()
+          .duration(500)
+          .attr("r", nodeRadius + 10)
+          .attr("stroke-width", 2)
+          .attr("stroke-dasharray", "1, 0");
+    }
+  }
+}
+
 
 //---- App Start ---------------------------------------------------------------
 update();
