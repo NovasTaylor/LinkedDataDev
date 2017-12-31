@@ -99,7 +99,8 @@ let svg = d3.select("#whiteboard").append("svg")
   .attr("height", h);
 
 // Global Declare
-let circle = svg.append('svg:g').selectAll('g');
+let edge = svg.append('svg:g').selectAll('edge'),
+  circle = svg.append('svg:g').selectAll('g');
 // Add node icon
 svg.append("svg:image")
   .attr({
@@ -148,7 +149,8 @@ svg.append('defs').append('marker')
     .attr('stroke','#ccc');
 
 //---- Edges TODO: MOVE INTO UPDATE() function
-let edge = svg.selectAll("line")
+/*
+edge = svg.selectAll("line")
   .data(edgesData)
   .enter()
   .append("line")
@@ -156,7 +158,7 @@ let edge = svg.selectAll("line")
     .attr('marker-end', 'url(#arrowhead)')
     //.attr('class', 'edge')
     .style("stroke", "#ccc");
-
+*/
 let edgepaths = svg.selectAll(".edgepath")
   .data(edgesData)
   .enter()
@@ -186,8 +188,10 @@ edgelabels.append('textPath')
   .on("dblclick", function(d, i){
      infoEdit(d,i, "edge");
    });
+/*
 edge.append("prefixText")
   .attr("id", function(d, i) {return("prefixText"+i) ; });
+*/
 
 function tick() {
   edge.attr({"x1" : function(d) {return d.source.x; },
@@ -220,7 +224,17 @@ function update(){
   //---- EDGES update ----------------------------------------------------------
 
   // Add new links ..... TO BE ADDED
+  edge = svg.selectAll("line")
+    .data(edgesData)
+    .enter()
+    .append("line")
+      .attr("id", function(d,i){return 'edge'+i})
+      .attr('marker-end', 'url(#arrowhead)')
+      //.attr('class', 'edge')
+      .style("stroke", "#ccc");
 
+  edge.append("prefixText")
+    .attr("id", function(d, i) {return("prefixText"+i) ; });
 
   // NODES update --------------------------------------------------------------
   //let node = svg.selectAll("g.node")
@@ -271,7 +285,7 @@ function update(){
 
         }})
       .on('mouseover', function(d){
-        console.log("NODE MOUSEOVER");
+        //DEBUG  console.log("NODE MOUSEOVER");
         let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
       })
       //Mouseout Node  - bring node back to full colour

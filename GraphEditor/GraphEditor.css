@@ -3,8 +3,9 @@
     stroke-width: 3;
 }
 
-.node {
-  font: 18pt sans-serif;font-size: 13px;
+.nodeLabel {
+  font: 18pt sans-serif;
+  font-size: 13px;
   font-weight: bold;
 }
 
@@ -96,6 +97,11 @@ text.id {
     /* border: 1px solid gray; */
     border:none;
 }
+.help tr:nth-child(even){
+  background-color: #e8fbe8;
+  color: black;
+}
+
 .help td:nth-child(1){
   width:300px;
   font-weight:normal;
@@ -105,4 +111,5 @@ text.id {
   font-weight: bold;
   bgcolor: #d2f8d2;
   font-family: courier;
+  font-size: .9em;
 }
