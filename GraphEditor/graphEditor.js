@@ -13,63 +13,69 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 -----------------------------------------------------------------------------*/
 "use strict";
 
-let  nodesData = [
-  { id: 0,
+let  dataset = {
+  nodesData: [
+
+  { id:0,
     label: 'PRODUCT1',
     prefix:"ldw",
     type: 'URI',
     x:500, y:60,
     fixed:true},
-  { id: 1,
+  { id:1,
     label: 'Serum 114',
     prefix:"--NONE--",
     type: 'STRING',
     x:700, y:60,
     fixed:true},
-  { id: 2,
+  { id:2,
     label: 'F',
     prefix:"ldw",
     type: 'URI',
     x:100, y:400,
     fixed:true},
-  { id: 3,
+  { id:3,
     label: 'C16576',
     prefix:"sdtmterm",
     type: 'URIONT',
     x:100, y:600,
     fixed:true},
-  { id: 4,
+  { id:4,
     label: 'M',
     prefix:"ldw",
     type: 'URI',
     x:200, y:400,
     fixed:true},
-  { id: 5,
+  { id:5,
     label: 'C20197',
     prefix:"sdtmterm",
     type: 'URIONT',
     x:200, y:600,
     fixed:true}
   ],
-  lastNodeId = 5,
-  edgesData = [
+  edgesData : [
     { id:0,
-      source: nodesData[0],
-      target: nodesData[1],
+      source:0,
+      target: 1,
       label: 'label',
       prefix:'foo'},
     { id:1,
-      source: nodesData[2],
-      target: nodesData[3],
+      source: 2,
+      target: 3,
       label: 'nciCode',
       prefix:"sdtmterm"},
     { id:2,
-      source: nodesData[4],
-      target: nodesData[5],
+      source: 4,
+      target: 5,
       label: 'nciCode',
       prefix:"sdtmterm"}
-  ],
-  lastEdgeId = 2;
+  ]
+};
+
+// These will later be CALCUlATED from the source data.
+let lastEdgeId = 2,
+ lastNodeId = 5;
+
 
 let infoActive = false;  // opacity flag for info editing box
 
@@ -128,8 +134,8 @@ svg.append("svg:image")
 
 // Initialize D3 force layout
 let force = d3.layout.force()
-  .nodes(nodesData)
-  .links(edgesData)
+  .nodes(dataset.nodesData)
+  .links(dataset.edgesData)
   .size([w, h])
   .on("tick", tick);
 
@@ -160,7 +166,7 @@ edge = svg.selectAll("line")
     .style("stroke", "#ccc");
 */
 let edgepaths = svg.selectAll(".edgepath")
-  .data(edgesData)
+  .data(dataset.edgesData)
   .enter()
   .append('path')
   .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
@@ -172,7 +178,7 @@ let edgepaths = svg.selectAll(".edgepath")
   ;
 // dx : the starting distance of the label from the source node
 let edgelabels = svg.selectAll(".edgelabel")
-  .data(edgesData).enter()
+  .data(dataset.edgesData).enter()
   .append('text')
     .attr({'class':'edgelabel',
       //
@@ -237,7 +243,7 @@ function update(){
 
   // Add new links ..... TO BE ADDED
   edge = svg.selectAll("line")
-    .data(edgesData)
+    .data(dataset.edgesData)
     .enter()
     .append("line")
       .attr("id", function(d,i){return 'edge'+i})
@@ -254,7 +260,7 @@ function update(){
 
   // Add new nodes.
   // node circles are WITHIN the <g> , so start with <g> and append the circle
-  circle = circle.data(nodesData, function(d) { return d.id; });
+  circle = circle.data(dataset.nodesData, function(d) { return d.id; });
 
   circle.selectAll('circle');
     //.style('fill', 'red'); //TW
@@ -467,7 +473,7 @@ let delButton = div.append("button")
     console.log("So you want to DELETE a node!")
     console.log("Selected_node: " , selected_node)
       // must delete the node and any edge attached to it (ingoing and outgoing)
-    nodesData.splice(nodesData.indexOf(selected_node), 1); // Delete selected node from array
+    dataset.nodesData.splice(dataset.nodesData.indexOf(selected_node), 1); // Delete selected node from array
     update();
   }
   if(source=="edge"){
@@ -475,7 +481,7 @@ let delButton = div.append("button")
     mousedown_edge = d; //TW captures the edge.
     selected_edge = mousedown_edge ;  //TW just playing here. Need to restructure ALL of this per Kirsling
     console.log("Selected_edge: " , selected_edge)
-    edgesData.splice(edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
+    dataset.edgesData.splice(dataset.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
     update();
   }
 });
@@ -496,9 +502,9 @@ function addNode(){
     type: 'UNSPEC',
     x:200, y:200,
     fixed:true};
-    let n = nodesData.push(newNode);
+    let n = dataset.nodesData.push(newNode);
     console.log(newNode)
-    console.log(nodesData)
+    console.log(dataset.nodesData)
     update();  // Adds node to the SVG
 }
 /* addLink()
@@ -511,11 +517,11 @@ function addEdge(){
 
   let newEdge = {
     id: ++lastEdgeId,
-    source: nodesData[startNode],
-    target: nodesData[endNode],
+    source: dataset.nodesData[startNode],
+    target: dataset.nodesData[endNode],
     label: 'NEW',
     prefix: 'ldw'};
-  let n = edgesData.push(newEdge);
+  let n = dataset.edgesData.push(newEdge);
   // Reset flags
   startNode = null,
   endNode = null;
