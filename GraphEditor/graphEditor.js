@@ -56,7 +56,7 @@ let  dataset = {
   edgesData : [
     { id:0,
       source:0,
-      target: 1,
+      target:1,
       label: 'label',
       prefix:'foo'},
     { id:1,
@@ -72,10 +72,11 @@ let  dataset = {
   ]
 };
 
-// These will later be CALCUlATED from the source data.
-let lastEdgeId = 2,
- lastNodeId = 5;
-
+// Find the max Node and Edge ID values based on array length. Used when
+// creating IDs for new nodes (increment counter)
+let lastEdgeId = dataset.edgesData.length -1 ,
+  lastNodeId = dataset.nodesData.length -1;
+  // console.log ("Max Edge and Node IDs: "+ lastEdgeId+ " "  +lastNodeId);
 
 let infoActive = false;  // opacity flag for info editing box
 
