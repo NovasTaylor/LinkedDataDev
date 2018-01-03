@@ -60,31 +60,6 @@ let edge = svg.append('svg:g').selectAll('edge'),
 
 let force = d3.layout.force();  // must define global
 
-// Add node icon
-svg.append("svg:image")
-  .attr({
-    'x':5,
-    'y':5,
-    'width': 20,
-    'height': 24,
-    'xlink:href': '/GraphEditor/img/AddIcon.png'})
-  .on('mouseover', function(d){
-    // console.log("Add a node")
-    let addIcon = d3.select(this)
-      .attr({
-        'width':25,
-        'height':29
-      });
-  })
-  .on('mouseout', function(d){
-    let addIcon = d3.select(this)
-      .attr({
-        'width':20,
-        'height':24
-      });
-  })
-  .on('click', function(d){ addNode();});
-
 // Arrow marker for end of edge
 svg.append('defs').append('marker')
     .attr({'id':'arrowhead',
@@ -109,8 +84,32 @@ function initializeGraph(graph){
     lastNodeId = graph.nodesData.length -1;
     console.log ("Max Id for Edges, Nodes: "+ lastEdgeId+ ","  +lastNodeId);
 
-  // Initialize D3 force layout
+    // Add node icon. Within initiallizeGraph() for access to "graph"data
+    svg.append("svg:image")
+      .attr({
+        'x':5,
+        'y':5,
+        'width': 20,
+        'height': 24,
+        'xlink:href': '/GraphEditor/img/AddIcon.png'})
+      .on('mouseover', function(d){
+        // console.log("Add a node")
+        let addIcon = d3.select(this)
+          .attr({
+            'width':25,
+            'height':29
+          });
+      })
+      .on('mouseout', function(d){
+        let addIcon = d3.select(this)
+          .attr({
+            'width':20,
+            'height':24
+          });
+      })
+      .on('click', function(d){ addNode(graph);});
 
+  // Initialize D3 force layout
     force.nodes(graph.nodesData)
     .links(graph.edgesData)
     .size([w, h])
@@ -268,7 +267,7 @@ function update(graph){
           else if (startNode !== null && startNode !== i){
             endNode= i;
             console.log("Start Node: " + startNode + " End Node: " + endNode);
-            addEdge();
+            addEdge(graph);
             // Turn off pulsating after edge created.
             d.pulse = false;
 
@@ -456,7 +455,7 @@ let delButton = div.append("button")
 //   Add a node
 //
 
-function addNode(){
+function addNode(graph){
   console.log("A node you wish to add!")
   let newNode = {
     id: ++lastNodeId,
@@ -475,7 +474,7 @@ function addNode(){
 //
 
 // ERROR: Need correct way to instead reference into the edgesData array!!
-function addEdge(){
+function addEdge(graph){
   console.log("A LINK you wish to add!")
 
   let newEdge = {
