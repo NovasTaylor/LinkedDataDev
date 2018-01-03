@@ -13,30 +13,19 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 -----------------------------------------------------------------------------*/
 "use strict";
 
-//Source data
-d3.queue()
- .defer(d3.json, '/graphEditor/data/graph1.json')
- .await(processData);
-
-function processData (error, graph1) {
-  if(error) { console.log(error); }
-  console.log(graph1.nodes[0]);
-  console.log(graph1.links[0]);
-  initializeGraph(graph1);
-;}
+// Initializations
+let w = 900,
+  h = 1100,
+  nodeRadius = 40; // also used to distance arrow from node
 
 let infoActive = false;  // opacity flag for info editing box
 
 // Start and end nodes when constructing a link
 //  count of edge and node Ids for later incrementing
-let startNode=null ,
-    endNode = null,
-    lastEdgeId = null,
-    lasteNodeId = null;
-
-let w = 900,
-    h = 1100,
-    nodeRadius = 40; // also used to distance arrow from node
+let startNode = null,
+  endNode     = null,
+  lastEdgeId  = null,
+  lastNodeId  = null;
 
 // mouse event settings  as per Kirsling. only mousedown_node in use as of 2017-12-23
 let selected_node = null,
@@ -45,13 +34,27 @@ let selected_node = null,
   mousedown_node  = null,
   mouseup_node    = null;
 
+// Read source data
+d3.queue()
+ .defer(d3.json, '/graphEditor/data/graph1.json')
+ .await(processData);
+
+function processData (error, graph1) {
+  if(error) { console.log(error); }
+  console.log(graph1.nodesData[0]);
+  console.log(graph1.edgesData[0]);
+  initializeGraph(graph1);
+;}
+
+// Setup the SVG elements that do not depend on data
 let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
   .attr("height", h);
+  // Global Declare
 
-// Global Declare
 let edge = svg.append('svg:g').selectAll('edge'),
-  circle = svg.append('svg:g').selectAll('g');
+    circle = svg.append('svg:g').selectAll('g');
+
 // Add node icon
 svg.append("svg:image")
   .attr({
@@ -92,84 +95,79 @@ svg.append('defs').append('marker')
       .attr('fill', '#ccc')
       .attr('stroke','#ccc');
 
-
-
+  let force = d3.layout.force();  // must define global
 // DATA DEPENDENT SECTION STARTS> MAKE IT A FUNCTION ---------------------------
 function initializeGraph(graph){
-
   // Find the max Node and Edge ID values based on array length. Used when
   // creating IDs for new nodes (increment counter)
-  let lastEdgeId = dataset.edgesData.length -1 ,
-    lastNodeId = dataset.nodesData.length -1;
-    // console.log ("Max Edge and Node IDs: "+ lastEdgeId+ " "  +lastNodeId);
+    lastEdgeId = graph.edgesData.length -1;
+    lastNodeId = graph.nodesData.length -1;
+    console.log ("Max Id for Edges, Nodes: "+ lastEdgeId+ ","  +lastNodeId);
 
+  // Initialize D3 force layout
 
-// Initialize D3 force layout
-let force = d3.layout.force()
-  .nodes(dataset.nodesData)
-  .links(dataset.edgesData)
-  .size([w, h])
-  .on("tick", tick);
+    force.nodes(graph.nodesData)
+    .links(graph.edgesData)
+    .size([w, h])
+    .on("tick", tick);
 
+  //---- Edges TODO: MOVE INTO update(graph) function
 
-//---- Edges TODO: MOVE INTO UPDATE() function
-/*
-edge = svg.selectAll("line")
-  .data(edgesData)
-  .enter()
-  .append("line")
-    .attr("id", function(d,i){return 'edge'+i})
-    .attr('marker-end', 'url(#arrowhead)')
-    //.attr('class', 'edge')
-    .style("stroke", "#ccc");
-*/
-let edgepaths = svg.selectAll(".edgepath")
-  .data(dataset.edgesData)
-  .enter()
-  .append('path')
-  .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-         'class':'edgepath',
-         'fill-opacity':0,
-         'stroke-opacity':0,
-         'id':function(d,i) {return 'edgepath'+i}})
-  .style("pointer-events", "none")
-  ;
-// dx : the starting distance of the label from the source node
-let edgelabels = svg.selectAll(".edgelabel")
-  .data(dataset.edgesData).enter()
-  .append('text')
-    .attr({'class':'edgelabel',
-      //
-      'dx':80,
-      'dy':-1  // change to 5 to put inline with edge
-    });
+  //edge = svg.selectAll("line")
+  //  .data(edgesData)
+  //  .enter()
+  //  .append("line")
+  //    .attr("id", function(d,i){return 'edge'+i})
+  //    .attr('marker-end', 'url(#arrowhead)')
+  //    .attr('class', 'edge')
+  //    .style("stroke", "#ccc");
 
-edgelabels.append('textPath')
-  .attr('xlink:href',function(d,i) {return '#edgepath'+i})
-  .attr('id', function(d,i){return 'edgelabel'+i})
-  .text(function(d,i){return d.label})
-  //---- Double click edge to edit ---------------------------------------------
-  .on("dblclick", function(d, i){
-     infoEdit(d,i, "edge");
-   });
-/*
-edge.append("prefixText")
-  .attr("id", function(d, i) {return("prefixText"+i) ; });
-*/
+  let edgepaths = svg.selectAll(".edgepath")
+    .data(graph.edgesData)
+    .enter()
+    .append('path')
+    .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+           'class':'edgepath',
+           'fill-opacity':0,
+           'stroke-opacity':0,
+           'id':function(d,i) {return 'edgepath'+i}})
+    .style("pointer-events", "none")
+    ;
+  // dx : the starting distance of the label from the source node
+  let edgelabels = svg.selectAll(".edgelabel")
+    .data(graph.edgesData).enter()
+    .append('text')
+      .attr({'class':'edgelabel',
+        //
+        'dx':80,
+        'dy':-1  // change to 5 to put inline with edge
+      });
 
-// NODE  creation
-circle.append("text")
-  .attr({
-    'class':       function(d,i){return 'nodeText'},
-    'id':          function(d, i) {return("nodeText"+i) ; },
-    'text-anchor': 'middle',
-    'class':        'nodeLabel'
-  })
-  .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
-    // after node text is changed, original and NEW overwrite.
-  ;
+  edgelabels.append('textPath')
+    .attr('xlink:href',function(d,i) {return '#edgepath'+i})
+    .attr('id', function(d,i){return 'edgelabel'+i})
+    .text(function(d,i){return d.label})
+    //---- Double click edge to edit ---------------------------------------------
+    .on("dblclick", function(d, i){
+       infoEdit(d,i, "edge");
+     });
 
-};  // end of initializeGraph
+  //edge.append("prefixText")
+  //  .attr("id", function(d, i) {return("prefixText"+i) ; });
+
+  // NODE  creation
+  circle.append("text")
+    .attr({
+      'class':       function(d,i){return 'nodeText'},
+      'id':          function(d, i) {return("nodeText"+i) ; },
+      'text-anchor': 'middle',
+      'class':        'nodeLabel'
+    })
+    .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
+      // after node text is changed, original and NEW overwrite.
+    ;
+    update(graph);
+}  // end of initializeGraph
 
 
 function tick() {
@@ -198,13 +196,13 @@ function tick() {
   });
 };  // End on tick
 
-function update(){
+function update(graph){
 
   //---- EDGES update ----------------------------------------------------------
 
   // Add new links ..... TO BE ADDED
   edge = svg.selectAll("line")
-    .data(dataset.edgesData)
+    .data(graph.edgesData)
     .enter()
     .append("line")
       .attr("id", function(d,i){return 'edge'+i})
@@ -221,7 +219,7 @@ function update(){
 
   // Add new nodes.
   // node circles are WITHIN the <g> , so start with <g> and append the circle
-  circle = circle.data(dataset.nodesData, function(d) { return d.id; });
+  circle = circle.data(graph.nodesData, function(d) { return d.id; });
 
   circle.selectAll('circle');
     //.style('fill', 'red'); //TW
@@ -309,18 +307,17 @@ function update(){
 
   // Start the force layout.
   force.start();
-}  // end of update()
-
+}  // end of update(graph)
 
 
 
 //-----------------------------------------------------------------------------
 //---- Additional Functions --------------------------------------------------------------
 
-/* infoEdit()
-   Edit information for either a "node" or an "edge"
-   Currently only works for a node
-*/
+// infoEdit()
+//   Edit information for either a "node" or an "edge"
+//   Currently only works for a node
+//
 function infoEdit(d, i, source){
   console.log("You clicked a  " +source)
   console.log("     infoEdit: " + source + " " + d.label);
@@ -434,25 +431,25 @@ let delButton = div.append("button")
     console.log("So you want to DELETE a node!")
     console.log("Selected_node: " , selected_node)
       // must delete the node and any edge attached to it (ingoing and outgoing)
-    dataset.nodesData.splice(dataset.nodesData.indexOf(selected_node), 1); // Delete selected node from array
-    update();
+    graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
+    update(graph);
   }
   if(source=="edge"){
     console.log("So you want to DELETE an Edge!")
     mousedown_edge = d; //TW captures the edge.
     selected_edge = mousedown_edge ;  //TW just playing here. Need to restructure ALL of this per Kirsling
     console.log("Selected_edge: " , selected_edge)
-    dataset.edgesData.splice(dataset.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
-    update();
+    graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
+    update(graph);
   }
 });
 
 }
 
 
-/* addNode()
-   Add a node
-*/
+// addNode()
+//   Add a node
+//
 
 function addNode(){
   console.log("A node you wish to add!")
@@ -463,14 +460,14 @@ function addNode(){
     type: 'UNSPEC',
     x:200, y:200,
     fixed:true};
-    let n = dataset.nodesData.push(newNode);
+    let n = graph.nodesData.push(newNode);
     console.log(newNode)
-    console.log(dataset.nodesData)
-    update();  // Adds node to the SVG
+    console.log(graph.nodesData)
+    update(graph);  // Adds node to the SVG
 }
-/* addLink()
-   Add a link
-*/
+// addLink()
+//   Add a link
+//
 
 // ERROR: Need correct way to instead reference into the edgesData array!!
 function addEdge(){
@@ -478,16 +475,16 @@ function addEdge(){
 
   let newEdge = {
     id: ++lastEdgeId,
-    source: dataset.nodesData[startNode],
-    target: dataset.nodesData[endNode],
+    source: graph.nodesData[startNode],
+    target: graph.nodesData[endNode],
     label: 'NEW',
     prefix: 'ldw'};
-  let n = dataset.edgesData.push(newEdge);
+  let n = graph.edgesData.push(newEdge);
   // Reset flags
   startNode = null,
   endNode = null;
   // RESET the flag for pulsing here!!
-  update();  // Adds node to the SVG
+  update(graph);  // Adds node to the SVG
 }
 
 // Pulse a circle selected for linking
@@ -529,4 +526,4 @@ function resetMouseVars() {
 
 
 //---- App Start ---------------------------------------------------------------
-update();
+//update(graph);
