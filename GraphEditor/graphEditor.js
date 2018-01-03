@@ -53,10 +53,10 @@ let svg = d3.select("#whiteboard").append("svg")
   // Global Declare
 
 let edge = svg.append('svg:g').selectAll('edge'),
-    circle = svg.append('svg:g').selectAll('g'),
-    edgepaths = svg.selectAll(".edgepath"),
-    edgelabels = svg.selectAll(".edgelabel")
-    ;
+    circle = svg.append('svg:g').selectAll('g');
+
+let edgepaths = null,
+    edgelabels = null;
 
 let force = d3.layout.force();  // must define global
 
@@ -126,36 +126,6 @@ function initializeGraph(graph){
   //    .attr('class', 'edge')
   //    .style("stroke", "#ccc");
 
-  edgepaths = svg.selectAll(".edgepath")
-    .data(graph.edgesData)
-    .enter()
-    .append('path')
-    .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-           'class':'edgepath',
-           'fill-opacity':0,
-           'stroke-opacity':0,
-           'id':function(d,i) {return 'edgepath'+i}})
-    .style("pointer-events", "none")
-    ;
-  // dx : the starting distance of the label from the source node
-
-  edgelabels.data(graph.edgesData).enter()
-    .append('text')
-      .attr({'class':'edgelabel',
-        //
-        'dx':80,
-        'dy':-1  // change to 5 to put inline with edge
-      });
-
-  edgelabels.append('textPath')
-    .attr('xlink:href',function(d,i) {return '#edgepath'+i})
-    .attr('id', function(d,i){return 'edgelabel'+i})
-    .text(function(d,i){return d.label})
-    //---- Double click edge to edit ---------------------------------------------
-    .on("dblclick", function(d, i){
-       infoEdit(d,i, "edge");
-     });
-
   //edge.append("prefixText")
   //  .attr("id", function(d, i) {return("prefixText"+i) ; });
 
@@ -172,7 +142,6 @@ function initializeGraph(graph){
     ;
     update(graph);
 }  // end of initializeGraph
-
 
 function tick() {
   edge.attr({"x1" : function(d) {return d.source.x; },
@@ -216,6 +185,39 @@ function update(graph){
 
   edge.append("prefixText")
     .attr("id", function(d, i) {return("prefixText"+i) ; });
+
+
+
+    edgepaths = svg.selectAll(".edgepath")
+      .data(graph.edgesData)
+      .enter()
+      .append('path')
+      .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+             'class':'edgepath',
+             'fill-opacity':0,
+             'stroke-opacity':0,
+             'id':function(d,i) {return 'edgepath'+i}})
+      .style("pointer-events", "none")
+      ;
+    // dx : the starting distance of the label from the source node
+
+    edgelabels =  svg.selectAll(".edgeabel")
+    .data(graph.edgesData).enter()
+      .append('text')
+        .attr({'class':'edgelabel',
+          //
+          'dx':80,
+          'dy':-1  // change to 5 to put inline with edge
+        })
+      .append('textPath')
+        .attr('xlink:href',function(d,i) {return '#edgepath'+i})
+        .attr('id', function(d,i){return 'edgelabel'+i})
+        .text(function(d,i){return d.label})
+      //  .text("foo")
+      //---- Double click edge to edit ---------------------------------------------
+      .on("dblclick", function(d, i){
+         infoEdit(d,i, "edge");
+       });
 
   // NODES update --------------------------------------------------------------
   //let node = svg.selectAll("g.node")
