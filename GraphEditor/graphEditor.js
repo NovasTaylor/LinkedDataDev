@@ -153,6 +153,8 @@ function tick() {
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
   circle.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
+//TW Problems here. Assignment of path and values undefined for d.source.x, etc. 
+// Likely scoping issue now that code is within initializeGraph() and update() functions
   edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     //console.log(d)
     return path});
@@ -228,7 +230,6 @@ function update(graph){
   circle = circle.data(graph.nodesData, function(d) { return d.id; });
 
   circle.selectAll('circle');
-    //.style('fill', 'red'); //TW
 
   // add new nodeSelection
   let g = circle.enter().append('svg:g');
@@ -279,7 +280,7 @@ function update(graph){
         }})
       .on('mouseover', function(d){
         //DEBUG  console.log("NODE MOUSEOVER");
-        let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,}); //TW opacity  for testing only!
+        let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,});
       })
       //Mouseout Node  - bring node back to full colour
       .on('mouseout', function(d){
@@ -329,7 +330,7 @@ function infoEdit(d, i, source){
   console.log("You clicked a  " +source)
   console.log("     infoEdit: " + source + " " + d.label);
   //console.log("clicked");
-  let self = this; //TW : Unnecessary?
+  let self = this; //Necessary?
 
   if (infoActive == true) {
     // clicked a node or edge while previous info block displayed
@@ -425,14 +426,13 @@ function infoEdit(d, i, source){
  }) // end of click on update button
   infoActive = true;
 
-//TW
 let delButton = div.append("button")
   .text("Delete")
   .on("click", function() {
     if(source=="node"){
     // select node
-    mousedown_node = d; //TW captures the node Initialized to null as per Kirsling
-    selected_node = mousedown_node ;  //TW just playing here. Need to restructure ALL of this per Kirsling
+    mousedown_node = d; // Captures the node Initialized to null as per Kirsling
+    selected_node = mousedown_node ;  // Playing here. Need to restructure?
     console.log("D: ", d)
     //let foo = indexOf(node());
     console.log("So you want to DELETE a node!")
@@ -443,8 +443,8 @@ let delButton = div.append("button")
   }
   if(source=="edge"){
     console.log("So you want to DELETE an Edge!")
-    mousedown_edge = d; //TW captures the edge.
-    selected_edge = mousedown_edge ;  //TW just playing here. Need to restructure ALL of this per Kirsling
+    mousedown_edge = d; // Captures the edge.
+    selected_edge = mousedown_edge ;  //Playing here. Restructure?
     console.log("Selected_edge: " , selected_edge)
     graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
     update(graph);
@@ -524,7 +524,7 @@ function pulsate(selection) {
   }
 }
 
-//TW.  As per Kirsling. Not yet in use. Move to fnt area of code.
+//HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
 function resetMouseVars() {
   mousedown_node = null;
   mouseup_node = null;
