@@ -53,7 +53,12 @@ let svg = d3.select("#whiteboard").append("svg")
   // Global Declare
 
 let edge = svg.append('svg:g').selectAll('edge'),
-    circle = svg.append('svg:g').selectAll('g');
+    circle = svg.append('svg:g').selectAll('g'),
+    edgepaths = svg.selectAll(".edgepath"),
+    edgelabels = svg.selectAll(".edgelabel")
+    ;
+
+let force = d3.layout.force();  // must define global
 
 // Add node icon
 svg.append("svg:image")
@@ -95,7 +100,7 @@ svg.append('defs').append('marker')
       .attr('fill', '#ccc')
       .attr('stroke','#ccc');
 
-  let force = d3.layout.force();  // must define global
+
 // DATA DEPENDENT SECTION STARTS> MAKE IT A FUNCTION ---------------------------
 function initializeGraph(graph){
   // Find the max Node and Edge ID values based on array length. Used when
@@ -122,7 +127,7 @@ function initializeGraph(graph){
   //    .attr('class', 'edge')
   //    .style("stroke", "#ccc");
 
-  let edgepaths = svg.selectAll(".edgepath")
+  edgepaths = svg.selectAll(".edgepath")
     .data(graph.edgesData)
     .enter()
     .append('path')
@@ -134,8 +139,8 @@ function initializeGraph(graph){
     .style("pointer-events", "none")
     ;
   // dx : the starting distance of the label from the source node
-  let edgelabels = svg.selectAll(".edgelabel")
-    .data(graph.edgesData).enter()
+
+  edgelabels.data(graph.edgesData).enter()
     .append('text')
       .attr({'class':'edgelabel',
         //
