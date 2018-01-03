@@ -36,14 +36,14 @@ let selected_node = null,
 
 // Read source data
 d3.queue()
- .defer(d3.json, '/graphEditor/data/graph1.json')
+ .defer(d3.json, '/graphEditor/data/graph.json')
  .await(processData);
 
-function processData (error, graph1) {
+function processData (error, graph) {
   if(error) { console.log(error); }
-  console.log(graph1.nodesData[0]);
-  console.log(graph1.edgesData[0]);
-  initializeGraph(graph1);
+  console.log(graph.nodesData[0]);
+  console.log(graph.edgesData[0]);
+  initializeGraph(graph);
 ;}
 
 // Setup the SVG elements that do not depend on data
@@ -238,6 +238,7 @@ function update(graph){
       .attr("class", function(d,i){
         if (d.type == "STRING"){ return "string";}
         else if (d.type == "URI"){ return "uri"; }
+        else if (d.type == "INT"){ return "int"; }
         else if (d.type == "URIONT"){ return "uriont"; }
         else {return "unspec";}
       })
