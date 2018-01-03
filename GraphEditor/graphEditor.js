@@ -13,76 +13,27 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 -----------------------------------------------------------------------------*/
 "use strict";
 
-let  dataset = {
-  nodesData: [
+//Source data
+d3.queue()
+ .defer(d3.json, '/graphEditor/data/graph1.json')
+ .await(processData);
 
-  { id:0,
-    label: 'PRODUCT1',
-    prefix:"ldw",
-    type: 'URI',
-    x:500, y:60,
-    fixed:true},
-  { id:1,
-    label: 'Serum 114',
-    prefix:"--NONE--",
-    type: 'STRING',
-    x:700, y:60,
-    fixed:true},
-  { id:2,
-    label: 'F',
-    prefix:"ldw",
-    type: 'URI',
-    x:100, y:400,
-    fixed:true},
-  { id:3,
-    label: 'C16576',
-    prefix:"sdtmterm",
-    type: 'URIONT',
-    x:100, y:600,
-    fixed:true},
-  { id:4,
-    label: 'M',
-    prefix:"ldw",
-    type: 'URI',
-    x:200, y:400,
-    fixed:true},
-  { id:5,
-    label: 'C20197',
-    prefix:"sdtmterm",
-    type: 'URIONT',
-    x:200, y:600,
-    fixed:true}
-  ],
-  edgesData : [
-    { id:0,
-      source:0,
-      target:1,
-      label: 'label',
-      prefix:'foo'},
-    { id:1,
-      source: 2,
-      target: 3,
-      label: 'nciCode',
-      prefix:"sdtmterm"},
-    { id:2,
-      source: 4,
-      target: 5,
-      label: 'nciCode',
-      prefix:"sdtmterm"}
-  ]
-};
-
-// Find the max Node and Edge ID values based on array length. Used when
-// creating IDs for new nodes (increment counter)
-let lastEdgeId = dataset.edgesData.length -1 ,
-  lastNodeId = dataset.nodesData.length -1;
-  // console.log ("Max Edge and Node IDs: "+ lastEdgeId+ " "  +lastNodeId);
+function processData (error, graph1) {
+  if(error) { console.log(error); }
+  console.log(graph1.nodes[0]);
+  console.log(graph1.links[0]);
+  initializeGraph(graph1);
+;}
 
 let infoActive = false;  // opacity flag for info editing box
 
 // Start and end nodes when constructing a link
+//  count of edge and node Ids for later incrementing
 let startNode=null ,
-    endNode = null;
+    endNode = null,
+    lastEdgeId = null,
+    lasteNodeId = null;
+
 let w = 900,
     h = 1100,
     nodeRadius = 40; // also used to distance arrow from node
@@ -93,13 +44,6 @@ let selected_node = null,
   mousedown_edge  = null,
   mousedown_node  = null,
   mouseup_node    = null;
-
-//TW.  As per Kirsling. Not yet in use. Move to fnt area of code.
-function resetMouseVars() {
-  mousedown_node = null;
-  mouseup_node = null;
-  mousedown_edge = null;
-}
 
 let svg = d3.select("#whiteboard").append("svg")
   .attr("width", w)
@@ -133,6 +77,33 @@ svg.append("svg:image")
   })
   .on('click', function(d){ addNode();});
 
+// Arrow marker for end of edge
+svg.append('defs').append('marker')
+    .attr({'id':'arrowhead',
+      'viewBox': '-0 -5 10 10',
+      'refX':    nodeRadius+12,
+      'refY':    0,
+      'orient': 'auto',
+      'markerWidth':  10,
+      'markerHeight': 10,
+      'xoverflow':'visible'})
+    .append('svg:path')
+      .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+      .attr('fill', '#ccc')
+      .attr('stroke','#ccc');
+
+
+
+// DATA DEPENDENT SECTION STARTS> MAKE IT A FUNCTION ---------------------------
+function initializeGraph(graph){
+
+  // Find the max Node and Edge ID values based on array length. Used when
+  // creating IDs for new nodes (increment counter)
+  let lastEdgeId = dataset.edgesData.length -1 ,
+    lastNodeId = dataset.nodesData.length -1;
+    // console.log ("Max Edge and Node IDs: "+ lastEdgeId+ " "  +lastNodeId);
+
+
 // Initialize D3 force layout
 let force = d3.layout.force()
   .nodes(dataset.nodesData)
@@ -140,20 +111,6 @@ let force = d3.layout.force()
   .size([w, h])
   .on("tick", tick);
 
-// Arrow marker for end of edge
-svg.append('defs').append('marker')
-  .attr({'id':'arrowhead',
-    'viewBox': '-0 -5 10 10',
-    'refX':    nodeRadius+12,
-    'refY':    0,
-    'orient': 'auto',
-    'markerWidth':  10,
-    'markerHeight': 10,
-    'xoverflow':'visible'})
-  .append('svg:path')
-    .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-    .attr('fill', '#ccc')
-    .attr('stroke','#ccc');
 
 //---- Edges TODO: MOVE INTO UPDATE() function
 /*
@@ -211,6 +168,9 @@ circle.append("text")
   .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
     // after node text is changed, original and NEW overwrite.
   ;
+
+};  // end of initializeGraph
+
 
 function tick() {
   edge.attr({"x1" : function(d) {return d.source.x; },
@@ -558,6 +518,13 @@ function pulsate(selection) {
           .attr("stroke-dasharray", "1, 0");
     }
   }
+}
+
+//TW.  As per Kirsling. Not yet in use. Move to fnt area of code.
+function resetMouseVars() {
+  mousedown_node = null;
+  mouseup_node = null;
+  mousedown_edge = null;
 }
 
 
