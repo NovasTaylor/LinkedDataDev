@@ -115,20 +115,6 @@ function initializeGraph(graph){
     .size([w, h])
     .on("tick", tick);
 
-  //---- Edges TODO: MOVE INTO update(graph) function
-
-  //edge = svg.selectAll("line")
-  //  .data(edgesData)
-  //  .enter()
-  //  .append("line")
-  //    .attr("id", function(d,i){return 'edge'+i})
-  //    .attr('marker-end', 'url(#arrowhead)')
-  //    .attr('class', 'edge')
-  //    .style("stroke", "#ccc");
-
-  //edge.append("prefixText")
-  //  .attr("id", function(d, i) {return("prefixText"+i) ; });
-
   // NODE  creation
   circle.append("text")
     .attr({
@@ -153,7 +139,7 @@ function tick() {
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
   circle.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-//TW Problems here. Assignment of path and values undefined for d.source.x, etc. 
+//TW Problems here. Assignment of path and values undefined for d.source.x, etc.
 // Likely scoping issue now that code is within initializeGraph() and update() functions
   edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
     //console.log(d)
@@ -222,8 +208,6 @@ function update(graph){
        });
 
   // NODES update --------------------------------------------------------------
-  //let node = svg.selectAll("g.node")
-//    .data(nodesData);
 
   // Add new nodes.
   // node circles are WITHIN the <g> , so start with <g> and append the circle
@@ -299,8 +283,7 @@ function update(graph){
       'text-anchor': 'middle',
       'class':        'nodeLabel'
     })
-    .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
-      // after node text is changed, original and NEW overwrite.
+    .text(function(d,i) { return d.label; }) //TW: Problem here AFTER a new node is added.
     ;
 
   // Create unique IDS for the PREFIX and TYPE text for updating from the info box
@@ -453,11 +436,6 @@ let delButton = div.append("button")
 
 }
 
-
-// addNode()
-//   Add a node
-//
-
 function addNode(graph){
   console.log("A node you wish to add!")
   let newNode = {
@@ -472,11 +450,6 @@ function addNode(graph){
     console.log(graph.nodesData)
     update(graph);  // Adds node to the SVG
 }
-// addLink()
-//   Add a link
-//
-
-// ERROR: Need correct way to instead reference into the edgesData array!!
 function addEdge(graph){
   console.log("A LINK you wish to add!")
 
@@ -533,4 +506,4 @@ function resetMouseVars() {
 
 
 //---- App Start ---------------------------------------------------------------
-//update(graph);
+//update(graph); // SWITCHED TO NEW LOCATION!
