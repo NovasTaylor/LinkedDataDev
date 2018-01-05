@@ -154,8 +154,7 @@ function tick() {
             let rx = bbox.x+bbox.width/2;
             let ry = bbox.y+bbox.height/2;
             return 'rotate(180 '+rx+' '+ry+')';
-    }
-    else {
+    } else {
       return 'rotate(0)';
     }
   });
@@ -519,7 +518,7 @@ function createTTL(jsonData) {
 
   // loop through the edges to create triples
   //   Code excludes unattached nodes. But if you have unattached nodes, you
-  // really re-evaluate your life choices... (ok, will code for them later..)
+  // should re-evaluate your life choices... (ok, will code for them later..)
   for(var i = 0; i < jsonData.edgesData.length; i++) {
     let raw = jsonData.edgesData[i];  // create object for shorter references
     let subject = raw.source.prefix + ":" + raw.source.label;
@@ -531,63 +530,24 @@ function createTTL(jsonData) {
     // URI and URIONT are treated the same
     if (raw.target.type ==='URI' || raw.target.type ==='URIONT') {
       object = raw.target.prefix + ":" + raw.target.label;
-    }
-    else{
-     // Literal values are enquoted with use of '"'
+    } else {
+      // Literal values are enquoted with use of '"'
       if (raw.target.type =='INT') {
         object = '"' + raw.target.label + '"^^xsd:integer' ;
-        //TW Keep for reference
-        //writer.addTriple('ldw:' + raw.source.id,
-        //  'ldw:' + raw.linkLabel,
-        //  '"'+ raw.target.id + '"^^xsd:integer');
-      }
-      else if (raw.target.type =='STRING') {
+      }else if (raw.target.type =='STRING') {
         object = '"' + raw.target.label + '"^^xsd:string' ;
-        //writer.addTriple('ldw:' + raw.source.id,
-        //  'ldw:' + raw.linkLabel,
-        //  '"'+ raw.target.id + '"^^xsd:string');
-        //console.log(raw.source.id +' -- '+ raw.linkLabel+' --> "' + raw.target.id + '"^^xsd:string');
       }
-
+      // Add some logic here to throw error if Subject, Predicate, Object undefined
+    } // end of Object creation
     console.log("TRIPLE: " + subject + " --" + predicate + "--> " + object);
-    /*
-      writer.addTriple('ldw:' + raw.source.id,
-        'ldw:' + raw.linkLabel,
-        'ldw:' + raw.target.id);
-*/
-//      console.log(raw.source.id + " -- " + raw.linkLabel + " --> " + raw.target.id);
-    }
-    /*
-    else{
-    // Literal values are enquoted with use of '"'
-      if (raw.target.type =='INT') {
-        writer.addTriple('ldw:' + raw.source.id,
-          'ldw:' + raw.linkLabel,
-          '"'+ raw.target.id + '"^^xsd:integer');
-        // console.log(raw.source.id + ' -- ' + raw.linkLabel + ' --> "' + raw.target.id + '"^^xsd:integer');
-      }
-      else if (raw.target.type =='STRING') {
-        writer.addTriple('ldw:' + raw.source.id,
-          'ldw:' + raw.linkLabel,
-          '"'+ raw.target.id + '"^^xsd:string');
-        //console.log(raw.source.id +' -- '+ raw.linkLabel+' --> "' + raw.target.id + '"^^xsd:string');
-      }
-    */
-    }
-  }
-/*TW
+    writer.addTriple(subject, predicate, object); // Add triple for each edge
+  } // end looping over edges
   // Write out to file
   writer.end(function (error, result) {
     console.log(result);
     var blob = new Blob([result], {type: "text/plain;charset=utf-8"});
     saveAs(blob, "WhiteBoardTriples.ttl");
   });
-*/
-
-
-//}
-
-
-
+} // end createTTL()
 //---- App Start ---------------------------------------------------------------
 //update(graph); // SWITCHED TO NEW LOCATION!
