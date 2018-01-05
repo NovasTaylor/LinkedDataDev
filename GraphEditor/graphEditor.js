@@ -521,42 +521,56 @@ function createTTL(jsonData) {
   //   Code excludes unattached nodes. But if you have unattached nodes, you
   // really re-evaluate your life choices... (ok, will code for them later..)
   for(var i = 0; i < jsonData.edgesData.length; i++) {
-    let obj = jsonData.edgesData[i];  // create object for shorter references
-    //console.log("edges 1 label: " + jsonData.edgesData[1].target.label)
-    //console.log("Target Type: " +jsonData.edgesData[i].target.type)
+    let raw = jsonData.edgesData[i];  // create object for shorter references
+    let subject = raw.source.prefix + ":" + raw.source.label;
+    let predicate = raw.prefix + ":" + raw.label;
+    let object = null;
+    //console.log("S-P: " + subject + " --" + predicate)
 
-    // let subject=jsonData.edgesData[i].source.prefix +":"+jsonData.edgesData[i].source.label;
-    let subject = obj.source.prefix + ":" + obj.source.label;
-    let predicate = obj.prefix + ":" + obj.label;
-
-    console.log("S-P: " + subject + " --" + predicate)
-
-
-    // Prefixes are hard-coded.
+    // Creae Object based on their type
     // URI and URIONT are treated the same
-    if (obj.target.type ==='URI' || obj.target.type ==='URIONT') {
-  //  console.log("Ackbar says about OBJECT: Its a URI or URIONT!")
+    if (raw.target.type ==='URI' || raw.target.type ==='URIONT') {
+      object = raw.target.prefix + ":" + raw.target.label;
+    }
+    else{
+     // Literal values are enquoted with use of '"'
+      if (raw.target.type =='INT') {
+        object = '"' + raw.target.label + '"^^xsd:integer' ;
+        //TW Keep for reference
+        //writer.addTriple('ldw:' + raw.source.id,
+        //  'ldw:' + raw.linkLabel,
+        //  '"'+ raw.target.id + '"^^xsd:integer');
+      }
+      else if (raw.target.type =='STRING') {
+        object = '"' + raw.target.label + '"^^xsd:string' ;
+        //writer.addTriple('ldw:' + raw.source.id,
+        //  'ldw:' + raw.linkLabel,
+        //  '"'+ raw.target.id + '"^^xsd:string');
+        //console.log(raw.source.id +' -- '+ raw.linkLabel+' --> "' + raw.target.id + '"^^xsd:string');
+      }
+
+    console.log("TRIPLE: " + subject + " --" + predicate + "--> " + object);
     /*
-      writer.addTriple('ldw:' + obj.source.id,
-        'ldw:' + obj.linkLabel,
-        'ldw:' + obj.target.id);
+      writer.addTriple('ldw:' + raw.source.id,
+        'ldw:' + raw.linkLabel,
+        'ldw:' + raw.target.id);
 */
-//      console.log(obj.source.id + " -- " + obj.linkLabel + " --> " + obj.target.id);
+//      console.log(raw.source.id + " -- " + raw.linkLabel + " --> " + raw.target.id);
     }
     /*
     else{
     // Literal values are enquoted with use of '"'
-      if (obj.target.type =='INT') {
-        writer.addTriple('ldw:' + obj.source.id,
-          'ldw:' + obj.linkLabel,
-          '"'+ obj.target.id + '"^^xsd:integer');
-        // console.log(obj.source.id + ' -- ' + obj.linkLabel + ' --> "' + obj.target.id + '"^^xsd:integer');
+      if (raw.target.type =='INT') {
+        writer.addTriple('ldw:' + raw.source.id,
+          'ldw:' + raw.linkLabel,
+          '"'+ raw.target.id + '"^^xsd:integer');
+        // console.log(raw.source.id + ' -- ' + raw.linkLabel + ' --> "' + raw.target.id + '"^^xsd:integer');
       }
-      else if (obj.target.type =='STRING') {
-        writer.addTriple('ldw:' + obj.source.id,
-          'ldw:' + obj.linkLabel,
-          '"'+ obj.target.id + '"^^xsd:string');
-        //console.log(obj.source.id +' -- '+ obj.linkLabel+' --> "' + obj.target.id + '"^^xsd:string');
+      else if (raw.target.type =='STRING') {
+        writer.addTriple('ldw:' + raw.source.id,
+          'ldw:' + raw.linkLabel,
+          '"'+ raw.target.id + '"^^xsd:string');
+        //console.log(raw.source.id +' -- '+ raw.linkLabel+' --> "' + raw.target.id + '"^^xsd:string');
       }
     */
     }
