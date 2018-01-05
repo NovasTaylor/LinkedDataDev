@@ -314,18 +314,22 @@ function update(graph){
 //   Currently only works for a node
 //
 function edit(d, i, source){
-  editActive = true;
   console.log("You clicked a  " +source)
   console.log("     edit: " + source + " " + d.label);
   //console.log("clicked");
-  let self = this; //Necessary?
 
+  // If another node or edge was already selected (edit window already present,
+  //   then made another dbl click, you must purge the existing info to allow
+  //   display of info from the second dbl clicked item to replace the first.
   if (editActive == true) {
     // clicked a node or edge while previous edit div displayed
-    d3.selectAll("input").remove();
+//    d3.selectAll("input").remove();
     d3.select("#edit").selectAll("*").remove();
     d3.select("#edit").style("opacity", 0);
   }
+
+  let self = this; //Necessary?
+  editActive = true;
   d3.select("#edit").style("opacity", 1);  // Display edit div
 
   let div = d3.select("#edit");
