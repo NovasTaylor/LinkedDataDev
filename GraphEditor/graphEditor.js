@@ -19,7 +19,7 @@ let w = 900,
   h = 1100,
   nodeRadius = 40; // also used to distance arrow from node
 
-let infoActive = false;  // opacity flag for info editing box
+let editActive = false;  // opacity flag for editing box
 
 // Start and end nodes when constructing a link
 //  count of edge and node Ids for later incrementing
@@ -208,7 +208,7 @@ function update(graph){
       //  .text("foo")
       //---- Double click edge to edit ---------------------------------------------
       .on("dblclick", function(d, i){
-         infoEdit(d,i, "edge");
+         edit(d,i, "edge");
        });
 
   // NODES update --------------------------------------------------------------
@@ -236,7 +236,7 @@ function update(graph){
       //---- Double click node to edit -----------------------------------------
       // For new nodes, this should allow the entry of label, type, and prefix...
       .on("dblclick", function(d, i){
-        infoEdit(d,i, "node");
+        edit(d,i, "node");
       })
       .on("click", function(d, i){
         if (d3.event.shiftKey)  {
@@ -290,7 +290,7 @@ function update(graph){
     .text(function(d,i) { return d.label; }) //TW: Problem here AFTER a new node is added.
     ;
 
-  // Create unique IDS for the PREFIX and TYPE text for updating from the info box
+  // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
   //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
   circle.append("prefixText")
     .attr("id", function(d, i) {return("prefixText"+i) ; });
@@ -309,26 +309,26 @@ function update(graph){
 //-----------------------------------------------------------------------------
 //---- Additional Functions --------------------------------------------------------------
 
-// infoEdit()
-//   Edit information for either a "node" or an "edge"
+// edit()
+//   Edit either a "node" or an "edge"
 //   Currently only works for a node
 //
-function infoEdit(d, i, source){
-  infoActive = true;
+function edit(d, i, source){
+  editActive = true;
   console.log("You clicked a  " +source)
-  console.log("     infoEdit: " + source + " " + d.label);
+  console.log("     edit: " + source + " " + d.label);
   //console.log("clicked");
   let self = this; //Necessary?
 
-  if (infoActive == true) {
-    // clicked a node or edge while previous info block displayed
+  if (editActive == true) {
+    // clicked a node or edge while previous edit div displayed
     d3.selectAll("input").remove();
-    d3.select("#info").selectAll("*").remove();
-    d3.select("#info").style("opacity", 0);
+    d3.select("#edit").selectAll("*").remove();
+    d3.select("#edit").style("opacity", 0);
   }
-  d3.select("#info").style("opacity", 1);  // Display edit div
+  d3.select("#edit").style("opacity", 1);  // Display edit div
 
-  let div = d3.select("#info");
+  let div = d3.select("#edit");
 
   div.append("p")
   .text(function() { return("Edit " + source) });  // Selet div for appending
@@ -406,10 +406,10 @@ function infoEdit(d, i, source){
         d3.select("#prefixText" + i)
           .text(function(d) {return (d.prefix = prefixInput.node().value); });
       } // end of Edge update
-      // Clean up the info window after click of Hide/Update
-      d3.select("#info").selectAll("*").remove();
-      d3.select("#info").style("opacity", 0);
-      infoActive = false;  // turn off the infoEdit area
+      // Clean up the edit window after click of Hide/Update
+      d3.select("#edit").selectAll("*").remove();
+      d3.select("#edit").style("opacity", 0);
+      editActive = false;  // turn off the edit area
 
   }) // end of click on update button
 
@@ -426,7 +426,7 @@ function infoEdit(d, i, source){
         console.log("Selected_node: " , selected_node)
         // must delete the node and any edge attached to it (ingoing and outgoing)
         graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
-        infoActive = false;  // turn off the infoEdit area
+        editActive = false;  // turn off the edt area
         update(graph);
       }
       if(source=="edge"){
@@ -435,7 +435,7 @@ function infoEdit(d, i, source){
         selected_edge = mousedown_edge ;  //Playing here. Restructure?
         console.log("Selected_edge: " , selected_edge)
         graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
-        infoActive = false;  // turn off the infoEdit area
+        editActive = false;  // turn off the edit area
         update(graph);
       }
   });
