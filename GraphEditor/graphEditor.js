@@ -111,8 +111,21 @@ function initializeGraph(graph){
       .on('click', function(d){ addNode(graph);});
 
   // handler for createTTL buttons
-  let createTTLClick = d3.select("#createTTL")
-  .on('click', function(d){ createTTL(graph);});
+  // Setup and display a buttons div for createTTL and saveState
+  let buttonsDiv = d3.select("#buttons");
+
+  buttonsDiv.append("button")
+    .text("Create TTL")
+    .on("click", function(d){ createTTL(graph);});
+
+  buttonsDiv.append("button")
+    .text("Save State")
+    .on("click", function(d){ saveState(graph);});
+
+  //let createTTLClick = d3.select("#createTTL")
+  //.on('click', function(d){ createTTL(graph);});
+
+
 
   // Initialize D3 force layout
   force.nodes(graph.nodesData)
@@ -331,7 +344,7 @@ function edit(d, i, source){
   let self = this; //Necessary?
   editActive = true;
   d3.select("#edit").style("opacity", 1);  // Display edit div
-
+  d3.select("#buttons").style("opacity", 0);  // Display edit div
   let div = d3.select("#edit");
 
   div.append("p")
@@ -414,6 +427,7 @@ function edit(d, i, source){
       d3.select("#edit").selectAll("*").remove();
       d3.select("#edit").style("opacity", 0);
       editActive = false;  // turn off the edit area
+      d3.select("#buttons").style("opacity", 1);  // redisplay buttons
 
   }) // end of click on update button
 
@@ -440,6 +454,7 @@ function edit(d, i, source){
         console.log("Selected_edge: " , selected_edge)
         graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
         editActive = false;  // turn off the edit area
+        d3.select("#buttons").style("opacity", 1);  // redisplay buttons
         update(graph);
       }
   });
@@ -560,5 +575,9 @@ function createTTL(jsonData) {
     saveAs(blob, "WhiteBoardTriples.ttl");
   });
 } // end createTTL()
+
+function saveState(graph){
+  alert("This function will save the graph. Method is TBD!");
+}
 //---- App Start ---------------------------------------------------------------
 //update(graph); // SWITCHED TO NEW LOCATION!
