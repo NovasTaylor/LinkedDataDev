@@ -514,7 +514,12 @@ function createTTL(jsonData) {
   //TW re-enable    alert("You will now create the TTL file. Click OK to confirm.");
 
   // Set the prefixes
-  var writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#' } });
+  var writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#',
+    rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    rdfs:'http://www.w3.org/2000/01/rdf-schema#',
+    sdtmterm:'https://raw.githubusercontent.com/phuse-org/CTDasRDF/master/data/rdf/sdtm-terminology.rdf#',
+    xsd:'http://www.w3.org/2001/XMLSchema#'
+  } });
 
   // loop through the edges to create triples
   //   Code excludes unattached nodes. But if you have unattached nodes, you
