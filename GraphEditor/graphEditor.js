@@ -109,6 +109,10 @@ function initializeGraph(graph){
       })
       .on('click', function(d){ addNode(graph);});
 
+  // handler for createTTL buttons
+  let createTTLClick = d3.select("#createTTL")
+  .on('click', function(d){ createTTL(graph);});
+
   // Initialize D3 force layout
     force.nodes(graph.nodesData)
     .links(graph.edgesData)
@@ -503,6 +507,72 @@ function resetMouseVars() {
   mouseup_node = null;
   mousedown_edge = null;
 }
+
+//HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
+function createTTL(jsonData) {
+  //console.log("Now Create TTL");
+  console.log(jsonData);
+  //TW re-enable    alert("You will now create the TTL file. Click OK to confirm.");
+
+  // Set the prefixes
+  var writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#' } });
+
+  // loop through the edges to create triples
+  //   Code excludes unattached nodes. But if you have unattached nodes, you
+  // really re-evaluate your life choices... (ok, will code for them later..)
+  for(var i = 0; i < jsonData.edgesData.length; i++) {
+    let obj = jsonData.edgesData[i];  // create object for shorter references
+    //console.log("edges 1 label: " + jsonData.edgesData[1].target.label)
+    //console.log("Target Type: " +jsonData.edgesData[i].target.type)
+
+    // let subject=jsonData.edgesData[i].source.prefix +":"+jsonData.edgesData[i].source.label;
+    let subject = obj.source.prefix + ":" + obj.source.label;
+    let predicate = obj.prefix + ":" + obj.label;
+
+    console.log("S-P: " + subject + " --" + predicate)
+
+
+    // Prefixes are hard-coded.
+    // URI and URIONT are treated the same
+    if (obj.target.type ==='URI' || obj.target.type ==='URIONT') {
+  //  console.log("Ackbar says about OBJECT: Its a URI or URIONT!")
+    /*
+      writer.addTriple('ldw:' + obj.source.id,
+        'ldw:' + obj.linkLabel,
+        'ldw:' + obj.target.id);
+*/
+//      console.log(obj.source.id + " -- " + obj.linkLabel + " --> " + obj.target.id);
+    }
+    /*
+    else{
+    // Literal values are enquoted with use of '"'
+      if (obj.target.type =='INT') {
+        writer.addTriple('ldw:' + obj.source.id,
+          'ldw:' + obj.linkLabel,
+          '"'+ obj.target.id + '"^^xsd:integer');
+        // console.log(obj.source.id + ' -- ' + obj.linkLabel + ' --> "' + obj.target.id + '"^^xsd:integer');
+      }
+      else if (obj.target.type =='STRING') {
+        writer.addTriple('ldw:' + obj.source.id,
+          'ldw:' + obj.linkLabel,
+          '"'+ obj.target.id + '"^^xsd:string');
+        //console.log(obj.source.id +' -- '+ obj.linkLabel+' --> "' + obj.target.id + '"^^xsd:string');
+      }
+    */
+    }
+  }
+/*TW
+  // Write out to file
+  writer.end(function (error, result) {
+    console.log(result);
+    var blob = new Blob([result], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "WhiteBoardTriples.ttl");
+  });
+*/
+
+
+//}
+
 
 
 //---- App Start ---------------------------------------------------------------
