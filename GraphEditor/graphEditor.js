@@ -8,6 +8,7 @@ IN  :
 OUT :
 DEV:
 NOTE: Basing node addition on this: http://jsfiddle.net/Nivaldo/tUKh3/
+      validate TTL file using RIOT: riot --validate "WhiteBoardTriples.ttl"
 TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
       Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
 -----------------------------------------------------------------------------*/
@@ -114,7 +115,7 @@ function initializeGraph(graph){
   .on('click', function(d){ createTTL(graph);});
 
   // Initialize D3 force layout
-    force.nodes(graph.nodesData)
+  force.nodes(graph.nodesData)
     .links(graph.edgesData)
     .size([w, h])
     .on("tick", tick);
@@ -313,6 +314,7 @@ function update(graph){
 //   Currently only works for a node
 //
 function infoEdit(d, i, source){
+  infoActive = true;
   console.log("You clicked a  " +source)
   console.log("     infoEdit: " + source + " " + d.label);
   //console.log("clicked");
@@ -343,13 +345,16 @@ function infoEdit(d, i, source){
 
   // PREFIX - both nodes and edges
   let prefixText = div.append("p")
-      .text("Prefix: ");
-  let prefixInput = prefixText.append("input")
-    .attr({
-      'size': '15',
-      'type': 'text',
-      'value': d.prefix
-    });
+    .text("Prefix: ");
+  let prefixData = ["ldw","rdf", "rdfs", "sdtmterm"]
+  let prefixInput = prefixText.append("select")
+    .attr('class','select');
+  let prefixSelect = prefixInput.selectAll('option')
+    .data(prefixData).enter()
+    .append('option')
+    .text(function (d) { return d; })
+    .property("selected", function(g){ return g === d.prefix; });
+
   //TYPE - NODES only
   let typeText = ""
   let typeInput = ""
@@ -365,8 +370,7 @@ function infoEdit(d, i, source){
         .data(typeData).enter()
         .append('option')
         .text(function (d) { return d; })
-        .property("selected", function(g){ return g === d.type; })
-        ;
+        .property("selected", function(g){ return g === d.type; });
   }
 
  //console.log("labelInput: " +labelInput.node().value);
@@ -391,10 +395,7 @@ function infoEdit(d, i, source){
         d3.select("#circle" + i)
           .attr("class", "")  // Remove all classes (node, uri, string, int)
           .attr("class", "node") // Add the node class back in.
-          .classed(typeInput.node().value.toLowerCase(), true) // add type class
-
-        ;
-
+          .classed(typeInput.node().value.toLowerCase(), true); // add type class
       } // end of node UPDATE
       if(source=="edge"){
         console.log("Updating Edge")
@@ -408,35 +409,36 @@ function infoEdit(d, i, source){
       // Clean up the info window after click of Hide/Update
       d3.select("#info").selectAll("*").remove();
       d3.select("#info").style("opacity", 0);
+      infoActive = false;  // turn off the infoEdit area
 
- }) // end of click on update button
-  infoActive = true;
+  }) // end of click on update button
 
-let delButton = div.append("button")
-  .text("Delete")
-  .on("click", function() {
-    if(source=="node"){
-    // select node
-    mousedown_node = d; // Captures the node Initialized to null as per Kirsling
-    selected_node = mousedown_node ;  // Playing here. Need to restructure?
-    console.log("D: ", d)
-    //let foo = indexOf(node());
-    console.log("So you want to DELETE a node!")
-    console.log("Selected_node: " , selected_node)
-      // must delete the node and any edge attached to it (ingoing and outgoing)
-    graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
-    update(graph);
-  }
-  if(source=="edge"){
-    console.log("So you want to DELETE an Edge!")
-    mousedown_edge = d; // Captures the edge.
-    selected_edge = mousedown_edge ;  //Playing here. Restructure?
-    console.log("Selected_edge: " , selected_edge)
-    graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
-    update(graph);
-  }
-});
-
+  let delButton = div.append("button")
+    .text("Delete")
+    .on("click", function() {
+        if(source=="node"){
+        // select node
+        mousedown_node = d; // Captures the node Initialized to null as per Kirsling
+        selected_node = mousedown_node ;  // Playing here. Need to restructure?
+        console.log("D: ", d)
+        //let foo = indexOf(node());
+        console.log("So you want to DELETE a node!")
+        console.log("Selected_node: " , selected_node)
+        // must delete the node and any edge attached to it (ingoing and outgoing)
+        graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
+        infoActive = false;  // turn off the infoEdit area
+        update(graph);
+      }
+      if(source=="edge"){
+        console.log("So you want to DELETE an Edge!")
+        mousedown_edge = d; // Captures the edge.
+        selected_edge = mousedown_edge ;  //Playing here. Restructure?
+        console.log("Selected_edge: " , selected_edge)
+        graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
+        infoActive = false;  // turn off the infoEdit area
+        update(graph);
+      }
+  });
 }
 
 function addNode(graph){
