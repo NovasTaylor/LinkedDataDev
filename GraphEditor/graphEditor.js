@@ -47,22 +47,36 @@ function processData (error, graph) {
   initializeGraph(graph);
 ;}
 
-// Setup the SVG elements that do not depend on data
-let svg = d3.select("#whiteboard").append("svg")
+
+let svg= d3.select("#whiteboard")
+  .append("svg")
   .attr("width", w)
   .attr("height", h);
-  // Global Declare
 
-let edge = svg.append('svg:g').selectAll('edge'),
-    circle = svg.append('svg:g').selectAll('g');
+// Global declare of items referecnced  in udpate()
+let force = null,
+  edge = null,
+  circle = null;
+// DATA DEPENDENT SECTION STARTS> MAKE IT A FUNCTION ---------------------------
+function initializeGraph(graph){
+  // Find the max Node and Edge ID values based on array length. Used when
+  // creating IDs for new nodes (increment counter)
+  lastEdgeId = graph.edgesData.length -1;
+  lastNodeId = graph.nodesData.length -1;
+  //console.log ("Max Id for Edges, Nodes: "+ lastEdgeId+ ","  +lastNodeId);
 
-let edgepaths = null,
-    edgelabels = null;
+  // Setup the SVG elements that do not depend on data
+    // Global Declare
 
-let force = d3.layout.force();  // must define global
+  // Initialize D3 force layout
+  force = d3.layout.force()
+    .nodes(graph.nodesData)
+    .links(graph.edgesData)
+    .size([w, h])
+    .on("tick", tick);
 
-// Arrow marker for end of edge
-svg.append('defs').append('marker')
+  // Arrow marker for end of edge
+  svg.append('svg:defs').append('svg:marker')
     .attr({'id':'arrowhead',
       'viewBox': '-0 -5 10 10',
       'refX':    nodeRadius+12,
@@ -76,15 +90,16 @@ svg.append('defs').append('marker')
       .attr('fill', '#ccc')
       .attr('stroke','#ccc');
 
+  edge = svg.append('svg:g').selectAll('path'),
+  circle= svg.append('svg:g').selectAll('g'); //66
 
-// DATA DEPENDENT SECTION STARTS> MAKE IT A FUNCTION ---------------------------
-function initializeGraph(graph){
-  // Find the max Node and Edge ID values based on array length. Used when
-  // creating IDs for new nodes (increment counter)
-    lastEdgeId = graph.edgesData.length -1;
-    lastNodeId = graph.nodesData.length -1;
-    console.log ("Max Id for Edges, Nodes: "+ lastEdgeId+ ","  +lastNodeId);
+/*TW
+  let edge = svg.append('svg:g').selectAll('edge'),
+      circle = svg.append('svg:g').selectAll('g');
 
+  let edgepaths = svg.append('svg:g').selectAll(".edgepath"),
+      edgelabels = null;
+*/
     // Add node icon. Within initiallizeGraph() for access to "graph"data
     svg.append("svg:image")
       .attr({
@@ -126,15 +141,10 @@ function initializeGraph(graph){
   //.on('click', function(d){ createTTL(graph);});
 
 
-
-  // Initialize D3 force layout
-  force.nodes(graph.nodesData)
-    .links(graph.edgesData)
-    .size([w, h])
-    .on("tick", tick);
-
   // NODE  creation
-  circle.append("text")
+  /*TW
+  circle.selectAll('g')
+  .append("text")
     .attr({
       'class':       function(d,i){return 'nodeText'},
       'id':          function(d, i) {return("nodeText"+i) ; },
@@ -144,24 +154,34 @@ function initializeGraph(graph){
     .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
       // after node text is changed, original and NEW overwrite.
     ;
-    update(graph);
+  */
+  update(graph);
+
 }  // end of initializeGraph
 
+
 function tick() {
-  edge.attr({"x1" : function(d) {return d.source.x; },
+  edge.attr({"x1" : function(d) {
+      //console.log(d.source.x);
+      return d.source.x;
+    },
     "y1": function(d) {return d.source.y; },
     "x2": function(d) { return d.target.x;},
     "y2": function(d) { return d.target.y;}
   });
 
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
-  circle.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  circle.attr("transform", function(d) {
+    //console.log(d.x);
+    return "translate(" + d.x + "," + d.y + ")"; });
 
 //TW Problems here. Assignment of path and values undefined for d.source.x, etc.
 // Likely scoping issue now that code is within initializeGraph() and update() functions
-  edgepaths.attr('d', function(d) { let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-    //console.log(d)
-    return path});
+/*TW OUT FOR TESTING
+  edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+                                               //console.log(d)
+                                               return path});
+
   edgelabels.attr('transform',function(d,i){
     if (d.target.x<d.source.x){
             let bbox = this.getBBox();
@@ -172,6 +192,7 @@ function tick() {
       return 'rotate(0)';
     }
   });
+TW END OUT FOR TESTING */
 };  // End on tick
 
 function update(graph){
@@ -179,22 +200,25 @@ function update(graph){
   //---- EDGES update ----------------------------------------------------------
 
   // Add new links ..... TO BE ADDED
-  edge = svg.selectAll("line")
-    .data(graph.edgesData)
-    .enter()
-    .append("line")
+
+  edge = edge.data(graph.edgesData);
+
+  edge.enter()
+    .append('svg:path')
+    .append("line") //TW
       .attr("id", function(d,i){return 'edge'+i})
       .attr('marker-end', 'url(#arrowhead)')
       //.attr('class', 'edge')
       .style("stroke", "#ccc");
 
-  edge.append("prefixText")
-    .attr("id", function(d, i) {return("prefixText"+i) ; });
+//  edge.append("prefixText")
+//    .attr("id", function(d, i) {return("prefixText"+i) ; });
 
+  edge.exit().remove();
 
-
-    edgepaths = svg.selectAll(".edgepath")
-      .data(graph.edgesData)
+//    edgepaths = svg.selectAll(".edgepath")
+/*TW out during testing
+      edgepaths.data(graph.edgesData)
       .enter()
       .append('path')
       .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
@@ -204,6 +228,7 @@ function update(graph){
              'id':function(d,i) {return 'edgepath'+i}})
       .style("pointer-events", "none")
       ;
+
     // dx : the starting distance of the label from the source node
 
     edgelabels =  svg.selectAll(".edgeabel")
@@ -223,7 +248,7 @@ function update(graph){
       .on("dblclick", function(d, i){
          edit(d,i, "edge");
        });
-
+END OF OUT FOR TESTING */
   // NODES update --------------------------------------------------------------
 
   // Add new nodes.
@@ -277,8 +302,8 @@ function update(graph){
             d.pulse = false;
 
           }
-
-        }})
+        }
+      }) // end mouse click
       .on('mouseover', function(d){
         //DEBUG  console.log("NODE MOUSEOVER");
         let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,});
@@ -287,12 +312,12 @@ function update(graph){
       .on('mouseout', function(d){
         //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
         let nodeSelection = d3.select(this).attr({'r':nodeRadius});
-      })
+      }) // end mouseout
       ;
 
   // Add nodeText ID to each node. Adding the actual text label here with the
   //.text  causes problems with intial nodes.
-  circle.append("text")
+  g.append("svg:text") //232
   //d3.selectAll("circle")
       .attr({
       'class':       function(d,i){return 'nodeText'},
@@ -579,5 +604,3 @@ function createTTL(jsonData) {
 function saveState(graph){
   alert("This function will save the graph. Method is TBD!");
 }
-//---- App Start ---------------------------------------------------------------
-//update(graph); // SWITCHED TO NEW LOCATION!
