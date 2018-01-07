@@ -57,7 +57,8 @@ let svg= d3.select("#whiteboard")
 let force = null,
   edge = null,
   circle = null;
-// DATA DEPENDENT SECTION STARTS> MAKE IT A FUNCTION ---------------------------
+
+// Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
   // Find the max Node and Edge ID values based on array length. Used when
   // creating IDs for new nodes (increment counter)
@@ -181,14 +182,10 @@ function update(graph){
 
   edge.enter()
     .append('svg:path')
-  //  .append("line") //TW
-      .attr('class', 'link')
       .attr("id", function(d,i){return 'edge'+i})
       .attr('marker-end', 'url(#arrowhead)')
-      //.attr('class', 'edge')
+    //  .attr('class', 'edge')
       .style("stroke", "#ccc");
-
-
 
 //  edge.append("prefixText")
 //    .attr("id", function(d, i) {return("prefixText"+i) ; });
