@@ -137,38 +137,19 @@ function initializeGraph(graph){
     .text("Save State")
     .on("click", function(d){ saveState(graph);});
 
-  //let createTTLClick = d3.select("#createTTL")
-  //.on('click', function(d){ createTTL(graph);});
-
-
-  // NODE  creation
-  /*TW
-  circle.selectAll('g')
-  .append("text")
-    .attr({
-      'class':       function(d,i){return 'nodeText'},
-      'id':          function(d, i) {return("nodeText"+i) ; },
-      'text-anchor': 'middle',
-      'class':        'nodeLabel'
-    })
-    .text(function(d,i) { return d.label; }) //Causes problems with preexisting nodes!
-      // after node text is changed, original and NEW overwrite.
-    ;
-  */
-  update(graph);
-
+  update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
-
 function tick() {
-  edge.attr({"x1" : function(d) {
-      //console.log(d.source.x);
-      return d.source.x;
-    },
-    "y1": function(d) {return d.source.y; },
-    "x2": function(d) { return d.target.x;},
-    "y2": function(d) { return d.target.y;}
-  });
+
+  // draw directed edges with proper padding from node centers
+  edge.attr('d', function(d) {
+
+    return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
+});
+
+
+
 
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
   circle.attr("transform", function(d) {
@@ -198,18 +179,19 @@ TW END OUT FOR TESTING */
 function update(graph){
 
   //---- EDGES update ----------------------------------------------------------
-
   // Add new links ..... TO BE ADDED
-
   edge = edge.data(graph.edgesData);
 
   edge.enter()
     .append('svg:path')
-    .append("line") //TW
+  //  .append("line") //TW
+      .attr('class', 'link')
       .attr("id", function(d,i){return 'edge'+i})
       .attr('marker-end', 'url(#arrowhead)')
       //.attr('class', 'edge')
       .style("stroke", "#ccc");
+
+
 
 //  edge.append("prefixText")
 //    .attr("id", function(d, i) {return("prefixText"+i) ; });
@@ -253,6 +235,7 @@ END OF OUT FOR TESTING */
 
   // Add new nodes.
   // node circles are WITHIN the <g> , so start with <g> and append the circle
+  //TW can d.id be deleted? ID is set as attr later.
   circle = circle.data(graph.nodesData, function(d) { return d.id; });
 
   circle.selectAll('circle');
