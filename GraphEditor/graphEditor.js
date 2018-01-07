@@ -148,9 +148,6 @@ function tick() {
     return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
 });
 
-
-
-
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
   circle.attr("transform", function(d) {
     //console.log(d.x);
