@@ -56,6 +56,8 @@ let svg= d3.select("#whiteboard")
 // Global declare of items referecnced  in udpate()
 let force = null,
   edge = null,
+  edgepath = null,
+  edgelabel = null,
   circle = null;
 
 // Initialize the graph components ---------------------------------------------
@@ -92,14 +94,12 @@ function initializeGraph(graph){
       .attr('stroke','#ccc');
 
   edge = svg.append('svg:g').selectAll('path'),
-  circle= svg.append('svg:g').selectAll('g'); //66
+  circle= svg.append('svg:g').selectAll('g');
+  // edgepath = svg.append('svg:g').selectAll(".edgepath"),
 
-/*TW
-  let edge = svg.append('svg:g').selectAll('edge'),
-      circle = svg.append('svg:g').selectAll('g');
-
-  let edgepaths = svg.append('svg:g').selectAll(".edgepath"),
-      edgelabels = null;
+/*
+  edgepath = svg.append('svg:g').selectAll(".edgepath"),
+  edgelabel = svg.append('svg:g').selectAll(".edgeLabelpath"),;
 */
     // Add node icon. Within initiallizeGraph() for access to "graph"data
     svg.append("svg:image")
@@ -145,33 +145,29 @@ function tick() {
 
   // draw directed edges with proper padding from node centers
   edge.attr('d', function(d) {
-
     return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
-});
+  });
 
   // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
   circle.attr("transform", function(d) {
     //console.log(d.x);
     return "translate(" + d.x + "," + d.y + ")"; });
 
-//TW Problems here. Assignment of path and values undefined for d.source.x, etc.
-// Likely scoping issue now that code is within initializeGraph() and update() functions
-/*TW OUT FOR TESTING
-  edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-                                               //console.log(d)
-                                               return path});
+  edgepath.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+                                       return path});
 
-  edgelabels.attr('transform',function(d,i){
-    if (d.target.x<d.source.x){
-            let bbox = this.getBBox();
-            let rx = bbox.x+bbox.width/2;
-            let ry = bbox.y+bbox.height/2;
-            return 'rotate(180 '+rx+' '+ry+')';
-    } else {
-      return 'rotate(0)';
-    }
-  });
-TW END OUT FOR TESTING */
+  edgelabel.attr('transform',function(d,i){
+      if (d.target.x<d.source.x){
+              let bbox = this.getBBox();
+              let rx = bbox.x+bbox.width/2;
+              let ry = bbox.y+bbox.height/2;
+              return 'rotate(180 '+rx+' '+ry+')';
+      } else {
+        return 'rotate(0)';
+      }
+    });
+
+
 };  // End on tick
 
 function update(graph){
@@ -192,10 +188,9 @@ function update(graph){
 
   edge.exit().remove();
 
-//    edgepaths = svg.selectAll(".edgepath")
-/*TW out during testing
-      edgepaths.data(graph.edgesData)
-      .enter()
+  edgepath = svg.selectAll(".edgepath")
+  .data(graph.edgesData)
+  .enter()
       .append('path')
       .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
              'class':'edgepath',
@@ -207,8 +202,10 @@ function update(graph){
 
     // dx : the starting distance of the label from the source node
 
-    edgelabels =  svg.selectAll(".edgeabel")
-    .data(graph.edgesData).enter()
+    // edgelabel =
+    edgelabel = svg.selectAll(".edgelabel")
+      .data(graph.edgesData)
+    .enter()
       .append('text')
         .attr({'class':'edgelabel',
           //
@@ -224,7 +221,7 @@ function update(graph){
       .on("dblclick", function(d, i){
          edit(d,i, "edge");
        });
-END OF OUT FOR TESTING */
+
   // NODES update --------------------------------------------------------------
 
   // Add new nodes.
@@ -440,7 +437,7 @@ function edit(d, i, source){
         // select node
         mousedown_node = d; // Captures the node Initialized to null as per Kirsling
         selected_node = mousedown_node ;  // Playing here. Need to restructure?
-        console.log("D: ", d)
+        console.log("D: ", d)//TW d is currently UNDEFINED during a delete!
         //let foo = indexOf(node());
         console.log("So you want to DELETE a node!")
         console.log("Selected_node: " , selected_node)
