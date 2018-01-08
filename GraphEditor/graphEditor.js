@@ -154,7 +154,7 @@ function tick() {
     });
 
     edgepath.attr('d', function(d) {
-        var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+        let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
         return path
     });
 
@@ -263,7 +263,7 @@ function update(graph){
                 }
 
                 if (startNode===null){
-                  var selected_circle = d3.select(this);
+                  let selected_circle = d3.select(this);
                   console.log("SELECTED FOR LINK: ", d3.select(this))
                   selected_circle.classed("subjectLink", true); // add type class
                   startNode= i;
@@ -300,7 +300,7 @@ function update(graph){
               'text-anchor': 'middle',
               'class':        'nodeLabel'
             })
-        .text(function(d,i) { return d.label; }) //TW: Problem here AFTER a new node is added.
+        .text(function(d,i) { return d.label; })
         ;
 
     // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
@@ -433,8 +433,8 @@ function edit(d, i, source, graph){
                             if(source=="node"){
                                 // select node
                                 mousedown_node = d; // Captures the node Initialized to null as per Kirsling
-                                selected_node = mousedown_node ;  // Playing here. Need to restructure?
-                                console.log("D: ", d)//TW d is currently UNDEFINED during a delete!
+                                selected_node = mousedown_node ;
+                                console.log("D: ", d)
                                 //let foo = indexOf(node());
                                 console.log("So you want to DELETE a node!")
                                 console.log("Selected_node: " , selected_node)
@@ -500,10 +500,10 @@ function resetMouseVars() {
 function createTTL(jsonData) {
     //console.log("Now Create TTL");
     console.log(jsonData);
-    //TW re-enable    alert("You will now create the TTL file. Click OK to confirm.");
+    //TW re-enable //    alert("You will now create the TTL file. Click OK to confirm.");
 
     // Set the prefixes
-    var writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#',
+    let writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#',
                                          rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
                                          rdfs:'http://www.w3.org/2000/01/rdf-schema#',
                                          sdtmterm:'https://raw.githubusercontent.com/phuse-org/CTDasRDF/master/data/rdf/sdtm-terminology.rdf#',
@@ -540,7 +540,7 @@ function createTTL(jsonData) {
     // Write out to file
     writer.end(function (error, result) {
         console.log(result);
-        var blob = new Blob([result], {type: "text/plain;charset=utf-8"});
+        let blob = new Blob([result], {type: "text/plain;charset=utf-8"});
         saveAs(blob, "WhiteBoardTriples.ttl");
     });
 } // end createTTL()
