@@ -253,18 +253,19 @@ function update(graph){
         })
         .on("click", function(d, i){
             if (d3.event.shiftKey)  {
-                // No links allowed FROM INT/STRING literals
-                if(d.type === "STRING" || d.type === "INT"){
+                // In this case you are trying to START a link from a literal,
+                // which is not allowed.  You are trying to set the node as a
+                // startnode and STRING or INT cannot be one.
+                if(startNode === null && (d.type === "STRING" || d.type === "INT")){
+                  console.log("STart node is: " + startNode);
                   window.confirm("Links from " + d.type + " nodes are not allowed.");
                   return;
                 }
-                d.pulse = !d.pulse;
-                if (d.pulse) {
-                    var selected_circle = d3.select(this);
-                    console.log("SELECTED FOR LINK: ", d3.select(this))
-                    pulsate(selected_circle);
-                }
+
                 if (startNode===null){
+                  var selected_circle = d3.select(this);
+                  console.log("SELECTED FOR LINK: ", d3.select(this))
+                  selected_circle.classed("subjectLink", true); // add type class
                   startNode= i;
                   console.log("Setting Start Node as node ID: " + startNode);
                 }
@@ -273,8 +274,8 @@ function update(graph){
                   endNode= i;
                   console.log("Start Node: " + startNode + " End Node: " + endNode);
                   addEdge(graph);
-                  // Turn off pulsating after edge created.
-                  d.pulse = false;
+                  d3.selectAll(".subjectLink")
+                    .classed("subjectLink", false); // add type class
                 }
            }
         }) // end mouse click
@@ -316,15 +317,11 @@ function update(graph){
     force.start();
 }  // end of update(graph)
 
-
-
 //-----------------------------------------------------------------------------
 //---- Additional Functions --------------------------------------------------------------
 
 // edit()
 //   Edit either a "node" or an "edge"
-//   Currently only works for a node
-//TW added GRAPH here
 function edit(d, i, source, graph){
     console.log("You clicked a  " +source)
     console.log("     edit: " + source + " " + d.label);
@@ -490,36 +487,6 @@ function addEdge(graph){
     endNode = null;
     // RESET the flag for pulsing here!!
     update(graph);  // Adds node to the SVG
-}
-
-// Pulse a circle selected for linking
-function pulsate(selection) {
-    recursive_transitions();
-
-    function recursive_transitions() {
-        if (selection.data()[0].pulse) {
-            selection.transition()
-                .duration(500) // was 400
-                .attr("stroke-width", 2)
-                .attr("r", nodeRadius)
-                //.ease('sin-in')
-                .ease('sin')
-                .transition()
-                .duration(500) // was 800
-                .attr('stroke-width', 3)
-                .attr("r", nodeRadius + 10)
-                //.ease('bounce-in')
-                .ease('sin')
-                .each("end", recursive_transitions);
-        } else {
-            // transition back to normal
-            selection.transition()
-                .duration(500)
-                .attr("r", nodeRadius + 10)
-                .attr("stroke-width", 2)
-                .attr("stroke-dasharray", "1, 0");
-        }
-    }
 }
 
 //HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.

@@ -16,24 +16,33 @@
 }
 
 circle.string {
-  fill:  #c5c5c5;
-  stroke: red;
+  fill:   #e4e4e4;
+  stroke: #646464;
   stroke-width: 4;
 }
+
+circle.int {
+  fill: #c1e1eC ; /* light blue */
+  stroke: #1a1aff;
+  stroke-width: 4;
+}
+
 circle.uri {
   fill: #bcf5bc ;
   stroke: black;
 }
 
+circle.uri.subjectLink {
+  fill: yellow ;
+  stroke: red;
+  stroke-width: 6;
+  stroke-dasharray: 2;
+}
+
+
 circle.uriont {
   fill: #ffc862 ;
   stroke: black;
-}
-
-circle.int {
-  fill: #c1e1eC ; /* light blue */
-  stroke: red;
-  stroke-width: 4;
 }
 
 circle.misc {
@@ -41,10 +50,10 @@ circle.misc {
 }
 
 circle.unspec {
-  fill: yellow ;
-  stroke: red;
+  fill: white ;
+  stroke: black;
   stroke-width: 4;
-  stroke-dasharray: 2;;
+  stroke-dasharray: 2;
 }
 
 
