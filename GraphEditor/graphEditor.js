@@ -150,7 +150,7 @@ function tick() {
     // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
     circle.attr("transform", function(d) {
       //console.log(d.x);
-      return "translate(" + d.x + "," + d.y + ")"; 
+      return "translate(" + d.x + "," + d.y + ")";
     });
 
     edgepath.attr('d', function(d) {
@@ -220,7 +220,7 @@ function update(graph){
                     //  .text("foo")
                     //---- Double click edge to edit ---------------------------------------------
                     .on("dblclick", function(d, i){
-                       edit(d,i, "edge");
+                       edit(d,i, "edge", graph);
                      });
 
     // NODES update --------------------------------------------------------------
@@ -249,7 +249,7 @@ function update(graph){
         //---- Double click node to edit -----------------------------------------
         // For new nodes, this should allow the entry of label, type, and prefix...
         .on("dblclick", function(d, i){
-            edit(d,i, "node");
+            edit(d,i, "node", graph);
         })
         .on("click", function(d, i){
             if (d3.event.shiftKey)  {
@@ -324,8 +324,8 @@ function update(graph){
 // edit()
 //   Edit either a "node" or an "edge"
 //   Currently only works for a node
-//
-function edit(d, i, source){
+//TW added GRAPH here
+function edit(d, i, source, graph){
     console.log("You clicked a  " +source)
     console.log("     edit: " + source + " " + d.label);
     //console.log("clicked");
@@ -432,6 +432,7 @@ function edit(d, i, source){
     let delButton = div.append("button")
                         .text("Delete")
                         .on("click", function() {
+                           //console.log("Graph is: "+graph);
                             if(source=="node"){
                                 // select node
                                 mousedown_node = d; // Captures the node Initialized to null as per Kirsling
