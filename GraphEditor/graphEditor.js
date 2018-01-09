@@ -62,14 +62,12 @@ let force     = null,
 
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
+
     // Find the max Node and Edge ID values based on array length. Used when
     // creating IDs for new nodes (increment counter)
     lastEdgeId = graph.edgesData.length -1;
     lastNodeId = graph.nodesData.length -1;
     //console.log ("Max Id for Edges, Nodes: "+ lastEdgeId+ ","  +lastNodeId);
-
-    // Setup the SVG elements that do not depend on data
-    // Global Declare
 
     // Initialize D3 force layout
     force = d3.layout.force()
@@ -138,16 +136,15 @@ function initializeGraph(graph){
 }  // end of initializeGraph
 
 function tick() {
-
-    // draw directed edges with proper padding from node centers
-
     edge.attr('d', function(d) {
+
         return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
     });
-
-    // THIS LINE DIFFERS FROM EG FN-EdgePathLabels.js
     circle.attr("transform", function(d) {
-      //console.log(d.x);
+      if (d.x > w ) {d.x = w-nodeRadius;}  // prevent node move off screen right
+      if (d.x < 0 ) {d.x = nodeRadius;}  // prevent node move off screen right
+      if (d.y < 0 ) {d.y = nodeRadius;}  // prevent node move off screen top
+      if (d.y > h ) {d.y = h-nodeRadius;} // prevvent node move off screen bottom
       return "translate(" + d.x + "," + d.y + ")";
     });
 
@@ -167,12 +164,10 @@ function tick() {
         }
     });
 
-};  // End on tick
+};  // End tick
 
 function update(graph){
-
     //---- EDGES update ----------------------------------------------------------
-    // Add new links ..... TO BE ADDED
     edge = edge.data(graph.edgesData);
     edge.enter()
         .append('svg:path')
@@ -187,10 +182,6 @@ function update(graph){
 
     edgepath = edgepath.data(graph.edgesData);
     edgepath.enter()
-    //edgepath = svg.selectAll(".edgepath")
-    //              .data(graph.edgesData)
-    //              .enter()
-
                   .append('path')
                   .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
                          'class':'edgepath',
@@ -329,7 +320,7 @@ function edit(d, i, source, graph){
     // If another node or edge was already selected (edit window already present,
     //   then made another dbl click, you must purge the existing info to allow
     //   display of info from the second dbl clicked item to replace the first.
-    if (editActive == true) {
+    if (editActive === true) {
         // clicked a node or edge while previous edit div displayed
         // d3.selectAll("input").remove();
         d3.select("#edit").selectAll("*").remove();
@@ -439,7 +430,8 @@ function edit(d, i, source, graph){
                                 console.log("Selected_node: " , selected_node)
                                 // must delete the node and any edge attached to it (ingoing and outgoing)
                                 graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
-                                editActive = false;  // turn off the edt area
+
+                                d3.select("#buttons").style("opacity", 1);  // redisplay buttons
                                 update(graph);
                             }
                             if(source=="edge"){
