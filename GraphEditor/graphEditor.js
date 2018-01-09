@@ -93,14 +93,11 @@ function initializeGraph(graph){
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
 
-    edge = svg.append('svg:g').selectAll('path'),
+    edge = svg.append('svg:g').selectAll('path');
     circle= svg.append('svg:g').selectAll('g');
-    // edgepath = svg.append('svg:g').selectAll(".edgepath"),
+    edgepath = svg.append('svg:g').selectAll(".edgepath");
+    edgelabel = svg.append('svg:g').selectAll(".edgelabel");
 
-/*
-  edgepath = svg.append('svg:g').selectAll(".edgepath"),
-  edgelabel = svg.append('svg:g').selectAll(".edgeLabelpath"),;
-*/
     // Add node icon. Within initiallizeGraph() for access to "graph"data
     svg.append("svg:image")
         .attr({'x'         : 5,
@@ -143,6 +140,7 @@ function initializeGraph(graph){
 function tick() {
 
     // draw directed edges with proper padding from node centers
+
     edge.attr('d', function(d) {
         return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
     });
@@ -176,7 +174,6 @@ function update(graph){
     //---- EDGES update ----------------------------------------------------------
     // Add new links ..... TO BE ADDED
     edge = edge.data(graph.edgesData);
-
     edge.enter()
         .append('svg:path')
         .attr("id", function(d,i){return 'edge'+i})
@@ -186,7 +183,6 @@ function update(graph){
 
 //    edge.append("prefixText")
 //      .attr("id", function(d, i) {return("prefixText"+i) ; });
-
     edge.exit().remove();
 
     edgepath = svg.selectAll(".edgepath")
@@ -203,10 +199,8 @@ function update(graph){
 
     // dx : the starting distance of the label from the source node
 
-    // edgelabel =
-    edgelabel = svg.selectAll(".edgelabel")
-                    .data(graph.edgesData)
-                    .enter()
+    edgelabel = edgelabel.data(graph.edgesData);
+    edgelabel.enter()
                     .append('text')
                     .attr({'class':'edgelabel',
                         //
@@ -222,6 +216,7 @@ function update(graph){
                     .on("dblclick", function(d, i){
                        edit(d,i, "edge", graph);
                      });
+   edgelabel.exit().remove();
 
     // NODES update --------------------------------------------------------------
 
