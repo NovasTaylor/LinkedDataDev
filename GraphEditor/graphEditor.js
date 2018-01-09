@@ -185,9 +185,12 @@ function update(graph){
 //      .attr("id", function(d, i) {return("prefixText"+i) ; });
     edge.exit().remove();
 
-    edgepath = svg.selectAll(".edgepath")
-                  .data(graph.edgesData)
-                  .enter()
+    edgepath = edgepath.data(graph.edgesData);
+    edgepath.enter()
+    //edgepath = svg.selectAll(".edgepath")
+    //              .data(graph.edgesData)
+    //              .enter()
+
                   .append('path')
                   .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
                          'class':'edgepath',
@@ -197,8 +200,9 @@ function update(graph){
                   .style("pointer-events", "none")
                   ;
 
-    // dx : the starting distance of the label from the source node
+    edgepath.exit().remove();
 
+    // dx : the starting distance of the label from the source node
     edgelabel = edgelabel.data(graph.edgesData);
     edgelabel.enter()
                     .append('text')
