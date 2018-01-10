@@ -175,10 +175,10 @@ function update(graph){
         .attr('marker-end', 'url(#arrowhead)')
         //  .attr('class', 'edge')
         .style("stroke", "#ccc");
-
-//    edge.append("prefixText")
-//      .attr("id", function(d, i) {return("prefixText"+i) ; });
-    edge.exit().remove();
+//TW testing here
+    edge.append("prefixText")
+      .attr("id", function(d, i) {return("prefixText"+i) ; });
+  edge.exit().remove();
 
     edgepath = edgepath.data(graph.edgesData);
     edgepath.enter()
@@ -385,7 +385,8 @@ function edit(d, i, source, graph){
                               console.log("Update on Node: "+ i)
                               // Label
                               d3.select("#nodeText" + i)
-                                .text(function(d) {return (d.label = labelInput.node().value); });
+                                // URI and URIONT nodes convert to uppercase. INT and STRING do not.
+                                .text(function(d) {return (d.label = labelInput.node().value.toUpperCase()); });
                               // Prefix
                               d3.select("#prefixText" + i)
                                 .text(function(d) {return (d.prefix = prefixInput.node().value); });
@@ -451,7 +452,7 @@ function addNode(graph){
     console.log("A node you wish to add!")
     let newNode = {
         id: ++lastNodeId,
-        label: 'Newbie',
+        label: 'NEW',
         prefix: 'new',
         type: 'UNSPEC',
         x:200, y:200,
@@ -537,5 +538,8 @@ function createTTL(jsonData) {
 } // end createTTL()
 
 function saveState(graph){
-    alert("This function will save the graph. Method is TBD!");
+    //TW alert("This function will save the graph. Method is TBD!");
+    // Hijacking the Save State to check data  pre/post deletes
+    console.log("Data check!!");
+    console.log(graph);
 }
