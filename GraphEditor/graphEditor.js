@@ -318,7 +318,10 @@ function update(graph){
                     window.confirm("Links from " + d.type + " nodes are not allowed.");
                     return;
                 }
-
+                if (startNode===d.id){
+                    let selected_circle = d3.select(this);
+                    selected_circle.classed("subjectLink", false); // add type class
+                }
                 if (startNode===null){
                     let selected_circle = d3.select(this);
                     console.log("SELECTED FOR LINK: ", d3.select(this))
