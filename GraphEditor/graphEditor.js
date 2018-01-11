@@ -385,8 +385,16 @@ function edit(d, i, source, graph){
                               console.log("Update on Node: "+ i)
                               // Label
                               d3.select("#nodeText" + i)
-                                // URI and URIONT nodes convert to uppercase. INT and STRING do not.
-                                .text(function(d) {return (d.label = labelInput.node().value.toUpperCase()); });
+                                // URI uppercase. INT and STRING can be mixed case.
+                                .text(function(d) {
+                                    if (typeInput.node().value==="URI"){//var nodeText =
+                                      return (d.label = labelInput.node().value.toUpperCase());
+                                    }
+                                    else{
+                                      return (d.label = labelInput.node().value);
+                                    }
+
+                                   });
                               // Prefix
                               d3.select("#prefixText" + i)
                                 .text(function(d) {return (d.prefix = prefixInput.node().value); });
@@ -404,8 +412,9 @@ function edit(d, i, source, graph){
                           if(source=="edge"){
                             console.log("Updating Edge")
 
+                            // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + i)
-                              .text(function(d)  {return (d.label = labelInput.node().value); });
+                              .text(function(d)  {return (d.label = labelInput.node().value.toLowerCase()); });
 
                             d3.select("#prefixText" + i)
                               .text(function(d) {return (d.prefix = prefixInput.node().value); });
