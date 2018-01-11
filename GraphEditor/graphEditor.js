@@ -399,6 +399,14 @@ function edit(d, i, source, graph){
         d3.select("#edit").selectAll("*").remove();
         d3.select("#edit").style("opacity", 0);
     }
+    // If a node has been selected (shift+click) then it will be deselected
+    if (startNode != null) {
+        console.log("I'll deselect the selected node for you:"+startNode)
+        startNode = null
+        d3.selectAll(".subjectLink")
+            .classed("subjectLink", false);
+    }
+
 
     let self = this; //Necessary?
     editActive = true;
