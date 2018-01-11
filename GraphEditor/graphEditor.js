@@ -314,25 +314,25 @@ function update(graph){
                 // which is not allowed.  You are trying to set the node as a
                 // startnode and STRING or INT cannot be one.
                 if(startNode === null && (d.type === "STRING" || d.type === "INT")){
-                  console.log("STart node is: " + startNode);
-                  window.confirm("Links from " + d.type + " nodes are not allowed.");
-                  return;
+                    console.log("STart node is: " + startNode);
+                    window.confirm("Links from " + d.type + " nodes are not allowed.");
+                    return;
                 }
 
                 if (startNode===null){
-                  let selected_circle = d3.select(this);
-                  console.log("SELECTED FOR LINK: ", d3.select(this))
-                  selected_circle.classed("subjectLink", true); // add type class
-                  startNode= i;
-                  console.log("Setting Start Node as node ID: " + startNode);
+                    let selected_circle = d3.select(this);
+                    console.log("SELECTED FOR LINK: ", d3.select(this))
+                    selected_circle.classed("subjectLink", true); // add type class
+                    startNode= i;
+                    console.log("Setting Start Node as node ID: " + startNode);
                 }
                 // Only set endNode if it is not the same as the startNode.
                 else if (startNode !== null && startNode !== i){
-                  endNode= i;
-                  console.log("Start Node: " + startNode + " End Node: " + endNode);
-                  addEdge(graph);
-                  d3.selectAll(".subjectLink")
-                    .classed("subjectLink", false); // add type class
+                    endNode= i;
+                    console.log("Start Node: " + startNode + " End Node: " + endNode);
+                    addEdge(graph);
+                    d3.selectAll(".subjectLink")
+                        .classed("subjectLink", false); // add type class
                 }
            }
         }) // end mouse click
