@@ -39,6 +39,12 @@ circle.uri.subjectLink {
   stroke-dasharray: 2;
 }
 
+circle.unspec.subjectLink {
+  fill: yellow ;
+  stroke: red;
+  stroke-width: 6;
+  stroke-dasharray: 2;
+}
 
 circle.uriont {
   fill: #ffc862 ;

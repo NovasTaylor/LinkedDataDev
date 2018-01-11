@@ -319,8 +319,11 @@ function update(graph){
                     return;
                 }
                 if (startNode===d.id){
+                    console.log("Deselecting link: ", startNode);
                     let selected_circle = d3.select(this);
                     selected_circle.classed("subjectLink", false); // add type class
+                    startNode= null;
+                    return;
                 }
                 if (startNode===null){
                     let selected_circle = d3.select(this);
