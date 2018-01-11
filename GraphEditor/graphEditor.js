@@ -16,7 +16,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 
 // Initializations
 let w          = 900,
-    h          = 1100,
+    h          = 1500,
     nodeRadius = 40; // also used to distance arrow from node
 
 let editActive = false;  // opacity flag for editing box
@@ -123,7 +123,6 @@ function initializeGraph(graph){
     // handler for createTTL buttons
     // Setup and display a buttons div for createTTL and saveState
     let buttonsDiv = d3.select("#buttons");
-
     buttonsDiv.append("button")
       .text("Create TTL")
       .on("click", function(d){ createTTL(graph);});
@@ -131,6 +130,74 @@ function initializeGraph(graph){
     buttonsDiv.append("button")
       .text("Save State")
       .on("click", function(d){ saveState(graph);});
+
+    //Legend creation
+    //TODO : Change to creation using a loop over the array of values in the legend.
+    //  Add the remaining legend items.
+    let legendDiv = d3.select("#legend").append("svg");
+    //legendDiv.append("text")
+    //  .text("foo bar!");
+    legendDiv.append("circle")
+        .attr("class", "node uri")
+        .attr("r", 10)
+        .attr("cx", 15)
+        .attr("cy", 15);
+    legendDiv.append("text")
+        .attr("dx", 40)
+        .attr("dy", 20)
+        .text("URI (links to/from)");
+
+    legendDiv.append("circle")
+        .attr("class", "unspec")
+        .attr("r", 10)
+        .attr("cx", 15)
+        .attr("cy", 50);
+    legendDiv.append("text")
+        .attr("dx", 40)
+        .attr("dy", 55)
+        .text("New Node: edit to set properties");
+
+    legendDiv.append("circle")
+        .attr("class", "node uri subjectLink")
+        .attr("r", 10)
+        .attr("cx", 15)
+        .attr("cy", 85);
+    legendDiv.append("text")
+        .attr("dx", 40)
+        .attr("dy", 90)
+        .text("Source node for new link");
+
+    legendDiv.append("circle")
+        .attr("class", "string")
+        .attr("r", 10)
+        .attr("cx", 15)
+        .attr("cy", 120);
+    legendDiv.append("text")
+        .attr("dx", 40)
+        .attr("dy", 125)
+        .text("String: No outgoing links!")
+
+    legendDiv.append("circle")
+        .attr("class", "node int")
+        .attr("r", 10)
+        .attr("cx", 15)
+        .attr("cy", 155);
+    legendDiv.append("text")
+        .attr("dx", 40)
+        .attr("dy", 160)
+        .text("Integer: No outgoing links!")
+
+    legendDiv.append("circle")
+        .attr("class", "uriont")
+        .attr("r", 10)
+        .attr("cx", 15)
+        .attr("cy", 190);
+    legendDiv.append("text")
+        .attr("dx", 40)
+        .attr("dy", 195)
+          .text("Integer: No outgoing links!")
+
+
 
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
