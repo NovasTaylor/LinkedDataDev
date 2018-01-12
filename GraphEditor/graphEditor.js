@@ -19,7 +19,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 //   nodeWidth may adjust with content in later versions.
 let w          = 900,
     h          = 1500,
-    nodeWidth  = 80,
+    nodeWidth  = 100,
     nodeHeight = 40;
     //nodeRadius = 40; // also used to distance arrow from node
 
@@ -62,7 +62,6 @@ let force     = null,
     edge      = null,
     edgepath  = null,
     edgelabel = null,
-//TW DEL circle    = null,
     rect      = null
     ;
 
@@ -98,7 +97,6 @@ function initializeGraph(graph){
         .attr('stroke','#ccc');
 
     edge = svg.append('svg:g').selectAll('path');
-//TW DEL circle= svg.append('svg:g').selectAll('g');
     rect = svg.append('svg:g').selectAll('g');
     edgepath = svg.append('svg:g').selectAll(".edgepath");
     edgelabel = svg.append('svg:g').selectAll(".edgelabel");
@@ -267,10 +265,9 @@ function update(graph){
         .attr('marker-end', 'url(#arrowhead)')
         //  .attr('class', 'edge')
         .style("stroke", "#ccc");
-//TW testing here
     edge.append("prefixText")
       .attr("id", function(d, i) {return("prefixText"+i) ; });
-  edge.exit().remove();
+    edge.exit().remove();
 
     edgepath = edgepath.data(graph.edgesData);
     edgepath.enter()
@@ -280,8 +277,7 @@ function update(graph){
                          'fill-opacity':0,
                          'stroke-opacity':0,
                          'id':function(d,i) {return 'edgepath'+i}})
-                  .style("pointer-events", "none")
-                  ;
+                  .style("pointer-events", "none");
 
     edgepath.exit().remove();
 
@@ -291,7 +287,7 @@ function update(graph){
                     .append('text')
                     .attr({'class':'edgelabel',
                         //
-                           'dx':80,
+                           'dx':nodeWidth+40,
                            'dy':-1  // change to 5 to put inline with edge
                           })
                     .append('textPath')
@@ -310,30 +306,21 @@ function update(graph){
     // Add new nodes.
     // node circles are WITHIN the <g> , so start with <g> and append the circle
     //TW can d.id be deleted? ID is set as attr later.
-/*TW DEL
-    circle = circle.data(graph.nodesData, function(d) { return d.id; });
-    circle.selectAll('circle');
-*/
     rect = rect.data(graph.nodesData, function(d) { return d.id; });
     rect.selectAll('rect');
 
     // add new nodeSelection
-//TW DEL let g = circle.enter().append('svg:g');
     let g = rect.enter().append('svg:g');
-//TW DEL g.append("svg:circle")
     g.append("svg:rect")
-        .attr("class", "node")
-        //TW DEL .attr("r", nodeRadius)
         .attr("width", nodeWidth)
         .attr("height", nodeHeight)
-//TW DEL .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
         .attr("id", function(d, i) {return("rect"+i) ; })  // ID used to update class
         .attr("class", function(d,i){
-            if (d.type == "STRING"){ return "string";}
-            else if (d.type == "URI"){ return "uri"; }
-            else if (d.type == "INT"){ return "int"; }
-            else if (d.type == "URIONT"){ return "uriont"; }
-            else {return "unspec";}
+            if (d.type == "STRING"){ return "node string";}
+            else if (d.type == "URI"){ return "node uri"; }
+            else if (d.type == "INT"){ return "node int"; }
+            else if (d.type == "URIONT"){ return "node uriont"; }
+            else {return "node unspec";}
         })
         //---- Double click node to edit -----------------------------------------
         // For new nodes, this should allow the entry of label, type, and prefix...
@@ -405,27 +392,20 @@ function update(graph){
     // Add nodeText ID to each node. Adding the actual text label here with the
     //.text  causes problems with intial nodes.
     g.append("svg:text") //232
-//TW DEL d3.selectAll("circle")
         .attr({
               'class':       function(d,i){return 'nodeText'},
               'id':          function(d, i) {return("nodeText"+i) ; },
-              'text-anchor': 'middle',
+              'text-anchor': 'start',
+              'x': 5,
+              'y': nodeHeight/2,
               'class':        'nodeLabel'
             })
         .text(function(d,i) { return d.label; })
+    //    .text("foo")
         ;
 
     // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
     //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
-/*TW DEL
-    circle.append("prefixText")
-        .attr("id", function(d, i) {return("prefixText"+i) ; });
-    circle.append("typeText")
-        .attr("id", function(d, i) {return("typeText"+i) ; });
-    circle.call(force.drag);
-    // Exit any old nodes.
-    circle.exit().remove();
-*/
     rect.append("prefixText")
         .attr("id", function(d, i) {return("prefixText"+i) ; });
     rect.append("typeText")
@@ -543,7 +523,6 @@ function edit(d, i, source, graph){
                               // Node Class
                               // Change class of rect to match TYPE so the node display will change
                               //   according to the node type
-//TW DEL d3.select("#circle" + i)
                               d3.select("#rect" + i)
                                 .attr("class", "")  // Remove all classes (node, uri, string, int)
                                 .attr("class", "node") // Add the node class back in.
