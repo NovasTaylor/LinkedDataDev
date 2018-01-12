@@ -217,25 +217,24 @@ function initializeGraph(graph){
 }  // end of initializeGraph
 
 function tick() {
+
     edge.attr('d', function(d) {
-
-        return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
+        let xposSource = d.source.x + nodeWidth/2,
+            xposTarget = d.target.x + nodeWidth/2,
+            yposSource = d.source.y + nodeHeight/2,
+            yposTarget = d.target.y + nodeHeight/2;
+        return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
     });
-/*TW DEL
-    circle.attr("transform", function(d) {
-      if (d.x > w ) {d.x = w-nodeRadius;}  // prevent node move off screen right
-      if (d.x < 0 ) {d.x = nodeRadius;}  // prevent node move off screen right
-      if (d.y < 0 ) {d.y = nodeRadius;}  // prevent node move off screen top
-      if (d.y > h ) {d.y = h-nodeRadius;} // prevvent node move off screen bottom
-      return "translate(" + d.x + "," + d.y + ")";
-*/
-    rect.attr("transform", function(d) {
-      if (d.x > w ) {d.x = w-nodeWidth;}  // prevent node move off screen right
-      if (d.x < 0 ) {d.x = nodeWidth;}  // prevent node move off screen right
-      if (d.y < 0 ) {d.y = nodeWidth;}  // prevent node move off screen top
-      if (d.y > h ) {d.y = h-nodeWidth;} // prevvent node move off screen bottom
-      return "translate(" + d.x + "," + d.y + ")";
 
+
+
+    // Prevvent node movement off the editing canvas
+    rect.attr("transform", function(d) {
+      if (d.x > w ) {d.x = w-nodeWidth;}  // right
+      if (d.x < 0 ) {d.x = nodeWidth;}    // left
+      if (d.y < 0 ) {d.y = nodeWidth;}    // top
+      if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
+      return "translate(" + d.x + "," + d.y + ")";
     });
 
     edgepath.attr('d', function(d) {
@@ -253,7 +252,6 @@ function tick() {
             return 'rotate(0)';
         }
     });
-
 };  // End tick
 
 function update(graph){
@@ -339,10 +337,6 @@ function update(graph){
                 }
                 if (startNode===d.id){
                     console.log("Deselecting link: ", startNode);
-/*TW DEL
-                    let selected_circle = d3.select(this);
-                    selected_circle.classed("subjectLink", false); // add type class
-*/
                     let selected_rect = d3.select(this);
                     selected_rect.classed("subjectLink", false); // add type class
 
@@ -350,15 +344,9 @@ function update(graph){
                     return;
                 }
                 if (startNode===null){
-/*TW DEL
-                    let selected_circle = d3.select(this);
-                    console.log("SELECTED FOR LINK: ", d3.select(this))
-                    selected_circle.classed("subjectLink", true); // add type class
-*/
                     let selected_rect = d3.select(this);
                     console.log("SELECTED FOR LINK: ", d3.select(this))
                     selected_rect.classed("subjectLink", true); // add type class
-
                     startNode= i;
                     console.log("Setting Start Node as node ID: " + startNode);
                 }
@@ -400,8 +388,7 @@ function update(graph){
               'y': nodeHeight/2,
               'class':        'nodeLabel'
             })
-        .text(function(d,i) { return d.label; })
-    //    .text("foo")
+        .text(function(d,i) { return d.prefix+":"+d.label; })
         ;
 
     // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
