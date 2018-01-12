@@ -137,68 +137,77 @@ function initializeGraph(graph){
     let legendDiv = d3.select("#legend").append("svg");
     //legendDiv.append("text")
     //  .text("foo bar!");
-    legendDiv.append("circle")
+    // URI
+    legendDiv.append("rect")
         .attr("class", "node uri")
-        .attr("r", 10)
-        .attr("cx", 15)
-        .attr("cy", 15);
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", 5)
+        .attr("y", 0);
     legendDiv.append("text")
-        .attr("dx", 40)
-        .attr("dy", 20)
+        .attr("dx", 35)
+        .attr("dy", 15)
         .text("URI (links to/from)");
 
-    legendDiv.append("circle")
-        .attr("class", "unspec")
-        .attr("r", 10)
-        .attr("cx", 15)
-        .attr("cy", 50);
+    //New (unspecified)
+    legendDiv.append("rect")
+        .attr("class", "node unspec")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", 5)
+        .attr("y", 30);
     legendDiv.append("text")
-        .attr("dx", 40)
-        .attr("dy", 55)
+        .attr("dx", 35)
+        .attr("dy", 45)
         .text("New Node: edit to set properties");
 
-    legendDiv.append("circle")
+    // Subject Link
+    legendDiv.append("rect")
         .attr("class", "node uri subjectLink")
-        .attr("r", 10)
-        .attr("cx", 15)
-        .attr("cy", 85);
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", 5)
+        .attr("y", 60);
     legendDiv.append("text")
-        .attr("dx", 40)
-        .attr("dy", 90)
+        .attr("dx", 35)
+        .attr("dy", 75)
         .text("Source node for new link");
 
-    legendDiv.append("circle")
-        .attr("class", "string")
-        .attr("r", 10)
-        .attr("cx", 15)
-        .attr("cy", 120);
+    // String
+    legendDiv.append("rect")
+        .attr("class", "node string")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", 5)
+        .attr("y", 90);
     legendDiv.append("text")
-        .attr("dx", 40)
-        .attr("dy", 125)
+        .attr("dx", 35)
+        .attr("dy", 105)
         .text("String: No outgoing links!")
 
-    legendDiv.append("circle")
+    // Integer
+    legendDiv.append("rect")
         .attr("class", "node int")
-        .attr("r", 10)
-        .attr("cx", 15)
-        .attr("cy", 155);
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", 5)
+        .attr("y", 120);
     legendDiv.append("text")
-        .attr("dx", 40)
-        .attr("dy", 160)
+        .attr("dx", 35)
+        .attr("dy", 135)
         .text("Integer: No outgoing links!")
 
-    legendDiv.append("circle")
-        .attr("class", "uriont")
-        .attr("r", 10)
-        .attr("cx", 15)
-        .attr("cy", 190);
+   // Ontology URI
+    legendDiv.append("rect")
+        .attr("class", "node uriont")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", 5)
+        .attr("y", 150);
     legendDiv.append("text")
-        .attr("dx", 40)
-        .attr("dy", 195)
+        .attr("dx", 35)
+        .attr("dy", 165)
           .text("Integer: No outgoing links!")
-
-
-
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 

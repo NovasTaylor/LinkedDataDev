@@ -15,29 +15,75 @@
   font-weight: bold;
 }
 
-circle.string {
-  fill:   #e4e4e4;
-  stroke: #646464;
-  stroke-width: 4;
-}
-
-circle.int {
-  fill: #c1e1eC ; /* light blue */
-  stroke: #1a1aff;
-  stroke-width: 4;
-}
-
+/*TW DELETE NEXT */
 circle.uri {
   fill: #bcf5bc ;
   stroke: black;
 }
+.node.uri {
+  fill: #bcf5bc ;
+  stroke: black;
+}
 
+/*TW DELETE NEXT */
+circle.unspec {
+  fill: white ;
+  stroke: black;
+  stroke-width: 4;
+  stroke-dasharray: 2;
+}
+.node.unspec {
+  fill: white ;
+  stroke: black;
+  stroke-width: 4;
+  stroke-dasharray: 2;
+}
+
+/*TW DELETE NEXT */
 circle.uri.subjectLink {
   fill: yellow ;
   stroke: red;
   stroke-width: 6;
   stroke-dasharray: 2;
 }
+.node.uri.subjectLink {
+  fill: yellow ;
+  stroke: red;
+  stroke-width: 6;
+  stroke-dasharray: 2;
+}
+/*TW DELETE NEXT */
+circle.string {
+  fill:   #e4e4e4;
+  stroke: #646464;
+  stroke-width: 4;
+}
+.node.string {
+  fill:   #e4e4e4;
+  stroke: #646464;
+  stroke-width: 4;
+}
+/*TW DELETE NEXT */
+circle.int {
+  fill: #c1e1eC ; /* light blue */
+  stroke: #1a1aff;
+  stroke-width: 4;
+}
+.node.int {
+  fill: #c1e1eC ; /* light blue */
+  stroke: #1a1aff;
+  stroke-width: 4;
+}
+/*TW DELETE NEXT */
+circle.uriont {
+  fill: #ffc862 ;
+  stroke: black;
+}
+.node.uriont {
+  fill: #ffc862 ;
+  stroke: black;
+}
+
 
 circle.unspec.subjectLink {
   fill: yellow ;
@@ -46,21 +92,11 @@ circle.unspec.subjectLink {
   stroke-dasharray: 2;
 }
 
-circle.uriont {
-  fill: #ffc862 ;
-  stroke: black;
-}
 
 circle.misc {
   fill: gray ;
 }
 
-circle.unspec {
-  fill: white ;
-  stroke: black;
-  stroke-width: 4;
-  stroke-dasharray: 2;
-}
 
 
 /* text for link labels */
