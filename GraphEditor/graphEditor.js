@@ -20,7 +20,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 let w          = 900,
     h          = 1500,
     nodeWidth  = 100,
-    nodeHeight = 40;
+    nodeHeight = 30;
     //nodeRadius = 40; // also used to distance arrow from node
 
 let editActive = false;  // opacity flag for editing box
@@ -142,77 +142,79 @@ function initializeGraph(graph){
     let legendDiv = d3.select("#legend").append("svg");
     //legendDiv.append("text")
     //  .text("foo bar!");
-    // URI
+    let legendNodeHeight = 15,
+        legendNodeWidth  = 20;
+    // IRI
     legendDiv.append("rect")
-        .attr("class", "node uri")
-        .attr("width", 20)
-        .attr("height", 20)
+        .attr("class", "node iri")
+        .attr("width", legendNodeWidth)
+        .attr("height", legendNodeHeight)
         .attr("x", 5)
         .attr("y", 0);
     legendDiv.append("text")
         .attr("dx", 35)
         .attr("dy", 15)
-        .text("URI (links to/from)");
+        .text("IRI (links to/from)");
 
     //New (unspecified)
     legendDiv.append("rect")
         .attr("class", "node unspec")
-        .attr("width", 20)
-        .attr("height", 20)
+        .attr("width", legendNodeWidth)
+        .attr("height", legendNodeHeight)
         .attr("x", 5)
-        .attr("y", 30);
+        .attr("y", 25);
     legendDiv.append("text")
         .attr("dx", 35)
-        .attr("dy", 45)
+        .attr("dy", 40)
         .text("New Node: edit to set properties");
 
     // Subject Link
     legendDiv.append("rect")
-        .attr("class", "node uri subjectLink")
-        .attr("width", 20)
-        .attr("height", 20)
+        .attr("class", "node iri subjectLink")
+        .attr("width", legendNodeWidth)
+        .attr("height", legendNodeHeight)
         .attr("x", 5)
-        .attr("y", 60);
+        .attr("y", 50);
     legendDiv.append("text")
         .attr("dx", 35)
-        .attr("dy", 75)
+        .attr("dy", 65)
         .text("Source node for new link");
 
     // String
     legendDiv.append("rect")
         .attr("class", "node string")
-        .attr("width", 20)
-        .attr("height", 20)
+        .attr("width", legendNodeWidth)
+        .attr("height", legendNodeHeight)
         .attr("x", 5)
-        .attr("y", 90);
+        .attr("y", 75);
     legendDiv.append("text")
         .attr("dx", 35)
-        .attr("dy", 105)
+        .attr("dy", 90)
         .text("String: No outgoing links!")
 
     // Integer
     legendDiv.append("rect")
         .attr("class", "node int")
-        .attr("width", 20)
-        .attr("height", 20)
+        .attr("width", legendNodeWidth)
+        .attr("height", legendNodeHeight)
         .attr("x", 5)
-        .attr("y", 120);
+        .attr("y", 100);
     legendDiv.append("text")
         .attr("dx", 35)
-        .attr("dy", 135)
+        .attr("dy", 115)
         .text("Integer: No outgoing links!")
 
-   // Ontology URI
+   // Ontology IRI
     legendDiv.append("rect")
-        .attr("class", "node uriont")
-        .attr("width", 20)
-        .attr("height", 20)
+        .attr("class", "node iriont")
+        .attr("width", legendNodeWidth)
+        .attr("height", legendNodeHeight)
         .attr("x", 5)
-        .attr("y", 150);
+        .attr("y", 125);
     legendDiv.append("text")
         .attr("dx", 35)
-        .attr("dy", 165)
-          .text("Integer: No outgoing links!")
+        .attr("dy", 140)
+          .text("External Ont. IRI")
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
@@ -226,8 +228,6 @@ function tick() {
         return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
     });
 
-
-
     // Prevvent node movement off the editing canvas
     rect.attr("transform", function(d) {
       if (d.x > w ) {d.x = w-nodeWidth;}  // right
@@ -238,7 +238,14 @@ function tick() {
     });
 
     edgepath.attr('d', function(d) {
-        let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+      let xposSource = d.source.x + nodeWidth/2,
+          xposTarget = d.target.x + nodeWidth/2,
+          yposSource = d.source.y + nodeHeight/2,
+          yposTarget = d.target.y + nodeHeight/2;
+
+        let path='M '+xposSource+' '+yposSource+' L '+ xposTarget +' '+yposTarget;
+
+        // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
         return path
     });
 
@@ -285,13 +292,13 @@ function update(graph){
                     .append('text')
                     .attr({'class':'edgelabel',
                         //
-                           'dx':nodeWidth+40,
+                           'dx':nodeWidth-10,  // Move label along edge
                            'dy':-1  // change to 5 to put inline with edge
                           })
                     .append('textPath')
                     .attr('xlink:href',function(d,i) {return '#edgepath'+i})
                     .attr('id', function(d,i){return 'edgelabel'+i})
-                    .text(function(d,i){return d.label})
+                    .text(function(d,i){return d.prefix+":"+d.label})
                     //  .text("foo")
                     //---- Double click edge to edit ---------------------------------------------
                     .on("dblclick", function(d, i){
@@ -312,12 +319,14 @@ function update(graph){
     g.append("svg:rect")
         .attr("width", nodeWidth)
         .attr("height", nodeHeight)
+        .attr("rx", 5) // Round edges
+        .attr("ry", 5)
         .attr("id", function(d, i) {return("rect"+i) ; })  // ID used to update class
         .attr("class", function(d,i){
             if (d.type == "STRING"){ return "node string";}
-            else if (d.type == "URI"){ return "node uri"; }
+            else if (d.type == "IRI"){ return "node iri"; }
             else if (d.type == "INT"){ return "node int"; }
-            else if (d.type == "URIONT"){ return "node uriont"; }
+            else if (d.type == "IRIONT"){ return "node iriont"; }
             else {return "node unspec";}
         })
         //---- Double click node to edit -----------------------------------------
@@ -339,7 +348,6 @@ function update(graph){
                     console.log("Deselecting link: ", startNode);
                     let selected_rect = d3.select(this);
                     selected_rect.classed("subjectLink", false); // add type class
-
                     startNode= null;
                     return;
                 }
@@ -385,7 +393,7 @@ function update(graph){
               'id':          function(d, i) {return("nodeText"+i) ; },
               'text-anchor': 'start',
               'x': 5,
-              'y': nodeHeight/2,
+              'y': nodeHeight/2+3,  // +n Moves down from top a little more
               'class':        'nodeLabel'
             })
         .text(function(d,i) { return d.prefix+":"+d.label; })
@@ -472,7 +480,7 @@ function edit(d, i, source, graph){
     if(source=="node"){
         typeText     = div.append("p")
                             .text("Type: ");
-        let typeData = ["URI","STRING", "INT"]
+        let typeData = ["IRI","STRING", "INT"]
         typeInput    = typeText.append("select")
                             .attr('class','select')
         typeSelect   = typeInput.selectAll('option')
@@ -491,9 +499,9 @@ function edit(d, i, source, graph){
                               console.log("Update on Node: "+ i)
                               // Label
                               d3.select("#nodeText" + i)
-                                // URI uppercase. INT and STRING can be mixed case.
+                                // IRI uppercase. INT and STRING can be mixed case.
                                 .text(function(d) {
-                                    if (typeInput.node().value==="URI"){//var nodeText =
+                                    if (typeInput.node().value==="IRI"){//var nodeText =
                                       return (d.label = labelInput.node().value.toUpperCase());
                                     }
                                     else{
@@ -511,7 +519,7 @@ function edit(d, i, source, graph){
                               // Change class of rect to match TYPE so the node display will change
                               //   according to the node type
                               d3.select("#rect" + i)
-                                .attr("class", "")  // Remove all classes (node, uri, string, int)
+                                .attr("class", "")  // Remove all classes (node, iri, string, int)
                                 .attr("class", "node") // Add the node class back in.
                                 .classed(typeInput.node().value.toLowerCase(), true); // add type class
                           } // end of node UPDATE
@@ -629,8 +637,8 @@ function createTTL(jsonData) {
         //console.log("S-P: " + subject + " --" + predicate)
 
         // Creae Object based on their type
-        // URI and URIONT are treated the same
-        if (raw.target.type ==='URI' || raw.target.type ==='URIONT') {
+        // IRI and IRIONT are treated the same
+        if (raw.target.type ==='IRI' || raw.target.type ==='IRIONT') {
             object = raw.target.prefix + ":" + raw.target.label;
         } else {
             // Literal values are enquoted with use of '"'

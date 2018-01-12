@@ -16,11 +16,11 @@
 }
 
 /*TW DELETE NEXT */
-circle.uri {
+circle.iri {
   fill: #bcf5bc ;
   stroke: black;
 }
-.node.uri {
+.node.iri {
   fill: #bcf5bc ;
   stroke: black;
 }
@@ -40,13 +40,13 @@ circle.unspec {
 }
 
 /*TW DELETE NEXT */
-circle.uri.subjectLink {
+circle.iri.subjectLink {
   fill: yellow ;
   stroke: red;
   stroke-width: 6;
   stroke-dasharray: 2;
 }
-.node.uri.subjectLink {
+.node.iri.subjectLink {
   fill: yellow ;
   stroke: red;
   stroke-width: 6;
@@ -75,11 +75,11 @@ circle.int {
   stroke-width: 4;
 }
 /*TW DELETE NEXT */
-circle.uriont {
+circle.iriont {
   fill: #ffc862 ;
   stroke: black;
 }
-.node.uriont {
+.node.iriont {
   fill: #ffc862 ;
   stroke: black;
 }
