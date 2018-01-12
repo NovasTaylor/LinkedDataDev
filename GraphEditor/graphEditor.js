@@ -14,10 +14,14 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 -----------------------------------------------------------------------------*/
 "use strict";
 
-// Initializations
+// Initializations.
+// nodeWidth/Height are the starting defaults for these values.
+//   nodeWidth may adjust with content in later versions.
 let w          = 900,
     h          = 1500,
-    nodeRadius = 40; // also used to distance arrow from node
+    nodeWidth  = 80,
+    nodeHeight = 40;
+    //nodeRadius = 40; // also used to distance arrow from node
 
 let editActive = false;  // opacity flag for editing box
 
@@ -58,7 +62,9 @@ let force     = null,
     edge      = null,
     edgepath  = null,
     edgelabel = null,
-    circle    = null;
+//TW DEL circle    = null,
+    rect      = null
+    ;
 
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
@@ -80,7 +86,7 @@ function initializeGraph(graph){
     svg.append('svg:defs').append('svg:marker')
         .attr({'id'          :'arrowhead',
                'viewBox'     : '-0 -5 10 10',
-               'refX'        : nodeRadius+12,
+               'refX'        : nodeWidth+12,
                'refY'        : 0,
                'orient'      : 'auto',
                'markerWidth' : 10,
@@ -92,7 +98,8 @@ function initializeGraph(graph){
         .attr('stroke','#ccc');
 
     edge = svg.append('svg:g').selectAll('path');
-    circle= svg.append('svg:g').selectAll('g');
+//TW DEL circle= svg.append('svg:g').selectAll('g');
+    rect = svg.append('svg:g').selectAll('g');
     edgepath = svg.append('svg:g').selectAll(".edgepath");
     edgelabel = svg.append('svg:g').selectAll(".edgelabel");
 
@@ -216,12 +223,21 @@ function tick() {
 
         return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
     });
+/*TW DEL
     circle.attr("transform", function(d) {
       if (d.x > w ) {d.x = w-nodeRadius;}  // prevent node move off screen right
       if (d.x < 0 ) {d.x = nodeRadius;}  // prevent node move off screen right
       if (d.y < 0 ) {d.y = nodeRadius;}  // prevent node move off screen top
       if (d.y > h ) {d.y = h-nodeRadius;} // prevvent node move off screen bottom
       return "translate(" + d.x + "," + d.y + ")";
+*/
+    rect.attr("transform", function(d) {
+      if (d.x > w ) {d.x = w-nodeWidth;}  // prevent node move off screen right
+      if (d.x < 0 ) {d.x = nodeWidth;}  // prevent node move off screen right
+      if (d.y < 0 ) {d.y = nodeWidth;}  // prevent node move off screen top
+      if (d.y > h ) {d.y = h-nodeWidth;} // prevvent node move off screen bottom
+      return "translate(" + d.x + "," + d.y + ")";
+
     });
 
     edgepath.attr('d', function(d) {
@@ -294,17 +310,24 @@ function update(graph){
     // Add new nodes.
     // node circles are WITHIN the <g> , so start with <g> and append the circle
     //TW can d.id be deleted? ID is set as attr later.
+/*TW DEL
     circle = circle.data(graph.nodesData, function(d) { return d.id; });
-
     circle.selectAll('circle');
+*/
+    rect = rect.data(graph.nodesData, function(d) { return d.id; });
+    rect.selectAll('rect');
 
     // add new nodeSelection
-    let g = circle.enter().append('svg:g');
-
-    g.append("svg:circle")
+//TW DEL let g = circle.enter().append('svg:g');
+    let g = rect.enter().append('svg:g');
+//TW DEL g.append("svg:circle")
+    g.append("svg:rect")
         .attr("class", "node")
-        .attr("r", nodeRadius)
-        .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
+        //TW DEL .attr("r", nodeRadius)
+        .attr("width", nodeWidth)
+        .attr("height", nodeHeight)
+//TW DEL .attr("id", function(d, i) {return("circle"+i) ; })  // ID used to update class
+        .attr("id", function(d, i) {return("rect"+i) ; })  // ID used to update class
         .attr("class", function(d,i){
             if (d.type == "STRING"){ return "string";}
             else if (d.type == "URI"){ return "uri"; }
@@ -329,15 +352,26 @@ function update(graph){
                 }
                 if (startNode===d.id){
                     console.log("Deselecting link: ", startNode);
+/*TW DEL
                     let selected_circle = d3.select(this);
                     selected_circle.classed("subjectLink", false); // add type class
+*/
+                    let selected_rect = d3.select(this);
+                    selected_rect.classed("subjectLink", false); // add type class
+
                     startNode= null;
                     return;
                 }
                 if (startNode===null){
+/*TW DEL
                     let selected_circle = d3.select(this);
                     console.log("SELECTED FOR LINK: ", d3.select(this))
                     selected_circle.classed("subjectLink", true); // add type class
+*/
+                    let selected_rect = d3.select(this);
+                    console.log("SELECTED FOR LINK: ", d3.select(this))
+                    selected_rect.classed("subjectLink", true); // add type class
+
                     startNode= i;
                     console.log("Setting Start Node as node ID: " + startNode);
                 }
@@ -353,19 +387,25 @@ function update(graph){
         }) // end mouse click
         .on('mouseover', function(d){
             //DEBUG  console.log("NODE MOUSEOVER");
-            let nodeSelection = d3.select(this).attr({'r':nodeRadius+5,});
+            let nodeSelection = d3.select(this).attr({
+              'width':nodeWidth+5,
+              'height':nodeHeight+5
+            });
         })
         //Mouseout Node  - bring node back to full colour
         .on('mouseout', function(d){
             //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
-            let nodeSelection = d3.select(this).attr({'r':nodeRadius});
+            let nodeSelection = d3.select(this).attr({
+              'width':nodeWidth,
+              'height': nodeHeight
+            });
         }) // end mouseout
         ;
 
     // Add nodeText ID to each node. Adding the actual text label here with the
     //.text  causes problems with intial nodes.
     g.append("svg:text") //232
-    //d3.selectAll("circle")
+//TW DEL d3.selectAll("circle")
         .attr({
               'class':       function(d,i){return 'nodeText'},
               'id':          function(d, i) {return("nodeText"+i) ; },
@@ -377,6 +417,7 @@ function update(graph){
 
     // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
     //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
+/*TW DEL
     circle.append("prefixText")
         .attr("id", function(d, i) {return("prefixText"+i) ; });
     circle.append("typeText")
@@ -384,6 +425,14 @@ function update(graph){
     circle.call(force.drag);
     // Exit any old nodes.
     circle.exit().remove();
+*/
+    rect.append("prefixText")
+        .attr("id", function(d, i) {return("prefixText"+i) ; });
+    rect.append("typeText")
+        .attr("id", function(d, i) {return("typeText"+i) ; });
+    rect.call(force.drag);
+    // Exit any old nodes.
+    rect.exit().remove();
 
     // Start the force layout.
     force.start();
@@ -492,9 +541,10 @@ function edit(d, i, source, graph){
                               d3.select("#typeText" + i)
                                 .text(function(d) {return (d.type = typeInput.node().value); });
                               // Node Class
-                              // Change class of circle to match TYPE so the node display will change
+                              // Change class of rect to match TYPE so the node display will change
                               //   according to the node type
-                              d3.select("#circle" + i)
+//TW DEL d3.select("#circle" + i)
+                              d3.select("#rect" + i)
                                 .attr("class", "")  // Remove all classes (node, uri, string, int)
                                 .attr("class", "node") // Add the node class back in.
                                 .classed(typeInput.node().value.toLowerCase(), true); // add type class
