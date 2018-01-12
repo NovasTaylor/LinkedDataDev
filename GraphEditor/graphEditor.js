@@ -19,7 +19,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 //   nodeWidth may adjust with content in later versions.
 let w          = 900,
     h          = 1500,
-    nodeWidth  = 100,
+    nodeWidth  = 150,
     nodeHeight = 30;
     //nodeRadius = 40; // also used to distance arrow from node
 
@@ -231,7 +231,7 @@ function tick() {
     // Prevvent node movement off the editing canvas
     rect.attr("transform", function(d) {
       if (d.x > w ) {d.x = w-nodeWidth;}  // right
-      if (d.x < 0 ) {d.x = nodeWidth;}    // left
+      if (d.x < -40 ) {d.x = nodeWidth;}    // left
       if (d.y < 0 ) {d.y = nodeWidth;}    // top
       if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
       return "translate(" + d.x + "," + d.y + ")";
@@ -317,7 +317,12 @@ function update(graph){
     // add new nodeSelection
     let g = rect.enter().append('svg:g');
     g.append("svg:rect")
-        .attr("width", nodeWidth)
+        .attr("width", function(d){
+           return nodeWidth; // original non-scaleable
+          // KLUDGE
+          //let textWidth=(d.prefix.length+d.label.length)*7+60;
+          //return textWidth;
+        })
         .attr("height", nodeHeight)
         .attr("rx", 5) // Round edges
         .attr("ry", 5)
@@ -396,8 +401,16 @@ function update(graph){
               'y': nodeHeight/2+3,  // +n Moves down from top a little more
               'class':        'nodeLabel'
             })
-        .text(function(d,i) { return d.prefix+":"+d.label; })
-        ;
+        .text(function(d,i) {
+            //No prefix for INT, STRING
+            if (d.type ==='INT' || d.type ==='STRING') {
+                return d.label;
+            }
+            // Prefix for all other types
+            else{
+                return d.prefix+":"+d.label;
+            }
+        });
 
     // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
     //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
@@ -463,7 +476,7 @@ function edit(d, i, source, graph){
     // PREFIX - both nodes and edges
     let prefixText = div.append("p")
                         .text("Prefix: ");
-    let prefixData = ["ldw","rdf", "rdfs", "sdtmterm"]
+    let prefixData = ["eg","rdf", "rdfs", "sdtmterm", "schema"]
     let prefixInput = prefixText.append("select")
                           .attr('class','select');
     let prefixSelect = prefixInput.selectAll('option')
@@ -594,7 +607,7 @@ function addEdge(graph){
         source: graph.nodesData[startNode],
         target: graph.nodesData[endNode],
         label: 'NEW',
-        prefix: 'ldw'
+        prefix: 'eg'
     };
     let n = graph.edgesData.push(newEdge);
     // Reset flags
@@ -618,10 +631,11 @@ function createTTL(jsonData) {
     //TW re-enable //    alert("You will now create the TTL file. Click OK to confirm.");
 
     // Set the prefixes
-    let writer = N3.Writer({ prefixes: { ldw: 'http://example.org/LDWorkshop#',
+    let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
                                          rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
                                          rdfs:'http://www.w3.org/2000/01/rdf-schema#',
                                          sdtmterm:'https://raw.githubusercontent.com/phuse-org/CTDasRDF/master/data/rdf/sdtm-terminology.rdf#',
+                                         schema:'http://schema.org/',
                                          xsd:'http://www.w3.org/2001/XMLSchema#'
                                         }
                           });
