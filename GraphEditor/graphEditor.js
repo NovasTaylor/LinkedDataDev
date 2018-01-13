@@ -238,12 +238,13 @@ function tick() {
     });
 
     edgepath.attr('d', function(d) {
+      //Adjust for rectangle shape
       let xposSource = d.source.x + nodeWidth/2,
           xposTarget = d.target.x + nodeWidth/2,
           yposSource = d.source.y + nodeHeight/2,
           yposTarget = d.target.y + nodeHeight/2;
 
-        let path='M '+xposSource+' '+yposSource+' L '+ xposTarget +' '+yposTarget;
+        let path='M '+ xposSource + ' ' + yposSource+' L '+ xposTarget + ' ' + yposTarget;
 
         // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
         return path
@@ -286,27 +287,24 @@ function update(graph){
 
     edgepath.exit().remove();
 
-    // dx : the starting distance of the label from the source node
     edgelabel = edgelabel.data(graph.edgesData);
     edgelabel.enter()
                     .append('text')
-                    .attr({'class':'edgelabel',
-                        //
-                           'dx':nodeWidth-10,  // Move label along edge
-                           'dy':-1  // change to 5 to put inline with edge
-                          })
+                    .attr("class", "edgelabel")
+                    .attr("dy", -1) // place above line. 5 for inline
                     .append('textPath')
+                    .style("text-anchor", "middle")
+                    .attr("startOffset", "50%")
                     .attr('xlink:href',function(d,i) {return '#edgepath'+i})
                     .attr('id', function(d,i){return 'edgelabel'+i})
                     .text(function(d,i){return d.prefix+":"+d.label})
-                    //  .text("foo")
-                    //---- Double click edge to edit ---------------------------------------------
+                    //---- Double click edgelabel to edit ----------------------
                     .on("dblclick", function(d, i){
                        edit(d,i, "edge", graph);
                      });
    edgelabel.exit().remove();
 
-    // NODES update --------------------------------------------------------------
+    // NODES update ------------------------------------------------------------
 
     // Add new nodes.
     // node circles are WITHIN the <g> , so start with <g> and append the circle
