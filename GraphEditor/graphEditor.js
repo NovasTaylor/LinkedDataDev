@@ -85,7 +85,7 @@ function initializeGraph(graph){
     svg.append('svg:defs').append('svg:marker')
         .attr({'id'          :'arrowhead',
                'viewBox'     : '-0 -5 10 10',
-               'refX'        : nodeWidth+12,
+               'refX'        : 90,
                'refY'        : 0,
                'orient'      : 'auto',
                'markerWidth' : 10,
