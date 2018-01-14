@@ -214,7 +214,7 @@ function initializeGraph(graph){
     legendDiv.append("text")
         .attr("dx", 35)
         .attr("dy", 140)
-          .text("External Ont. IRI")
+          .text("External Ontology IRI")
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
@@ -431,7 +431,7 @@ function update(graph){
 //   Edit either a "node" or an "edge"
 function edit(d, i, source, graph){
     console.log("You clicked a  " +source)
-    console.log("     edit: " + source + " " + d.label);
+    console.log("     edit: " + source + " " + d.prefix + ":" + d.label);
     //console.log("clicked");
 
     // If another node or edge was already selected (edit window already present,
@@ -501,11 +501,11 @@ function edit(d, i, source, graph){
                             .property("selected", function(g){ return g === d.type; });
     }
 
-    //console.log("labelInput: " +labelInput.node().value);
     //---- UPDATE BUTTON -----------------------------------------------------//
     let button =  div.append("button")
                       .text("Update/Hide")
                       .on("click", function() {
+                          console.log("Prefix is: " + d.prefix);
                           if(source=="node"){
                               console.log("Update on Node: "+ i)
                               // Label
@@ -513,16 +513,15 @@ function edit(d, i, source, graph){
                                 // IRI uppercase. INT and STRING can be mixed case.
                                 .text(function(d) {
                                     if (typeInput.node().value==="IRI"){//var nodeText =
-                                      return (d.label = labelInput.node().value.toUpperCase());
+                                      //return (d.label = labelInput.node().value.toUpperCase());
+                                      return prefixInput.node().value + ":" + labelInput.node().value;
+
                                     }
                                     else{
                                       return (d.label = labelInput.node().value);
                                     }
 
                                    });
-                              // Prefix
-                              d3.select("#prefixText" + i)
-                                .text(function(d) {return (d.prefix = prefixInput.node().value); });
                               // Type
                               d3.select("#typeText" + i)
                                 .text(function(d) {return (d.type = typeInput.node().value); });
@@ -533,22 +532,31 @@ function edit(d, i, source, graph){
                                 .attr("class", "")  // Remove all classes (node, iri, string, int)
                                 .attr("class", "node") // Add the node class back in.
                                 .classed(typeInput.node().value.toLowerCase(), true); // add type class
+
+                              d.label=labelInput.node().value;
+                              d.prefix = prefixInput.node().value;
+                              d.type = typeInput.node().value;
+
                           } // end of node UPDATE
+
                           if(source=="edge"){
                             console.log("Updating Edge")
-
                             // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + i)
-                              .text(function(d)  {return (d.label = labelInput.node().value.toLowerCase()); });
-
-                            d3.select("#prefixText" + i)
-                              .text(function(d) {return (d.prefix = prefixInput.node().value); });
+                              .text(function(d)  {
+                                // 1. Values for the data array
+                                d.prefix = prefixInput.node().value;
+                                d.label=labelInput.node().value;
+                                // 2. prefix + label to display in the SVG
+                                return prefixInput.node().value + ":" + labelInput.node().value;
+                              })
                           } // end of Edge update
                           // Clean up the edit window after click of Hide/Update
                           d3.select("#edit").selectAll("*").remove();
                           d3.select("#edit").style("opacity", 0);
                           editActive = false;  // turn off the edit area
                           d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+
                       }) // end of click on update button
 
     let delButton = div.append("button")
@@ -626,7 +634,7 @@ function resetMouseVars() {
 function createTTL(jsonData) {
     //console.log("Now Create TTL");
     console.log(jsonData);
-    //TW re-enable //    alert("You will now create the TTL file. Click OK to confirm.");
+    //TW re-enable later: //    alert("You will now create the TTL file. Click OK to confirm.");
 
     // Set the prefixes
     let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
