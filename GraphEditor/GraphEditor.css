@@ -52,6 +52,18 @@ circle.iri.subjectLink {
   stroke-width: 6;
   stroke-dasharray: 2;
 }
+.node.iriont.subjectLink {
+  fill: yellow ;
+  stroke: red;
+  stroke-width: 6;
+  stroke-dasharray: 2;
+}
+.node.unspec.subjectLink {
+  fill: yellow ;
+  stroke: red;
+  stroke-width: 6;
+  stroke-dasharray: 2;
+}
 /*TW DELETE NEXT */
 circle.string {
   fill:   #e4e4e4;
