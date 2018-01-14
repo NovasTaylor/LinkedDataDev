@@ -461,6 +461,20 @@ function edit(d, i, source, graph){
     div.append("p")
         .text(function() { return("Edit " + source) });  // Selet div for appending
 
+
+        // PREFIX - both nodes and edges
+        let prefixText = div.append("p")
+                            .text("Prefix: ");
+        let prefixData = ["eg","rdf", "rdfs", "sdtmterm", "schema"]
+        let prefixInput = prefixText.append("select")
+                              .attr('class','select');
+        let prefixSelect = prefixInput.selectAll('option')
+                              .data(prefixData).enter()
+                              .append('option')
+                              .text(function (d) { return d; })
+                              .property("selected", function(g){ return g === d.prefix; });
+
+
     // LABEL  - both nodes and edge
     let labelText = div.append("p")
                         .text("Label: ");
@@ -471,17 +485,6 @@ function edit(d, i, source, graph){
                           'value': d.label
                         });
 
-    // PREFIX - both nodes and edges
-    let prefixText = div.append("p")
-                        .text("Prefix: ");
-    let prefixData = ["eg","rdf", "rdfs", "sdtmterm", "schema"]
-    let prefixInput = prefixText.append("select")
-                          .attr('class','select');
-    let prefixSelect = prefixInput.selectAll('option')
-                          .data(prefixData).enter()
-                          .append('option')
-                          .text(function (d) { return d; })
-                          .property("selected", function(g){ return g === d.prefix; });
 
     //TYPE - NODES only
     let typeText   = ""
@@ -582,9 +585,28 @@ function edit(d, i, source, graph){
                                 mousedown_edge = d; // Captures the edge.
                                 selected_edge = mousedown_edge ;  //Playing here. Restructure?
                                 console.log("Selected_edge: " , selected_edge)
+                                console.log("---ID: " + d.id)
+
+                                // Remove from the SVG
+                                //  1.edgepathID removes the text along the Path
+                                //  2. edgeID removes the edge (line)
+                                //let edgepathID = "#edgepath"+d.id;
+                                //let edgeID = "#edge"+d.id;
+                                //d3.select(edgepathID).remove();
+                                //d3.select(edgeID).remove();
+
+
+ // THIS REMOVES ALL edges and edgepaths and they do not come  back
+                                //d3.selectAll('path').remove();
+                                //d3.selectAll('.edgepath').remove();
+
+                                // Remove from the array
                                 graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
+
+                                // Reset edit window and buttons visiblities.
                                 editActive = false;  // turn off the edit area
                                 d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+
                                 update(graph);
                             }
                         });
