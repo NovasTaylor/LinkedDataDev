@@ -412,10 +412,10 @@ function update(graph){
 
     // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
     //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
-    rect.append("prefixText")
-        .attr("id", function(d, i) {return("prefixText"+i) ; });
-    rect.append("typeText")
-        .attr("id", function(d, i) {return("typeText"+i) ; });
+    // rect.append("prefixText")
+    //     .attr("id", function(d, i) {return("prefixText"+i) ; });
+    // rect.append("typeText")
+    //     .attr("id", function(d, i) {return("typeText"+i) ; });
     rect.call(force.drag);
     // Exit any old nodes.
     rect.exit().remove();
