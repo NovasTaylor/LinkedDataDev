@@ -461,6 +461,19 @@ function edit(d, i, source, graph){
     div.append("p")
         .text(function() { return("Edit " + source) });  // Selet div for appending
 
+
+        // PREFIX - both nodes and edges
+    let prefixText = div.append("p")
+                        .text("Prefix: ");
+    let prefixData = ["eg","rdf", "rdfs", "sdtmterm", "schema"]
+    let prefixInput = prefixText.append("select")
+                        .attr('class','select');
+    let prefixSelect = prefixInput.selectAll('option')
+                        .data(prefixData).enter()
+                        .append('option')
+                        .text(function (d) { return d; })
+                        .property("selected", function(g){ return g === d.prefix; });
+
     // LABEL  - both nodes and edge
     let labelText = div.append("p")
                         .text("Label: ");
@@ -470,18 +483,6 @@ function edit(d, i, source, graph){
                           'type': 'text',
                           'value': d.label
                         });
-
-    // PREFIX - both nodes and edges
-    let prefixText = div.append("p")
-                        .text("Prefix: ");
-    let prefixData = ["eg","rdf", "rdfs", "sdtmterm", "schema"]
-    let prefixInput = prefixText.append("select")
-                          .attr('class','select');
-    let prefixSelect = prefixInput.selectAll('option')
-                          .data(prefixData).enter()
-                          .append('option')
-                          .text(function (d) { return d; })
-                          .property("selected", function(g){ return g === d.prefix; });
 
     //TYPE - NODES only
     let typeText   = ""
