@@ -27,18 +27,8 @@
   stroke-dasharray: 2;
 }
 
-.node.iri.subjectLink {
-  fill: yellow ;
-  stroke: red;
-  stroke-width: 6;
-  stroke-dasharray: 2;
-}
-.node.iriont.subjectLink {
-  fill: yellow ;
-  stroke: red;
-  stroke-width: 6;
-  stroke-dasharray: 2;
-}
+.node.iri.subjectLink,
+.node.iriont.subjectLink,
 .node.unspec.subjectLink {
   fill: yellow ;
   stroke: red;
