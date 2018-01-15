@@ -61,13 +61,27 @@
 }
 
 /* text for link labels */
-.edgeLabel{
-  color: #333333;
-  flood-color: #FFFFFF;
+.edgelabel{
   flood-opacity:1;
-  font: 18pt sans-serif;
+  font: 12pt sans-serif;
   text-anchor: middle;
 }
+
+.edgelabel.extont{
+  fill: #cc7000;  /* dark orange, similar to external ont nodes */
+}
+
+.edgelabel.rdf{
+  fill: #0000d8;  /* dark blue */
+}
+
+.edgelabel.unspec{
+  color: #333333;
+  flood-color: #FFFFFF;
+}
+
+
+
 text.id {
   text-anchor: middle;
   font-weight: bold;

@@ -290,7 +290,20 @@ function update(graph){
     edgelabel = edgelabel.data(graph.edgesData);
     edgelabel.enter()
                     .append('text')
-                    .attr("class", "edgelabel")
+                    .attr("id", function(d,i){
+                      return "edgetext" + i;
+                    })
+                    //.attr("class", "edgelabel")
+                    .attr("class", function(d,i){
+                        if (d.prefix == "schema"){ return "edgelabel extont";}
+                        else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
+                        //else if (d.type == "INT"){ return "node int"; }
+                        // Other external ontologies would need to be added here along with schema
+                      //  else if (d.prefix == "schema" || d.prefix == "sdtmterm"){ return "node iriont"; }
+                      //  else if (d.prefix == "eg"){ return "node iri"; }
+                      //  else if (d.type == "IRIONT"){ return "node iriont"; }
+                        else {return "edgelabel unspec";}
+                    })
                     .attr("dy", -1) // place above line. 5 for inline
                     .append('textPath')
                     .style("text-anchor", "middle")
@@ -327,9 +340,11 @@ function update(graph){
         .attr("id", function(d, i) {return("rect"+i) ; })  // ID used to update class
         .attr("class", function(d,i){
             if (d.type == "STRING"){ return "node string";}
-            else if (d.type == "IRI"){ return "node iri"; }
             else if (d.type == "INT"){ return "node int"; }
-            else if (d.type == "IRIONT"){ return "node iriont"; }
+            // Other external ontologies would need to be added here along with schema
+            else if (d.prefix == "schema" || d.prefix == "sdtmterm"){ return "node iriont"; }
+            else if (d.prefix == "eg"){ return "node iri"; }
+          //  else if (d.type == "IRIONT"){ return "node iriont"; }
             else {return "node unspec";}
         })
         //---- Double click node to edit -----------------------------------------
@@ -500,6 +515,8 @@ function edit(d, i, source, graph){
                       .text("Update/Hide")
                       .on("click", function() {
                           console.log("Prefix is: " + d.prefix);
+
+                          //---- NODE ------------------------------------------
                           if(source=="node"){
                               console.log("Update on Node: "+ i)
                               // Label
@@ -533,8 +550,16 @@ function edit(d, i, source, graph){
 
                           } // end of node UPDATE
 
+                          //---- EDGE -----------------------------------------
                           if(source=="edge"){
                             console.log("Updating Edge")
+//TW NEW
+                            d3.select("#edgetext" + i)
+                              .attr("class", "")  // Remove all classes (node, iri, string, int)
+                              .attr("class", "edgelabel") // Add the node class back in.
+                              .classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
+
+
                             // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + i)
                               .text(function(d)  {
@@ -544,6 +569,8 @@ function edit(d, i, source, graph){
                                 // 2. prefix + label to display in the SVG
                                 return prefixInput.node().value + ":" + labelInput.node().value;
                               })
+
+
                           } // end of Edge update
                           // Clean up the edit window after click of Hide/Update
                           d3.select("#edit").selectAll("*").remove();
