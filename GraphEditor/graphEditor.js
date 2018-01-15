@@ -409,13 +409,6 @@ function update(graph){
                 return d.prefix+":"+d.label;
             }
         });
-
-    // Create unique IDS for the PREFIX and TYPE text for updating from the edit box
-    //  Required for BOTH nodes (prefixText, typeText) and edges (prefixText)
-    // rect.append("prefixText")
-    //     .attr("id", function(d, i) {return("prefixText"+i) ; });
-    // rect.append("typeText")
-    //     .attr("id", function(d, i) {return("typeText"+i) ; });
     rect.call(force.drag);
     // Exit any old nodes.
     rect.exit().remove();
@@ -424,8 +417,8 @@ function update(graph){
     force.start();
 }  // end of update(graph)
 
-//-----------------------------------------------------------------------------
-//---- Additional Functions --------------------------------------------------------------
+//------------------------------------------------------------------------------
+//---- Additional Functions ----------------------------------------------------
 
 // edit()
 //   Edit either a "node" or an "edge"
@@ -502,7 +495,7 @@ function edit(d, i, source, graph){
                             .property("selected", function(g){ return g === d.type; });
     }
 
-    //---- UPDATE BUTTON -----------------------------------------------------//
+    //---- UPDATE BUTTON -------------------------------------------------------
     let button =  div.append("button")
                       .text("Update/Hide")
                       .on("click", function() {

@@ -15,23 +15,11 @@
   font-weight: bold;
 }
 
-/*TW DELETE NEXT */
-circle.iri {
-  fill: #bcf5bc ;
-  stroke: black;
-}
 .node.iri {
   fill: #bcf5bc ;
   stroke: black;
 }
 
-/*TW DELETE NEXT */
-circle.unspec {
-  fill: white ;
-  stroke: black;
-  stroke-width: 4;
-  stroke-dasharray: 2;
-}
 .node.unspec {
   fill: white ;
   stroke: black;
@@ -39,13 +27,6 @@ circle.unspec {
   stroke-dasharray: 2;
 }
 
-/*TW DELETE NEXT */
-circle.iri.subjectLink {
-  fill: yellow ;
-  stroke: red;
-  stroke-width: 6;
-  stroke-dasharray: 2;
-}
 .node.iri.subjectLink {
   fill: yellow ;
   stroke: red;
@@ -64,21 +45,9 @@ circle.iri.subjectLink {
   stroke-width: 6;
   stroke-dasharray: 2;
 }
-/*TW DELETE NEXT */
-circle.string {
-  fill:   #e4e4e4;
-  stroke: #646464;
-  stroke-width: 4;
-}
 .node.string {
   fill:   #e4e4e4;
   stroke: #646464;
-  stroke-width: 4;
-}
-/*TW DELETE NEXT */
-circle.int {
-  fill: #c1e1eC ; /* light blue */
-  stroke: #1a1aff;
   stroke-width: 4;
 }
 .node.int {
@@ -86,30 +55,10 @@ circle.int {
   stroke: #1a1aff;
   stroke-width: 4;
 }
-/*TW DELETE NEXT */
-circle.iriont {
-  fill: #ffc862 ;
-  stroke: black;
-}
 .node.iriont {
   fill: #ffc862 ;
   stroke: black;
 }
-
-
-circle.unspec.subjectLink {
-  fill: yellow ;
-  stroke: red;
-  stroke-width: 6;
-  stroke-dasharray: 2;
-}
-
-
-circle.misc {
-  fill: gray ;
-}
-
-
 
 /* text for link labels */
 .edgeLabel{
