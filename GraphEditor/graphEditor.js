@@ -264,9 +264,10 @@ function tick() {
 
 function update(graph){
     //---- EDGES update ----------------------------------------------------------
-    // edge = edge.data(graph.edgesData);
     edge = svg.append('svg:g').selectAll('path')
         .data(graph.edgesData);
+        // .data(graph.edgesData, function(d) { /* alert("add edge:"+JSON.stringify(d)); */ return d.source.id+"-edge-"+d.target.id});
+        // .data(graph.edgesData, function(d) { alert("add edge:"+JSON.stringify(d));return d.source+"-edge-"+d.target.id+idnum++});
     edge.enter()
         .append('svg:path')
         .attr("id", function(d,i){return 'edge'+i})
@@ -277,9 +278,10 @@ function update(graph){
       .attr("id", function(d, i) {return("prefixText"+i) ; });
     edge.exit().remove();
 
-    // edgepath = edgepath.data(graph.edgesData);
     edgepath = svg.append('svg:g').selectAll(".edgepath")
         .data(graph.edgesData);
+        // .data(graph.edgesData, function(d) { return d.source.id+"-path-"+d.target.id});
+        // .data(graph.edgesData, function(d) { alert("add edge:"+JSON.stringify(d));return d.source+"-edge-"+d.target.id+idnum++});
     edgepath.enter()
                   .append('path')
                   .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
@@ -291,9 +293,10 @@ function update(graph){
 
     edgepath.exit().remove();
 
-    // edgelabel = edgelabel.data(graph.edgesData);
     edgelabel = svg.append('svg:g').selectAll(".edgelabel")
         .data(graph.edgesData);
+        // .data(graph.edgesData, function(d) { return d.source.id+"-label-"+d.target.id});
+        // .data(graph.edgesData, function(d) { alert("add edge:"+JSON.stringify(d));return d.source+"-edge-"+d.target.id+idnum++});
     edgelabel.enter()
                     .append('text')
                     .attr("id", function(d,i){
@@ -328,10 +331,8 @@ function update(graph){
     // Add new nodes.
     // node circles are WITHIN the <g> , so start with <g> and append the circle
     //TW can d.id be deleted? ID is set as attr later.
-    // rect = rect.data(graph.nodesData, function(d) { return d.id; });
     rect = svg.append('svg:g').selectAll('g')
-        .data(graph.nodesData, function(d) { return d.id; });
-    rect.selectAll('rect');
+        .data(graph.nodesData, function(d) { return d.id; }); // Might need something more elaborate here
 
     // add new nodeSelection
     let g = rect.enter().append('svg:g');
