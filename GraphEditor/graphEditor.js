@@ -96,10 +96,10 @@ function initializeGraph(graph){
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
 
-    edge = svg.append('svg:g').selectAll('path');
-    rect = svg.append('svg:g').selectAll('g');
-    edgepath = svg.append('svg:g').selectAll(".edgepath");
-    edgelabel = svg.append('svg:g').selectAll(".edgelabel");
+    // edge = svg.append('svg:g').selectAll('path');
+    // rect = svg.append('svg:g').selectAll('g');
+    // edgepath = svg.append('svg:g').selectAll(".edgepath");
+    // edgelabel = svg.append('svg:g').selectAll(".edgelabel");
 
     // Add node icon. Within initiallizeGraph() for access to "graph"data
     svg.append("svg:image")
