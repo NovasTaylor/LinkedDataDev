@@ -342,7 +342,9 @@ function update(graph){
             if (d.type == "STRING"){ return "node string";}
             else if (d.type == "INT"){ return "node int"; }
             // Other external ontologies would need to be added here along with schema
-            else if (d.prefix == "schema" || d.prefix == "sdtmterm"){ return "node iriont"; }
+            else if (d.prefix == "schema" ||
+                     d.prefix == "sdtmterm" ||
+                     d.prefix == "cto"){ return "node iriont"; }
             else if (d.prefix == "eg"){ return "node iri"; }
           //  else if (d.type == "IRIONT"){ return "node iriont"; }
             else {return "node unspec";}
@@ -606,7 +608,9 @@ function edit(d, i, source, graph){
                                 graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
                                 editActive = false;  // turn off the edit area
                                 d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+                                force.start();
                                 update(graph);
+
                             }
                         });
 }
