@@ -708,6 +708,15 @@ function createTTL(jsonData) {
 function saveState(graph){
     //TW alert("This function will save the graph. Method is TBD!");
     // Hijacking the Save State to check data  pre/post deletes
-    console.log("Data check!!");
-    console.log(graph);
+    //console.log("Data check!!");
+    //console.log(graph);
+
+    graph.edgesData.forEach(e => {
+      e.source = e.source.id;
+      e.target = e.target.id;
+    });
+
+    var blob = new Blob([JSON.stringify(graph)], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "graphBackup.JSON");
+
 }
