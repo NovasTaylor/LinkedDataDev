@@ -25,58 +25,54 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 <body>
   <div class="wrapper">
     <div class="box" id="whiteboard">
-      <!-- Graph inserted here -->
+        <!-- Graph inserted here -->
     </div>
 
     <div class= "box" id="edit" style="opacity:0">
-      <!-- Edit box for nodes and links -->
+        <!-- Edit box for nodes and links -->
     </div>
 
     <div class= "box" id="buttons" style="opacity:1">
-      <!--<input id="createTTL" type="button" value="Create TTL"" /> MOVED TO JS-->
+        <!--<input id="createTTL" type="button" value="Create TTL"" /> MOVED TO JS-->
     </div>
-   <div class= "box rightBottRegion">
-     <!---- NODES help --->
-     <table class="help">
-       <tr>
-         <td><b>NODES</b></td><td></td>
-       <tr>
-         <td>Create</td><td><img width=15 height=15 src='/GraphEditor/img/AddIcon.png'>(upper left)</td>
-       </tr>
-       <tr>
-          <td>Move</td><td>Click+Drag</td>
-        </tr>
-       <tr>
-         <td>Edit</td><td>Double-Click</td>
-      </tr>
-       <tr>
-         <td>Delete</td><td><i>Edit</i>,[Delete] button</td>
-       </tr>
-     </table>
-     <hr>
-     <table class="help">
-       <tr>
-         <td><b>LINKS</b></td><td></td>
-       <tr>
-         <tr>
-           <td>Create</td><td>SHIFT+Click source, SHIFT+Click target</td>
-         </tr>
-       <tr>
-         <td>Edit</td><td>Double-click Label</td>
-       </tr>
-       <tr>
-         <td>Delete</td><td>TBD!</td>
-       </tr>
-    </table>
-    <hr>
-    <div id="legend">
+    <div class= "box rightBottRegion">
+        <!-- NODES help -->
+        <table class="help">
+            <tr>
+                <td><b>NODES</b></td><td></td>
+            </tr>
+            <tr>
+                <td>Create</td><td><img width=15 height=15 src='/GraphEditor/img/AddIcon.png'>(upper left)</td>
+            </tr>
+            <tr>
+                <td>Move</td><td>Click+Drag</td>
+            </tr>
+            <tr>
+                <td>Edit</td><td>Double-Click</td>
+            </tr>
+            <tr>
+                <td>Delete</td><td><i>Edit</i>,[Delete] button</td>
+            </tr>
+        </table>
+        <hr>
+        <table class="help">
+            <tr>
+                <td><b>LINKS</b></td><td></td>
+            </tr>
+            <tr>
+                <td>Create</td><td>SHIFT+Click source, SHIFT+Click target</td>
+            </tr>
+            <tr>
+                <td>Edit</td><td>Double-click Label</td>
+            </tr>
+            <tr>
+                <td>Delete</td><td>TBD!</td>
+            </tr>
+        </table>
+        <hr>
+        <div id="legend">
+        </div>
     </div>
-
-   </div>
-  </div>
-  <div id="whiteboard">
-   <!-- graph whiteboard goes here -->
-  </div>
-<script src="/GraphEditor/graphEditor.js"></script>
+    <script src="/GraphEditor/graphEditor.js"></script>
 </body>
 </html>
