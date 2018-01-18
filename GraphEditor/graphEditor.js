@@ -440,6 +440,9 @@ function update(graph){
 // edit()
 //   Edit either a "node" or an "edge"
 function edit(d, i, source, graph){
+    // upsource used in editor display to match exercises text
+    let upSource = source.charAt(0).toUpperCase() + source.slice(1);
+
     console.log("You clicked a  " +source)
     console.log("     edit: " + source + " " + d.prefix + ":" + d.label);
     //console.log("clicked");
@@ -469,7 +472,7 @@ function edit(d, i, source, graph){
     let div = d3.select("#edit");
 
     div.append("p")
-        .text(function() { return("Edit " + source) });  // Selet div for appending
+        .text(function() { return(upSource + " values") });  // Selet div for appending
 
 
         // PREFIX - both nodes and edges
@@ -711,6 +714,9 @@ function saveState(graph){
     //console.log("Data check!!");
     //console.log(graph);
 
+//!! THIS manipulation results in loss of edges. Could be a result of the current
+// problems in intializeGraph vs update(). Fix that first, then return here.
+// Data export is actually correct!
     graph.edgesData.forEach(e => {
       e.source = e.source.id;
       e.target = e.target.id;
@@ -718,5 +724,6 @@ function saveState(graph){
 
     var blob = new Blob([JSON.stringify(graph)], {type: "text/plain;charset=utf-8"});
     saveAs(blob, "graphBackup.JSON");
+
 
 }

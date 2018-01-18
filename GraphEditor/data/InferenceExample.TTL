@@ -10,10 +10,10 @@ schema:Study  rdf:type rdfs:Class .
 schema:Person rdf:type rdfs:Class .
 
 eg:HumanStudySubject rdf:type rdfs:Class;
-    rdfs:SubClassof  schema:Person .
+    rdfs:subClassOf  schema:Person .
 
 eg:Investigator  rdf:type  rdfs:Class;
-    rdfs:SubClassof  schema:Person .
+    rdfs:subClassOf  schema:Person .
 
 eg:enrolledin  rdf:type rdfs:Property;
   rdfs:domain   eg:HumanStudySubject;
