@@ -51,19 +51,17 @@ function processData (error, graph) {
     initializeGraph(graph);
 ;}
 
-
 let svg=d3.select("#whiteboard")
           .append("svg")
           .attr("width", w)
           .attr("height", h);
 
 // Global declare of items referecnced  in udpate()
-let force     = null,
-    edge      = null,
-    edgepath  = null,
-    edgelabel = null,
-    rect      = null
-    ;
+let force     = null
+// let edge      = null
+// let edgepath  = null
+// let edgelabel = null
+// let rect      = null
 
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
@@ -96,131 +94,19 @@ function initializeGraph(graph){
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
 
-    edge = svg.append('svg:g').selectAll('path');
-    rect = svg.append('svg:g').selectAll('g');
-    edgepath = svg.append('svg:g').selectAll(".edgepath");
-    edgelabel = svg.append('svg:g').selectAll(".edgelabel");
+    let edge = svg.append("g").attr("id","edgeGroup") //.append('svg:g') //.selectAll('path');
+    let rect = svg.append("g").attr("id","rectGroup") //.append('svg:g') //.selectAll('g');
+    let edgepath = svg.append("g").attr("id","edgepathGroup") //.append('svg:g') //.selectAll(".edgepath");
+    let edgelabel = svg.append("g").attr("id","edgelabelGroup") //.append('svg:g') //.selectAll(".edgelabel");
 
-    // Add node icon. Within initiallizeGraph() for access to "graph"data
-    svg.append("svg:image")
-        .attr({'x'         : 5,
-               'y'         : 5,
-               'width'     : 20,
-               'height'    : 24,
-               'xlink:href': '/GraphEditor/img/AddIcon.png'})
-        .on('mouseover', function(d){
-                // console.log("Add a node")
-                let addIcon = d3.select(this)
-                               .attr({
-                                      'width' :25,
-                                      'height':29
-                                    });
-        })
-        .on('mouseout', function(d){
-                let addIcon = d3.select(this)
-                               .attr({
-                                      'width' :20,
-                                      'height':24
-                                    });
-        })
-        .on('click', function(d){ addNode(graph);});
-
-    // handler for createTTL buttons
-    // Setup and display a buttons div for createTTL and saveState
-    let buttonsDiv = d3.select("#buttons");
-    buttonsDiv.append("button")
-      .text("Create TTL")
-      .on("click", function(d){ createTTL(graph);});
-
-    buttonsDiv.append("button")
-      .text("Save State")
-      .on("click", function(d){ saveState(graph);});
-
-    //Legend creation
-    //TODO : Change to creation using a loop over the array of values in the legend.
-    //  Add the remaining legend items.
-    let legendDiv = d3.select("#legend").append("svg");
-    //legendDiv.append("text")
-    //  .text("foo bar!");
-    let legendNodeHeight = 15,
-        legendNodeWidth  = 20;
-    // IRI
-    legendDiv.append("rect")
-        .attr("class", "node iri")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 0);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 15)
-        .text("IRI (links to/from)");
-
-    //New (unspecified)
-    legendDiv.append("rect")
-        .attr("class", "node unspec")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 25);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 40)
-        .text("New Node: edit to set properties");
-
-    // Subject Link
-    legendDiv.append("rect")
-        .attr("class", "node iri subjectLink")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 50);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 65)
-        .text("Source node for new link");
-
-    // String
-    legendDiv.append("rect")
-        .attr("class", "node string")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 75);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 90)
-        .text("String: No outgoing links!")
-
-    // Integer
-    legendDiv.append("rect")
-        .attr("class", "node int")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 100);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 115)
-        .text("Integer: No outgoing links!")
-
-   // Ontology IRI
-    legendDiv.append("rect")
-        .attr("class", "node iriont")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 125);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 140)
-          .text("External Ontology IRI")
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
 function tick() {
 
-    edge.attr('d', function(d) {
+    // edge.attr('d', function(d) {
+    svg.selectAll(".edge")
+        .attr('d', function(d) {
         let xposSource = d.source.x + nodeWidth/2,
             xposTarget = d.target.x + nodeWidth/2,
             yposSource = d.source.y + nodeHeight/2,
@@ -229,104 +115,107 @@ function tick() {
     });
 
     // Prevvent node movement off the editing canvas
-    rect.attr("transform", function(d) {
-      if (d.x > w ) {d.x = w-nodeWidth;}  // right
-      if (d.x < -40 ) {d.x = nodeWidth;}    // left
-      if (d.y < 0 ) {d.y = nodeWidth;}    // top
-      if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
-      return "translate(" + d.x + "," + d.y + ")";
-    });
+    svg.selectAll(".rect")
+        .attr("transform", function(d) {
+            if (d.x > w ) {d.x = w-nodeWidth;}  // right
+            if (d.x < -40 ) {d.x = nodeWidth;}    // left
+            if (d.y < 0 ) {d.y = nodeWidth;}    // top
+            if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
+            return "translate(" + d.x + "," + d.y + ")";
+        });
 
-    edgepath.attr('d', function(d) {
-      //Adjust for rectangle shape
-      let xposSource = d.source.x + nodeWidth/2,
-          xposTarget = d.target.x + nodeWidth/2,
-          yposSource = d.source.y + nodeHeight/2,
-          yposTarget = d.target.y + nodeHeight/2;
+    svg.selectAll(".edgepath")
+        .attr("transform", function(d) {
+        //Adjust for rectangle shape
+            let xposSource = d.source.x + nodeWidth/2,
+                xposTarget = d.target.x + nodeWidth/2,
+                yposSource = d.source.y + nodeHeight/2,
+                yposTarget = d.target.y + nodeHeight/2;
 
-        let path='M '+ xposSource + ' ' + yposSource+' L '+ xposTarget + ' ' + yposTarget;
+            let path='M '+ xposSource + ' ' + yposSource+' L '+ xposTarget + ' ' + yposTarget;
 
-        // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-        return path
-    });
+            // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+            return path
+        });
 
-    edgelabel.attr('transform',function(d,i){
-        if (d.target.x<d.source.x){
-            let bbox = this.getBBox();
-            let rx = bbox.x+bbox.width/2;
-            let ry = bbox.y+bbox.height/2;
-            return 'rotate(180 '+rx+' '+ry+')';
-        } else {
-            return 'rotate(0)';
-        }
-    });
+    svg.selectAll(".edgelabel")
+        .attr("transform", function(d) {
+            if (d.target.x<d.source.x){
+                let bbox = this.getBBox();
+                let rx = bbox.x+bbox.width/2;
+                let ry = bbox.y+bbox.height/2;
+                return 'rotate(180 '+rx+' '+ry+')';
+            } else {
+                return 'rotate(0)';
+            }
+        });
 };  // End tick
 
 function update(graph){
     //---- EDGES update ----------------------------------------------------------
-    edge = edge.data(graph.edgesData);
-    edge.enter()
-        .append('svg:path')
-        .attr("id", function(d,i){return 'edge'+d.id})
-        .attr('marker-end', 'url(#arrowhead)')
-        //  .attr('class', 'edge')
-        .style("stroke", "#ccc");
-    edge.append("prefixText")
-      .attr("id", function(d, i) {return("prefixText"+d.id) ; });
-    edge.exit().remove();
+   //  edge = edge.data(graph.edgesData);
+   //  edge.enter()
+   //      .append('svg:path')
+   //      .attr("id", function(d,i){return 'edge'+d.id})
+   //      .attr('marker-end', 'url(#arrowhead)')
+   //      //  .attr('class', 'edge')
+   //      .style("stroke", "#ccc");
+   //  edge.append("prefixText")
+   //    .attr("id", function(d, i) {return("prefixText"+d.id) ; });
+   //  edge.exit().remove();
 
-    edgepath = edgepath.data(graph.edgesData);
-    edgepath.enter()
-                  .append('path')
-                  .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-                         'class':'edgepath',
-                         'fill-opacity':0,
-                         'stroke-opacity':0,
-                         'id':function(d,i) {return 'edgepath'+d.id}})
-                  .style("pointer-events", "none");
+   //  edgepath = edgepath.data(graph.edgesData);
+   //  edgepath.enter()
+   //                .append('path')
+   //                .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+   //                       'class':'edgepath',
+   //                       'fill-opacity':0,
+   //                       'stroke-opacity':0,
+   //                       'id':function(d,i) {return 'edgepath'+d.id}})
+   //                .style("pointer-events", "none");
 
-    edgepath.exit().remove();
+   //  edgepath.exit().remove();
 
-    edgelabel = edgelabel.data(graph.edgesData);
-    edgelabel.enter()
-                    .append('text')
-                    .attr("id", function(d,i){
-                      return "edgetext" + d.id;
-                    })
-                    //.attr("class", "edgelabel")
-                    .attr("class", function(d,i){
-                        if (d.prefix == "schema"){ return "edgelabel extont";}
-                        else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
-                        //else if (d.type == "INT"){ return "node int"; }
-                        // Other external ontologies would need to be added here along with schema
-                      //  else if (d.prefix == "schema" || d.prefix == "sdtmterm"){ return "node iriont"; }
-                      //  else if (d.prefix == "eg"){ return "node iri"; }
-                      //  else if (d.type == "IRIONT"){ return "node iriont"; }
-                        else {return "edgelabel unspec";}
-                    })
-                    .attr("dy", -1) // place above line. 5 for inline
-                    .append('textPath')
-                    .style("text-anchor", "middle")
-                    .attr("startOffset", "50%")
-                    .attr('xlink:href',function(d,i) {return '#edgepath'+i})
-                    .attr('id', function(d,i){return 'edgelabel'+i})
-                    .text(function(d,i){return d.prefix+":"+d.label})
-                    //---- Double click edgelabel to edit ----------------------
-                    .on("dblclick", function(d, i){
-                       edit(d,i, "edge", graph);
-                     });
-   edgelabel.exit().remove();
+   //  edgelabel = edgelabel.data(graph.edgesData);
+   //  edgelabel.enter()
+   //                  .append('text')
+   //                  .attr("id", function(d,i){
+   //                    return "edgetext" + d.id;
+   //                  })
+   //                  //.attr("class", "edgelabel")
+   //                  .attr("class", function(d,i){
+   //                      if (d.prefix == "schema"){ return "edgelabel extont";}
+   //                      else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
+   //                      //else if (d.type == "INT"){ return "node int"; }
+   //                      // Other external ontologies would need to be added here along with schema
+   //                    //  else if (d.prefix == "schema" || d.prefix == "sdtmterm"){ return "node iriont"; }
+   //                    //  else if (d.prefix == "eg"){ return "node iri"; }
+   //                    //  else if (d.type == "IRIONT"){ return "node iriont"; }
+   //                      else {return "edgelabel unspec";}
+   //                  })
+   //                  .attr("dy", -1) // place above line. 5 for inline
+   //                  .append('textPath')
+   //                  .style("text-anchor", "middle")
+   //                  .attr("startOffset", "50%")
+   //                  .attr('xlink:href',function(d,i) {return '#edgepath'+i})
+   //                  .attr('id', function(d,i){return 'edgelabel'+i})
+   //                  .text(function(d,i){return d.prefix+":"+d.label})
+   //                  //---- Double click edgelabel to edit ----------------------
+   //                  .on("dblclick", function(d, i){
+   //                     edit(d,i, "edge", graph);
+   //                   });
+   // edgelabel.exit().remove();
 
     // NODES update ------------------------------------------------------------
 
     // Add new nodes.
     // node circles are WITHIN the <g> , so start with <g> and append the circle
     //TW can d.id be deleted? ID is set as attr later.
-    rect = rect.data(graph.nodesData, function(d) { return d.id; });
-    rect.selectAll('rect');
+    let theRects = svg.selectAll(".rectNodes")
+        .data(graph.nodesData, function(d) { return d.id; });
 
     // add new nodeSelection
-    let g = rect.enter().append('svg:g');
+    theRects.enter().append('svg:g');
     g.append("svg:rect")
         .attr("width", function(d){
            return nodeWidth; // original non-scaleable
