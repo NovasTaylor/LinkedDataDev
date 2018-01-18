@@ -599,6 +599,9 @@ function edit(d, i, source, graph){
                                 console.log("Selected_node: " , selected_node)
                                 // must delete the node and any edge attached to it (ingoing and outgoing)
                                 graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
+                                graph.edgesData = graph.edgesData.filter(function(l) {
+                                    return l.source !== d && l.target !== d;
+                                });
 
                                 d3.select("#buttons").style("opacity", 1);  // redisplay buttons
                                 update(graph);
