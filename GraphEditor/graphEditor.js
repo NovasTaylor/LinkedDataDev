@@ -264,7 +264,7 @@ function tick() {
 
 function update(graph){
     //---- EDGES update ----------------------------------------------------------
-    edge = edge.data(graph.edgesData);
+    edge = edge.data(graph.edgesData, function(d) { return "edge"+d.id; });
     edge.enter()
         .append('svg:path')
         .attr("id", function(d,i){return 'edge'+d.id})
@@ -275,7 +275,7 @@ function update(graph){
       .attr("id", function(d, i) {return("prefixText"+d.id) ; });
     edge.exit().remove();
 
-    edgepath = edgepath.data(graph.edgesData);
+    edgepath = edgepath.data(graph.edgesData, function(d) { return "edgepath"+d.id; });
     edgepath.enter()
                   .append('path')
                   .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
@@ -287,7 +287,7 @@ function update(graph){
 
     edgepath.exit().remove();
 
-    edgelabel = edgelabel.data(graph.edgesData);
+    edgelabel = edgelabel.data(graph.edgesData, function(d) { return "edgelabel"+d.id; });
     edgelabel.enter()
                     .append('text')
                     .attr("id", function(d,i){
@@ -383,7 +383,7 @@ function update(graph){
                 // Only set endNode if it is not the same as the startNode.
                 else if (startNode !== null && startNode !== d){
                     endNode= d;
-                    console.log("Start Node: " + startNode + " End Node: " + endNode);
+                    console.log("aStart Node: " + check(startNode) + " End Node: " + check(endNode));
                     addEdge(graph);
                     d3.selectAll(".subjectLink")
                         .classed("subjectLink", false); // add type class
