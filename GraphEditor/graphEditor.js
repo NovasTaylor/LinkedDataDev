@@ -364,8 +364,9 @@ function update(graph){
                     window.confirm("Links from " + d.type + " nodes are not allowed.");
                     return;
                 }
-                if (startNode===d.id){
-                    console.log("Deselecting link: ", startNode);
+                // if (startNode===d.id){
+                if (startNode===d){
+                    console.log("Deselecting link: ", startNode+" "+check(d));
                     let selected_rect = d3.select(this);
                     selected_rect.classed("subjectLink", false); // add type class
                     startNode= null;
@@ -375,12 +376,13 @@ function update(graph){
                     let selected_rect = d3.select(this);
                     console.log("SELECTED FOR LINK: ", d3.select(this))
                     selected_rect.classed("subjectLink", true); // add type class
-                    startNode= i;
-                    console.log("Setting Start Node as node ID: " + startNode);
+                    // startNode= d.id;
+                    startNode= d;
+                    console.log("Setting Start Node as node ID: " + startNode+" "+check(d));
                 }
                 // Only set endNode if it is not the same as the startNode.
-                else if (startNode !== null && startNode !== i){
-                    endNode= i;
+                else if (startNode !== null && startNode !== d){
+                    endNode= d;
                     console.log("Start Node: " + startNode + " End Node: " + endNode);
                     addEdge(graph);
                     d3.selectAll(".subjectLink")
@@ -444,7 +446,7 @@ function edit(d, i, source, graph){
     let upSource = source.charAt(0).toUpperCase() + source.slice(1);
 
     console.log("You clicked a  " +source)
-    console.log("     edit: " + source + " " + d.prefix + ":" + d.label);
+    console.log("     edit: source="+ source +" id="+ d.id + " :" + d.prefix + ":" + d.label);
     //console.log("clicked");
 
     // If another node or edge was already selected (edit window already present,
@@ -636,13 +638,28 @@ function addNode(graph){
     console.log(graph.nodesData)
     update(graph);  // Adds node to the SVG
 }
+function check(theObject){
+    // return "id:"+JSON.stringify(theObject.id)+" prefix:"+JSON.stringify(theObject.prefix)+" label:"+JSON.stringify(theObject.label)
+    return JSON.stringify(theObject)
+}
 function addEdge(graph){
     console.log("A LINK you wish to add!")
 
+    // alert("startNode:"+JSON.stringify(startNode)+"\nendNode:"+JSON.stringify(endNode))
+    // alert("startNode:"+check(graph.nodesData[startNode]))
+    // let theStartNode = graph.nodesData.filter( function (asdf) {
+    //                                                             asdf.id === startNode
+    //                                                          })
+    // console.log("real startNode: "+check(startNode))
+    // console.log("startNode:"+startNode+" "+check(graph.nodesData[startNode]))
+    // console.log("endNode:"+endNode+" "+check(graph.nodesData[endNode]))
+
     let newEdge = {
         id: ++lastEdgeId,
-        source: graph.nodesData[startNode],
-        target: graph.nodesData[endNode],
+        // source: graph.nodesData[startNode],
+        source: startNode,
+        // target: graph.nodesData[endNode],
+        target: endNode,
         label: 'NEW',
         prefix: 'eg'
     };
