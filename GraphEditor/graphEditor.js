@@ -267,12 +267,12 @@ function update(graph){
     edge = edge.data(graph.edgesData);
     edge.enter()
         .append('svg:path')
-        .attr("id", function(d,i){return 'edge'+i})
+        .attr("id", function(d,i){return 'edge'+d.id})
         .attr('marker-end', 'url(#arrowhead)')
         //  .attr('class', 'edge')
         .style("stroke", "#ccc");
     edge.append("prefixText")
-      .attr("id", function(d, i) {return("prefixText"+i) ; });
+      .attr("id", function(d, i) {return("prefixText"+d.id) ; });
     edge.exit().remove();
 
     edgepath = edgepath.data(graph.edgesData);
@@ -282,7 +282,7 @@ function update(graph){
                          'class':'edgepath',
                          'fill-opacity':0,
                          'stroke-opacity':0,
-                         'id':function(d,i) {return 'edgepath'+i}})
+                         'id':function(d,i) {return 'edgepath'+d.id}})
                   .style("pointer-events", "none");
 
     edgepath.exit().remove();
@@ -291,7 +291,7 @@ function update(graph){
     edgelabel.enter()
                     .append('text')
                     .attr("id", function(d,i){
-                      return "edgetext" + i;
+                      return "edgetext" + d.id;
                     })
                     //.attr("class", "edgelabel")
                     .attr("class", function(d,i){
@@ -337,7 +337,7 @@ function update(graph){
         .attr("height", nodeHeight)
         .attr("rx", 5) // Round edges
         .attr("ry", 5)
-        .attr("id", function(d, i) {return("rect"+i) ; })  // ID used to update class
+        .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
         .attr("class", function(d,i){
             if (d.type == "STRING"){ return "node string";}
             else if (d.type == "INT"){ return "node int"; }
