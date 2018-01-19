@@ -403,7 +403,7 @@ function update(graph){
             });
 
             console.log("Node Mouseover is happening");
-            // Add tooltip here 
+            // Add tooltip here
 
         })
         //Mouseout Node  - bring node back to full colour
