@@ -573,12 +573,10 @@ function edit(d, i, source, graph){
                           //---- EDGE -----------------------------------------
                           if(source=="edge"){
                             console.log("Updating Edge")
-//TW NEW
                             d3.select("#edgetext" + i)
                               .attr("class", "")  // Remove all classes (node, iri, string, int)
                               .attr("class", "edgelabel") // Add the node class back in.
                               .classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
-
 
                             // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + i)
@@ -589,7 +587,6 @@ function edit(d, i, source, graph){
                                 // 2. prefix + label to display in the SVG
                                 return prefixInput.node().value + ":" + labelInput.node().value;
                               })
-
 
                           } // end of Edge update
                           // Clean up the edit window after click of Hide/Update
@@ -725,21 +722,23 @@ function createTTL(jsonData) {
 } // end createTTL()
 
 function saveState(graph){
-    //TW alert("This function will save the graph. Method is TBD!");
-    // Hijacking the Save State to check data  pre/post deletes
-    //console.log("Data check!!");
-    //console.log(graph);
+    // Clone the original graph to allow pre-export cleansing
+    let graphClone = JSON.parse(JSON.stringify(graph));
 
-//!! THIS manipulation results in loss of edges. Could be a result of the current
-// problems in intializeGraph vs update(). Fix that first, then return here.
-// Data export is actually correct!
-    graph.edgesData.forEach(e => {
-      e.source = e.source.id;
-      e.target = e.target.id;
+    // Remove properties created by the force() function
+    graphClone.nodesData.forEach(n => {
+        delete n.index;
+        delete n.px;
+        delete n.py;
+        delete n.weight;
     });
 
-    var blob = new Blob([JSON.stringify(graph)], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, "graphBackup.JSON");
-
-
+    // Replace node array values with their index reference
+    graphClone.edgesData.forEach(e => {
+        e.source = e.source.id;
+        e.target = e.target.id;
+    });
+    // Convert to blob for saving, then save.
+    var blob = new Blob([JSON.stringify(graphClone)], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "graph-Saved.JSON");
 }
