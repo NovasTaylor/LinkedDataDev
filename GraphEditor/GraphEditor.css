@@ -1,3 +1,29 @@
+/* Tool tips for the URL values the RDF Table
+  See : http://www.w3schools.com/css/tryit.asp?filename=trycss_tooltip
+  NOT USED due to restriction of the table cell being unable to show the enlarged tip
+*/
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: relative;
+    z-index: 999;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
 .edge{
     stroke: gray;
     stroke-width: 3;

@@ -39,6 +39,7 @@ let selected_node  = null,
     mousedown_node = null,
     mouseup_node   = null;
 
+
 // Read source data
 d3.queue()
    .defer(d3.json, '/graphEditor/data/graph.json')
@@ -64,6 +65,8 @@ let force     = null,
     edgelabel = null,
     rect      = null
     ;
+
+
 
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
@@ -215,6 +218,9 @@ function initializeGraph(graph){
         .attr("dx", 35)
         .attr("dy", 140)
           .text("External Ontology IRI")
+
+
+
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
@@ -295,7 +301,7 @@ function update(graph){
                     })
                     //.attr("class", "edgelabel")
                     .attr("class", function(d,i){
-                        if (d.prefix == "schema"){ return "edgelabel extont";}
+                        if (d.prefix == "schema" || d.prefix == "ncit"){ return "edgelabel extont";}
                         else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
                         //else if (d.type == "INT"){ return "node int"; }
                         // Other external ontologies would need to be added here along with schema
@@ -342,7 +348,8 @@ function update(graph){
             if (d.type == "STRING"){ return "node string";}
             else if (d.type == "INT"){ return "node int"; }
             // Other external ontologies would need to be added here along with schema
-            else if (d.prefix == "schema" ||
+            else if (d.prefix == "schema"   ||
+                    d.prefix  == "ncit"     ||
                      d.prefix == "sdtmterm" ||
                      d.prefix == "cto"){ return "node iriont"; }
             else if (d.prefix == "eg"){ return "node iri"; }
@@ -394,6 +401,10 @@ function update(graph){
               'width':nodeWidth+5,
               'height':nodeHeight+5
             });
+
+            console.log("Node Mouseover is happening");
+            // Add tooltip here 
+
         })
         //Mouseout Node  - bring node back to full colour
         .on('mouseout', function(d){
@@ -472,13 +483,17 @@ function edit(d, i, source, graph){
     let div = d3.select("#edit");
 
     div.append("p")
-        .text(function() { return(upSource + " values") });  // Selet div for appending
+        .text(function() {
+          // Use 'Link values' for edges to match exercises (for comprehension)
+          if (source=="edge"){return("Link values"); }
+          else {return (upSource + " values");}
+        });  // Selet div for appending
 
 
         // PREFIX - both nodes and edges
     let prefixText = div.append("p")
                         .text("Prefix: ");
-    let prefixData = ["eg","rdf", "rdfs", "sdtmterm", "schema"]
+    let prefixData = ["eg","ncit","rdf", "rdfs", "schema", "sdtmterm" ]
     let prefixInput = prefixText.append("select")
                         .attr('class','select');
     let prefixSelect = prefixInput.selectAll('option')
@@ -666,10 +681,11 @@ function createTTL(jsonData) {
 
     // Set the prefixes
     let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
+                                         ncit: 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#',
                                          rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
                                          rdfs:'http://www.w3.org/2000/01/rdf-schema#',
-                                         sdtmterm:'https://raw.githubusercontent.com/phuse-org/CTDasRDF/master/data/rdf/sdtm-terminology.rdf#',
                                          schema:'http://schema.org/',
+                                         sdtmterm:'https://raw.githubusercontent.com/phuse-org/CTDasRDF/master/data/rdf/sdtm-terminology.rdf#',
                                          xsd:'http://www.w3.org/2001/XMLSchema#'
                                         }
                           });

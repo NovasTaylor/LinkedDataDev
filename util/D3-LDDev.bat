@@ -1,2 +1,2 @@
-cd C:\_gitHub\LinkedDataDev
+cd C:\_gitHub\LinkedDataDev\
 python -m http.server
