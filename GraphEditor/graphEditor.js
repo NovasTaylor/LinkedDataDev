@@ -58,7 +58,82 @@ let svg=d3.select("#whiteboard")
           .attr("width", w)
           .attr("height", h);
 
-// Global declare of items referecnced  in udpate()
+//Legend creation
+//TODO : Change to creation using a loop over the array of values in the legend.
+let legendDiv = d3.select("#legend").append("svg");
+let legendNodeHeight = 15,
+legendNodeWidth  = 20;
+// IRI
+legendDiv.append("rect")
+    .attr("class", "node iri")
+    .attr("width", legendNodeWidth)
+    .attr("height", legendNodeHeight)
+    .attr("x", 5)
+    .attr("y", 0);
+legendDiv.append("text")
+    .attr("dx", 35)
+    .attr("dy", 15)
+    .text("IRI (links to/from)");
+//New (unspecified)
+legendDiv.append("rect")
+              .attr("class", "node unspec")
+              .attr("width", legendNodeWidth)
+              .attr("height", legendNodeHeight)
+              .attr("x", 5)
+              .attr("y", 25);
+legendDiv.append("text")
+              .attr("dx", 35)
+              .attr("dy", 40)
+              .text("New Node: edit to set properties");
+
+// Subject Link
+ legendDiv.append("rect")
+              .attr("class", "node iri subjectLink")
+              .attr("width", legendNodeWidth)
+              .attr("height", legendNodeHeight)
+              .attr("x", 5)
+              .attr("y", 50);
+legendDiv.append("text")
+              .attr("dx", 35)
+              .attr("dy", 65)
+              .text("Source node for new link");
+// String
+legendDiv.append("rect")
+              .attr("class", "node string")
+              .attr("width", legendNodeWidth)
+              .attr("height", legendNodeHeight)
+              .attr("x", 5)
+              .attr("y", 75);
+legendDiv.append("text")
+              .attr("dx", 35)
+              .attr("dy", 90)
+              .text("String: No outgoing links!")
+          // Integer
+legendDiv.append("rect")
+              .attr("class", "node int")
+              .attr("width", legendNodeWidth)
+              .attr("height", legendNodeHeight)
+              .attr("x", 5)
+              .attr("y", 100);
+legendDiv.append("text")
+              .attr("dx", 35)
+              .attr("dy", 115)
+              .text("Integer: No outgoing links!")
+         // Ontology IRI
+legendDiv.append("rect")
+              .attr("class", "node iriont")
+              .attr("width", legendNodeWidth)
+              .attr("height", legendNodeHeight)
+              .attr("x", 5)
+              .attr("y", 125);
+legendDiv.append("text")
+              .attr("dx", 35)
+              .attr("dy", 140)
+                .text("External Ontology IRI")
+
+// Global declare of items referecnced  in update()
+//TW
+// MOVE edge and rect  declares from here to within funt
 let force     = null,
     edge      = null,
     edgepath  = null,
@@ -66,11 +141,8 @@ let force     = null,
     rect      = null
     ;
 
-
-
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
-
     // Find the max Node and Edge ID values based on array length. Used when
     // creating IDs for new nodes (increment counter)
     lastEdgeId = graph.edgesData.length -1;
@@ -83,7 +155,6 @@ function initializeGraph(graph){
             .links(graph.edgesData)
             .size([w, h])
             .on("tick", tick);
-
     // Arrow marker for end of edge
     svg.append('svg:defs').append('svg:marker')
         .attr({'id'          :'arrowhead',
@@ -98,7 +169,7 @@ function initializeGraph(graph){
         .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
-
+//TW these will all become let
     edge = svg.append('g').selectAll('path');
     rect = svg.append('g').selectAll('g');
     edgepath = svg.append('g').selectAll(".edgepath");
@@ -138,86 +209,6 @@ function initializeGraph(graph){
     buttonsDiv.append("button")
       .text("Save State")
       .on("click", function(d){ saveState(graph);});
-
-    //Legend creation
-    //TODO : Change to creation using a loop over the array of values in the legend.
-    //  Add the remaining legend items.
-    let legendDiv = d3.select("#legend").append("svg");
-    //legendDiv.append("text")
-    //  .text("foo bar!");
-    let legendNodeHeight = 15,
-        legendNodeWidth  = 20;
-    // IRI
-    legendDiv.append("rect")
-        .attr("class", "node iri")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 0);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 15)
-        .text("IRI (links to/from)");
-
-    //New (unspecified)
-    legendDiv.append("rect")
-        .attr("class", "node unspec")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 25);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 40)
-        .text("New Node: edit to set properties");
-
-    // Subject Link
-    legendDiv.append("rect")
-        .attr("class", "node iri subjectLink")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 50);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 65)
-        .text("Source node for new link");
-
-    // String
-    legendDiv.append("rect")
-        .attr("class", "node string")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 75);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 90)
-        .text("String: No outgoing links!")
-
-    // Integer
-    legendDiv.append("rect")
-        .attr("class", "node int")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 100);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 115)
-        .text("Integer: No outgoing links!")
-
-   // Ontology IRI
-    legendDiv.append("rect")
-        .attr("class", "node iriont")
-        .attr("width", legendNodeWidth)
-        .attr("height", legendNodeHeight)
-        .attr("x", 5)
-        .attr("y", 125);
-    legendDiv.append("text")
-        .attr("dx", 35)
-        .attr("dy", 140)
-          .text("External Ontology IRI")
 
 
 
