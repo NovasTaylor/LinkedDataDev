@@ -171,7 +171,7 @@ function initializeGraph(graph){
         .attr('stroke','#ccc');
 //TW these will all become let
     edge = svg.append('g').selectAll('path');
-    rect = svg.append('g').selectAll('g');
+    //rect = svg.append('g').selectAll('g');
     edgepath = svg.append('g').selectAll(".edgepath");
     edgelabel = svg.append('g').selectAll(".edgelabel");
 
@@ -275,95 +275,102 @@ function update(graph){
     // Add new nodes.
     // node circles are WITHIN the <g> , so start with <g> and append the circle
     //TW can d.id be deleted? ID is set as attr later.
-    //NEW var rect_update = svg.selectAll("rect")
+    // All the rectangles have class "node"
+    var rect_update = svg.selectAll(".node").data(force.nodes(),
+        function(d) {
+        // log shows the repition after nodes are created.
+        console.log ("Node ID check: " + d.id)
+        return d.id;}
+    );
+    let g = rect_update.enter().append('g');
+    //FROM ig():   rect = svg.append('g').selectAll('g');
+      g.append("rect")
+      .attr("class", function(d) {return "node " + d.id;})
 
-    rect = rect.data(graph.nodesData, function(d) { return d.id; });
-    rect.selectAll('rect');
+      .attr("width", function(d){
+         return nodeWidth; // original non-scaleable
+        // KLUDGE
+        //let textWidth=(d.prefix.length+d.label.length)*7+60;
+        //return textWidth;
+      })
+      .attr("height", nodeHeight)
+      .attr("rx", 5) // Round edges
+      .attr("ry", 5)
+      .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
+      .attr("class", function(d,i){
+          if (d.type == "STRING"){ return "node string";}
+          else if (d.type == "INT"){ return "node int"; }
+          // Other external ontologies would need to be added here along with schema
+          else if (d.prefix == "schema"   ||
+                  d.prefix  == "ncit"     ||
+                   d.prefix == "sdtmterm" ||
+                   d.prefix == "cto"){ return "node iriont"; }
+          else if (d.prefix == "eg"){ return "node iri"; }
+        //  else if (d.type == "IRIONT"){ return "node iriont"; }
+          else {return "node unspec";}
+      })
+      //---- Double click node to edit -----------------------------------------
+      // For new nodes, this should allow the entry of label, type, and prefix...
+      .on("dblclick", function(d, i){
+          edit(d,i, "node", graph);
+      })
+      .on("click", function(d, i){
+          if (d3.event.shiftKey)  {
+              // In this case you are trying to START a link from a literal,
+              // which is not allowed.  You are trying to set the node as a
+              // startnode and STRING or INT cannot be one.
+              if(startNode === null && (d.type === "STRING" || d.type === "INT")){
+                  console.log("STart node is: " + startNode);
+                  window.confirm("Links from " + d.type + " nodes are not allowed.");
+                  return;
+              }
+              if (startNode===d.id){
+                  console.log("Deselecting link: ", startNode);
+                  let selected_rect = d3.select(this);
+                  selected_rect.classed("subjectLink", false); // add type class
+                  startNode= null;
+                  return;
+              }
+              if (startNode===null){
+                  let selected_rect = d3.select(this);
+                  console.log("SELECTED FOR LINK: ", d3.select(this))
+                  selected_rect.classed("subjectLink", true); // add type class
+                  startNode= i;
+                  console.log("Setting Start Node as node ID: " + startNode);
+              }
+              // Only set endNode if it is not the same as the startNode.
+              else if (startNode !== null && startNode !== i){
+                  endNode= i;
+                  console.log("Start Node: " + startNode + " End Node: " + endNode);
+                  addEdge(graph);
+                  d3.selectAll(".subjectLink")
+                      .classed("subjectLink", false); // add type class
+              }
+         }
+      }) // end mouse click
+      .on('mouseover', function(d){
+          //DEBUG  console.log("NODE MOUSEOVER");
+          let nodeSelection = d3.select(this).attr({
+            'width':nodeWidth+5,
+            'height':nodeHeight+5
+          });
 
-    // add new nodeSelection
-    let g = rect.enter().append('g');
-    g.append("rect")
-        .attr("width", function(d){
-           return nodeWidth; // original non-scaleable
-          // KLUDGE
-          //let textWidth=(d.prefix.length+d.label.length)*7+60;
-          //return textWidth;
-        })
-        .attr("height", nodeHeight)
-        .attr("rx", 5) // Round edges
-        .attr("ry", 5)
-        .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
-        .attr("class", function(d,i){
-            if (d.type == "STRING"){ return "node string";}
-            else if (d.type == "INT"){ return "node int"; }
-            // Other external ontologies would need to be added here along with schema
-            else if (d.prefix == "schema"   ||
-                    d.prefix  == "ncit"     ||
-                     d.prefix == "sdtmterm" ||
-                     d.prefix == "cto"){ return "node iriont"; }
-            else if (d.prefix == "eg"){ return "node iri"; }
-          //  else if (d.type == "IRIONT"){ return "node iriont"; }
-            else {return "node unspec";}
-        })
-        //---- Double click node to edit -----------------------------------------
-        // For new nodes, this should allow the entry of label, type, and prefix...
-        .on("dblclick", function(d, i){
-            edit(d,i, "node", graph);
-        })
-        .on("click", function(d, i){
-            if (d3.event.shiftKey)  {
-                // In this case you are trying to START a link from a literal,
-                // which is not allowed.  You are trying to set the node as a
-                // startnode and STRING or INT cannot be one.
-                if(startNode === null && (d.type === "STRING" || d.type === "INT")){
-                    console.log("STart node is: " + startNode);
-                    window.confirm("Links from " + d.type + " nodes are not allowed.");
-                    return;
-                }
-                if (startNode===d.id){
-                    console.log("Deselecting link: ", startNode);
-                    let selected_rect = d3.select(this);
-                    selected_rect.classed("subjectLink", false); // add type class
-                    startNode= null;
-                    return;
-                }
-                if (startNode===null){
-                    let selected_rect = d3.select(this);
-                    console.log("SELECTED FOR LINK: ", d3.select(this))
-                    selected_rect.classed("subjectLink", true); // add type class
-                    startNode= i;
-                    console.log("Setting Start Node as node ID: " + startNode);
-                }
-                // Only set endNode if it is not the same as the startNode.
-                else if (startNode !== null && startNode !== i){
-                    endNode= i;
-                    console.log("Start Node: " + startNode + " End Node: " + endNode);
-                    addEdge(graph);
-                    d3.selectAll(".subjectLink")
-                        .classed("subjectLink", false); // add type class
-                }
-           }
-        }) // end mouse click
-        .on('mouseover', function(d){
-            //DEBUG  console.log("NODE MOUSEOVER");
-            let nodeSelection = d3.select(this).attr({
-              'width':nodeWidth+5,
-              'height':nodeHeight+5
-            });
+          console.log("Node Mouseover is happening");
+          // Add tooltip here
 
-            console.log("Node Mouseover is happening");
-            // Add tooltip here
+      })
+      //Mouseout Node  - bring node back to full colour
+      .on('mouseout', function(d){
+          //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
+          let nodeSelection = d3.select(this).attr({
+            'width':nodeWidth,
+            'height': nodeHeight
+          });
+      }) // end mouseout
+      ;
 
-        })
-        //Mouseout Node  - bring node back to full colour
-        .on('mouseout', function(d){
-            //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
-            let nodeSelection = d3.select(this).attr({
-              'width':nodeWidth,
-              'height': nodeHeight
-            });
-        }) // end mouseout
-        ;
+
+
 
     // Add nodeText ID to each node. Adding the actual text label here with the
     //.text  causes problems with intial nodes.
@@ -386,9 +393,11 @@ function update(graph){
                 return d.prefix+":"+d.label;
             }
         });
-    rect.call(force.drag);
+    g.call(force.drag);
     // Exit any old nodes.
-    rect.exit().remove();
+
+    // Remove rect when it vanishes from the list
+    rect_update.exit().remove();
 
     // Start the force layout.
     force.start();
@@ -404,15 +413,6 @@ function tick() {
         return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
     });
 
-    // Prevvent node movement off the editing canvas
-    rect.attr("transform", function(d) {
-      if (d.x > w ) {d.x = w-nodeWidth;}  // right
-      if (d.x < -40 ) {d.x = nodeWidth;}    // left
-      if (d.y < 0 ) {d.y = nodeWidth;}    // top
-      if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
-      return "translate(" + d.x + "," + d.y + ")";
-    });
-
     edgepath.attr('d', function(d) {
       //Adjust for rectangle shape
       let xposSource = d.source.x + nodeWidth/2,
@@ -425,7 +425,6 @@ function tick() {
         // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
         return path
     });
-
     edgelabel.attr('transform',function(d,i){
         if (d.target.x<d.source.x){
             let bbox = this.getBBox();
@@ -436,6 +435,17 @@ function tick() {
             return 'rotate(0)';
         }
     });
+    // Prevvent node movement off the editing canvas
+    svg.selectAll(".node")
+      .attr("transform", function(d) {
+      if (d.x > w ) {d.x = w-nodeWidth;}  // right
+      if (d.x < -40 ) {d.x = nodeWidth;}    // left
+      if (d.y < 0 ) {d.y = nodeWidth;}    // top
+      if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+
+
 };  // End tick
 
 //------------------------------------------------------------------------------
