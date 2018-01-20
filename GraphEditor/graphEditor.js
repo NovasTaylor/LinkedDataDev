@@ -156,7 +156,7 @@ function initializeGraph(graph){
             .size([w, h])
             .on("tick", tick);
     // Arrow marker for end of edge
-    svg.append('svg:defs').append('svg:marker')
+    svg.append('defs').append('marker')
         .attr({'id'          :'arrowhead',
                'viewBox'     : '-0 -5 10 10',
                'refX'        : 90,
@@ -165,7 +165,7 @@ function initializeGraph(graph){
                'markerWidth' : 10,
                'markerHeight': 10,
                'xoverflow'   :'visible'})
-        .append('svg:path')
+        .append('path')
         .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
@@ -176,7 +176,7 @@ function initializeGraph(graph){
     edgelabel = svg.append('g').selectAll(".edgelabel");
 
     // Add node icon. Within initiallizeGraph() for access to "graph"data
-    svg.append("svg:image")
+    svg.append("image")
         .attr({'x'         : 5,
                'y'         : 5,
                'width'     : 20,
@@ -215,55 +215,11 @@ function initializeGraph(graph){
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
-function tick() {
-
-    edge.attr('d', function(d) {
-        let xposSource = d.source.x + nodeWidth/2,
-            xposTarget = d.target.x + nodeWidth/2,
-            yposSource = d.source.y + nodeHeight/2,
-            yposTarget = d.target.y + nodeHeight/2;
-        return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
-    });
-
-    // Prevvent node movement off the editing canvas
-    rect.attr("transform", function(d) {
-      if (d.x > w ) {d.x = w-nodeWidth;}  // right
-      if (d.x < -40 ) {d.x = nodeWidth;}    // left
-      if (d.y < 0 ) {d.y = nodeWidth;}    // top
-      if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
-      return "translate(" + d.x + "," + d.y + ")";
-    });
-
-    edgepath.attr('d', function(d) {
-      //Adjust for rectangle shape
-      let xposSource = d.source.x + nodeWidth/2,
-          xposTarget = d.target.x + nodeWidth/2,
-          yposSource = d.source.y + nodeHeight/2,
-          yposTarget = d.target.y + nodeHeight/2;
-
-        let path='M '+ xposSource + ' ' + yposSource+' L '+ xposTarget + ' ' + yposTarget;
-
-        // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-        return path
-    });
-
-    edgelabel.attr('transform',function(d,i){
-        if (d.target.x<d.source.x){
-            let bbox = this.getBBox();
-            let rx = bbox.x+bbox.width/2;
-            let ry = bbox.y+bbox.height/2;
-            return 'rotate(180 '+rx+' '+ry+')';
-        } else {
-            return 'rotate(0)';
-        }
-    });
-};  // End tick
-
 function update(graph){
     //---- EDGES update ----------------------------------------------------------
     edge = edge.data(graph.edgesData);
     edge.enter()
-        .append('svg:path')
+        .append('path')
         .attr("id", function(d,i){return 'edge'+d.id})
         .attr('marker-end', 'url(#arrowhead)')
         //  .attr('class', 'edge')
@@ -319,12 +275,14 @@ function update(graph){
     // Add new nodes.
     // node circles are WITHIN the <g> , so start with <g> and append the circle
     //TW can d.id be deleted? ID is set as attr later.
+    //NEW var rect_update = svg.selectAll("rect")
+
     rect = rect.data(graph.nodesData, function(d) { return d.id; });
     rect.selectAll('rect');
 
     // add new nodeSelection
     let g = rect.enter().append('g');
-    g.append("svg:rect")
+    g.append("rect")
         .attr("width", function(d){
            return nodeWidth; // original non-scaleable
           // KLUDGE
@@ -409,7 +367,7 @@ function update(graph){
 
     // Add nodeText ID to each node. Adding the actual text label here with the
     //.text  causes problems with intial nodes.
-    g.append("svg:text") //232
+    g.append("text") //232
         .attr({
               'class':       function(d,i){return 'nodeText'},
               'id':          function(d, i) {return("nodeText"+i) ; },
@@ -435,6 +393,50 @@ function update(graph){
     // Start the force layout.
     force.start();
 }  // end of update(graph)
+
+function tick() {
+
+    edge.attr('d', function(d) {
+        let xposSource = d.source.x + nodeWidth/2,
+            xposTarget = d.target.x + nodeWidth/2,
+            yposSource = d.source.y + nodeHeight/2,
+            yposTarget = d.target.y + nodeHeight/2;
+        return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
+    });
+
+    // Prevvent node movement off the editing canvas
+    rect.attr("transform", function(d) {
+      if (d.x > w ) {d.x = w-nodeWidth;}  // right
+      if (d.x < -40 ) {d.x = nodeWidth;}    // left
+      if (d.y < 0 ) {d.y = nodeWidth;}    // top
+      if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+
+    edgepath.attr('d', function(d) {
+      //Adjust for rectangle shape
+      let xposSource = d.source.x + nodeWidth/2,
+          xposTarget = d.target.x + nodeWidth/2,
+          yposSource = d.source.y + nodeHeight/2,
+          yposTarget = d.target.y + nodeHeight/2;
+
+        let path='M '+ xposSource + ' ' + yposSource+' L '+ xposTarget + ' ' + yposTarget;
+
+        // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+        return path
+    });
+
+    edgelabel.attr('transform',function(d,i){
+        if (d.target.x<d.source.x){
+            let bbox = this.getBBox();
+            let rx = bbox.x+bbox.width/2;
+            let ry = bbox.y+bbox.height/2;
+            return 'rotate(180 '+rx+' '+ry+')';
+        } else {
+            return 'rotate(0)';
+        }
+    });
+};  // End tick
 
 //------------------------------------------------------------------------------
 //---- Additional Functions ----------------------------------------------------
