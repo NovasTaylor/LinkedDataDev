@@ -272,32 +272,22 @@ function update(graph){
                      });
    edgelabel.exit().remove();
 
-    // NODES update ------------------------------------------------------------
-
-    // Add new nodes.
-    // node circles are WITHIN the <g> , so start with <g> and append the circle
-    //TW can d.id be deleted? ID is set as attr later.
-    //var rect_update = svg.selectAll("rect").data(force.nodes(),
-
+    // NODES -------------------------------------------------------------------
+   // Data for nodes
     let node_update = svg.selectAll('.node').data(
-      force.nodes(),
-      function(d) {return d.id;}
-    );
+        force.nodes(),
+        function(d) {return d.id;}
+    ).enter();
 
-/*
-    rect = rect.data(graph.nodesData, function(d) { return d.id; });
-    rect.selectAll('rect');
-*/
+    // Data for node labels
+    let node_updateText = svg.selectAll(".nodeText").data(
+        force.nodes(),
+        function(d){ return d.id;}
+    ).enter();
 
-    // add new nodeSelection
-    node_update.enter()
-      .append("rect")
-        .attr("width", function(d){
-           return nodeWidth; // original non-scaleable
-          // KLUDGE
-          //let textWidth=(d.prefix.length+d.label.length)*7+60;
-          //return textWidth;
-        })
+    // Append the rect shape to the node data
+    node_update.append("rect")
+        .attr("width", function(d){ return nodeWidth; })
         .attr("height", nodeHeight)
         .attr("rx", 5) // Round edges
         .attr("ry", 5)
@@ -314,6 +304,7 @@ function update(graph){
           //  else if (d.type == "IRIONT"){ return "node iriont"; }
             else {return "node unspec";}
         })
+        .call(force.drag)
         //---- Double click node to edit -----------------------------------------
         // For new nodes, this should allow the entry of label, type, and prefix...
         .on("dblclick", function(d, i){
@@ -374,16 +365,15 @@ function update(graph){
         }) // end mouseout
         ;
 
-    // Add nodeText ID to each node. Adding the actual text label here with the
-    //.text  causes problems with intial nodes.
-    node_update.append("text") //232
+    // Add id (nodeTextn) and the text
+    node_updateText.append("text")
         .attr({
-              'class':       function(d,i){return 'nodeText'},
+              //'class':       function(d,i){return 'nodeText'},
               'id':          function(d, i) {return("nodeText"+i) ; },
-              'text-anchor': 'start',
-              'x': 5,
-              'y': nodeHeight/2+3,  // +n Moves down from top a little more
-              'class':        'nodeLabel'
+              //'text-anchor': 'start',
+              //'x':     function(d,i){return d.x},
+              //'y':     function(d,i){return d.y},
+              'class':        'nodeText'
             })
         .text(function(d,i) {
             //No prefix for INT, STRING
@@ -391,20 +381,22 @@ function update(graph){
                 return d.label;
             }
             // Prefix for all other types
-            else{
-                return d.prefix+":"+d.label;
-            }
+            else{ return d.prefix+":"+d.label; }
         });
-    node_update.call(force.drag);
-    // Exit any old nodes.
-    node_update.exit().remove();
 
+    // Exit any old nodes and their text
+    var nodeExit = svg.selectAll(".node").data(
+             force.nodes()
+     ).exit().remove();
+
+    var nodeTextExit = svg.selectAll(".nodeText").data(
+             force.nodes()
+     ).exit().remove();
     // Start the force layout.
     force.start();
 }  // end of update(graph)
 
 function tick() {
-
     edge.attr('d', function(d) {
         let xposSource = d.source.x + nodeWidth/2,
             xposTarget = d.target.x + nodeWidth/2,
@@ -435,7 +427,7 @@ function tick() {
             return 'rotate(0)';
         }
     });
-    // Prevvent node movement off the editing canvas
+    // Prevvent node movement off the editing canvas by adj. each d.x, d.y
     svg.selectAll(".node").attr("transform", function(d) {
       if (d.x > w ) {d.x = w-nodeWidth;}  // right
       if (d.x < -40 ) {d.x = nodeWidth;}    // left
@@ -444,7 +436,10 @@ function tick() {
       return "translate(" + d.x + "," + d.y + ")";
     });
 
-
+    // Node Text label
+    svg.selectAll(".nodeText")
+        .attr("x", function(d){ return d.x+5;})
+        .attr("y", function(d){ return d.y+17;});
 };  // End tick
 
 //------------------------------------------------------------------------------
@@ -476,7 +471,6 @@ function edit(d, i, source, graph){
         d3.selectAll(".subjectLink")
             .classed("subjectLink", false);
     }
-
 
     let self = this; //Necessary?
     editActive = true;
