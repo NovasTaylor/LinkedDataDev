@@ -75,8 +75,8 @@ function initializeGraph(graph){
 
     // Initialize D3 force layout
     force = d3.layout.force()
-            // .nodes(graph.nodesData)
-            // .links(graph.edgesData)
+            .nodes(graph.nodesData)
+            .links(graph.edgesData)
             .size([w, h])
             .on("tick", tick);
 
