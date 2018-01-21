@@ -36,18 +36,6 @@ let selected_node  = null,
     mousedown_edge = null,
     mousedown_node = null,
     mouseup_node   = null;
-// Read source data
-d3.queue()
-   .defer(d3.json, '/graphEditor/data/graph.json')
-   .await(processData);
-
-function processData (error, graph) {
-    if(error) { console.log(error); }
-    console.log(graph.nodesData[0]);
-    console.log(graph.edgesData[0]);
-    initializeGraph(graph);
-;}
-
 
 let svg=d3.select("#whiteboard")
           .append("svg")
@@ -136,6 +124,20 @@ let force     = null,
     edgepath  = null,
     edgelabel = null;
     ;
+
+    // Read source data
+    d3.queue()
+       .defer(d3.json, '/graphEditor/data/graph.json')
+       .await(processData);
+
+    function processData (error, graph) {
+        if(error) { console.log(error); }
+        console.log(graph.nodesData[0]);
+        console.log(graph.edgesData[0]);
+        initializeGraph(graph);
+    ;}
+
+
 
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
@@ -380,16 +382,18 @@ function update(graph){
             else{ return d.prefix+":"+d.label; }
         });
 
+    // Remove nodes
     var nodeExit = svg.selectAll(".node").data(
         force.nodes()
      ).exit().remove();
 
-     // Exit any old nodes and their text
+     // Remove nodeText
      var nodeTextExit = svg.selectAll(".nodeText").data(
          force.nodes()
       ).exit().remove();
-     // Start the force layout.
 
+
+     // Start the force layout.
     force.start();  // Restart the force
 }  // end of update(graph)
 
@@ -594,16 +598,7 @@ function edit(d, i, source, graph){
                                 // select node
                                 mousedown_node = d; // Captures the node Initialized to null as per Kirsling
                                 selected_node = mousedown_node ;
-                                console.log("D: ", d)
-                                console.log("So you want to DELETE a node!")
-                                console.log("Selected_node: " , selected_node)
-                                // must delete the node and any edge attached to it (ingoing and outgoing)
-                                graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
-                                console.log("Nodes data post-deletion:");
-                                console.log(graph.nodesData);
-                                d3.select("#buttons").style("opacity", 1);  // redisplay buttons
-                                update(graph);
-
+                                deleteNode(graph, selected_node);
                             }
                             if(source=="edge"){
                                 console.log("So you want to DELETE an Edge!")
@@ -636,6 +631,23 @@ function addNode(graph){
     console.log(graph.nodesData)
     update(graph);  // Adds node to the SVG
 }
+
+function deleteNode(graph, selected_node){
+    console.log("A node you will delete!")
+    console.log("id number: ", )
+    console.log("Selected_node: " , selected_node)
+    console.log("Selected_node Label: " , selected_node.label)
+
+    //TODO: Add deletion of any edge attached to the selected node
+    graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
+    console.log("Nodes data post-deletion:");
+    console.log(graph.nodesData);
+    // Remove the text in the SVG that is associated with this node. [TW KLUDGE]
+    d3.select("#nodeText" + selected_node.id).remove();
+    d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+    update(graph);
+}
+
 function addEdge(graph){
     console.log("A LINK you wish to add!")
 
