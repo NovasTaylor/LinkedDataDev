@@ -21,8 +21,6 @@ let w          = 900,
     h          = 1500,
     nodeWidth  = 150,
     nodeHeight = 30;
-    //nodeRadius = 40; // also used to distance arrow from node
-
 let editActive = false;  // opacity flag for editing box
 
 // Start and end nodes when constructing a link
@@ -38,8 +36,6 @@ let selected_node  = null,
     mousedown_edge = null,
     mousedown_node = null,
     mouseup_node   = null;
-
-
 // Read source data
 d3.queue()
    .defer(d3.json, '/graphEditor/data/graph.json')
@@ -76,69 +72,69 @@ legendDiv.append("text")
     .text("IRI (links to/from)");
 //New (unspecified)
 legendDiv.append("rect")
-              .attr("class", "node unspec")
-              .attr("width", legendNodeWidth)
-              .attr("height", legendNodeHeight)
-              .attr("x", 5)
-              .attr("y", 25);
+    .attr("class", "node unspec")
+    .attr("width", legendNodeWidth)
+    .attr("height", legendNodeHeight)
+    .attr("x", 5)
+    .attr("y", 25);
 legendDiv.append("text")
-              .attr("dx", 35)
-              .attr("dy", 40)
-              .text("New Node: edit to set properties");
+    .attr("dx", 35)
+    .attr("dy", 40)
+    .text("New Node: edit to set properties");
 
 // Subject Link
  legendDiv.append("rect")
-              .attr("class", "node iri subjectLink")
-              .attr("width", legendNodeWidth)
-              .attr("height", legendNodeHeight)
-              .attr("x", 5)
-              .attr("y", 50);
+    .attr("class", "node iri subjectLink")
+    .attr("width", legendNodeWidth)
+    .attr("height", legendNodeHeight)
+    .attr("x", 5)
+    .attr("y", 50);
 legendDiv.append("text")
-              .attr("dx", 35)
-              .attr("dy", 65)
-              .text("Source node for new link");
+    .attr("dx", 35)
+    .attr("dy", 65)
+    .text("Source node for new link");
 // String
 legendDiv.append("rect")
-              .attr("class", "node string")
-              .attr("width", legendNodeWidth)
-              .attr("height", legendNodeHeight)
-              .attr("x", 5)
-              .attr("y", 75);
+    .attr("class", "node string")
+    .attr("width", legendNodeWidth)
+    .attr("height", legendNodeHeight)
+    .attr("x", 5)
+    .attr("y", 75);
 legendDiv.append("text")
-              .attr("dx", 35)
-              .attr("dy", 90)
-              .text("String: No outgoing links!")
-          // Integer
+    .attr("dx", 35)
+    .attr("dy", 90)
+    .text("String: No outgoing links!")
+// Integer
 legendDiv.append("rect")
-              .attr("class", "node int")
-              .attr("width", legendNodeWidth)
-              .attr("height", legendNodeHeight)
-              .attr("x", 5)
-              .attr("y", 100);
+    .attr("class", "node int")
+    .attr("width", legendNodeWidth)
+    .attr("height", legendNodeHeight)
+    .attr("x", 5)
+    .attr("y", 100);
 legendDiv.append("text")
-              .attr("dx", 35)
-              .attr("dy", 115)
-              .text("Integer: No outgoing links!")
-         // Ontology IRI
+    .attr("dx", 35)
+    .attr("dy", 115)
+    .text("Integer: No outgoing links!")
+// Ontology IRI
 legendDiv.append("rect")
-              .attr("class", "node iriont")
-              .attr("width", legendNodeWidth)
-              .attr("height", legendNodeHeight)
-              .attr("x", 5)
-              .attr("y", 125);
+    .attr("class", "node iriont")
+    .attr("width", legendNodeWidth)
+    .attr("height", legendNodeHeight)
+    .attr("x", 5)
+    .attr("y", 125);
 legendDiv.append("text")
-              .attr("dx", 35)
-              .attr("dy", 140)
-                .text("External Ontology IRI")
+    .attr("dx", 35)
+    .attr("dy", 140)
+    .text("External Ontology IRI");
 
-// Global declare of items referecnced  in update()
-//TW
+//TODO: These declarations should be removed when code is changed to have them
+//  within update() as edge_upate, edgepath_update etc., folling the model of
+//  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null,
     edge      = null,
     edgepath  = null,
-    edgelabel = null,
-    rect      = null
+    edgelabel = null;
     ;
 
 // Initialize the graph components ---------------------------------------------
@@ -280,7 +276,7 @@ function update(graph){
     ).enter();
 
     // Data for node labels
-    let node_updateText = svg.selectAll(".nodeText").data(
+    let nodeText_update = svg.selectAll(".nodeText").data(
         force.nodes(),
         function(d){ return d.id;}
     ).enter();
@@ -366,7 +362,7 @@ function update(graph){
         ;
 
     // Add id (nodeTextn) and the text
-    node_updateText.append("text")
+    nodeText_update.append("text")
         .attr({
               //'class':       function(d,i){return 'nodeText'},
               'id':          function(d, i) {return("nodeText"+i) ; },
