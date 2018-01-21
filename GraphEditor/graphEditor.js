@@ -207,9 +207,6 @@ function initializeGraph(graph){
     buttonsDiv.append("button")
       .text("Save State")
       .on("click", function(d){ saveState(graph);});
-
-
-
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
@@ -227,10 +224,15 @@ function update(graph){
     edge.exit().remove();
 
     edgepath = edgepath.data(graph.edgesData);
+    //ERROR HERE. The problem here is that d.source.x and friends are not known
+    // for edgepath.
     edgepath.enter()
                   .append('path')
-                  .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-                         'class':'edgepath',
+                  .attr('d', function(d) {
+                     console.log("ERROR HERE for d.source.x etc.");
+                     console.log("The numbers: "+ d.source.x + " " + d.source.y + " " + d.target.x + " " + d.target.y);
+                          return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y})
+                  .attr({'class':'edgepath',
                          'fill-opacity':0,
                          'stroke-opacity':0,
                          'id':function(d,i) {return 'edgepath'+d.id}})
@@ -268,14 +270,18 @@ function update(graph){
                      });
    edgelabel.exit().remove();
 
+
+
     // NODES -------------------------------------------------------------------
    // Data for nodes
+   // THE PROBLEM HERE IS in the NODE ID.
+
     let node_update = svg.selectAll('.node').data(
         force.nodes(),
         function(d) {return d.id;}
     ).enter();
 
-    // Data for node labels
+    // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
         force.nodes(),
         function(d){ return d.id;}
@@ -297,7 +303,6 @@ function update(graph){
                      d.prefix == "sdtmterm" ||
                      d.prefix == "cto"){ return "node iriont"; }
             else if (d.prefix == "eg"){ return "node iri"; }
-          //  else if (d.type == "IRIONT"){ return "node iriont"; }
             else {return "node unspec";}
         })
         .call(force.drag)
@@ -309,8 +314,7 @@ function update(graph){
         .on("click", function(d, i){
             if (d3.event.shiftKey)  {
                 // In this case you are trying to START a link from a literal,
-                // which is not allowed.  You are trying to set the node as a
-                // startnode and STRING or INT cannot be one.
+                // which is not allowed. STRING/INT not allowed as startnode.
                 if(startNode === null && (d.type === "STRING" || d.type === "INT")){
                     console.log("STart node is: " + startNode);
                     window.confirm("Links from " + d.type + " nodes are not allowed.");
@@ -358,38 +362,35 @@ function update(graph){
               'width':nodeWidth,
               'height': nodeHeight
             });
-        }) // end mouseout
-        ;
+            //TODO: Add removal of tooltip
+
+        }); // end mouseout
 
     // Add id (nodeTextn) and the text
     nodeText_update.append("text")
         .attr({
-              //'class':       function(d,i){return 'nodeText'},
-              'id':          function(d, i) {return("nodeText"+i) ; },
-              //'text-anchor': 'start',
-              //'x':     function(d,i){return d.x},
-              //'y':     function(d,i){return d.y},
-              'class':        'nodeText'
-            })
+            // 'id':    function(d, i) {return("nodeText"+i) ; },
+            'id':    function(d, i) {return("nodeText"+d.id) ; },
+            'class': 'nodeText'
+        })
         .text(function(d,i) {
             //No prefix for INT, STRING
-            if (d.type ==='INT' || d.type ==='STRING') {
-                return d.label;
-            }
+            if (d.type ==='INT' || d.type ==='STRING') { return d.label; }
             // Prefix for all other types
             else{ return d.prefix+":"+d.label; }
         });
 
-    // Exit any old nodes and their text
     var nodeExit = svg.selectAll(".node").data(
-             force.nodes()
+        force.nodes()
      ).exit().remove();
 
-    var nodeTextExit = svg.selectAll(".nodeText").data(
-             force.nodes()
-     ).exit().remove();
-    // Start the force layout.
-    force.start();
+     // Exit any old nodes and their text
+     var nodeTextExit = svg.selectAll(".nodeText").data(
+         force.nodes()
+      ).exit().remove();
+     // Start the force layout.
+
+    force.start();  // Restart the force
 }  // end of update(graph)
 
 function tick() {
@@ -402,16 +403,16 @@ function tick() {
     });
 
     edgepath.attr('d', function(d) {
-      //Adjust for rectangle shape
-      let xposSource = d.source.x + nodeWidth/2,
-          xposTarget = d.target.x + nodeWidth/2,
-          yposSource = d.source.y + nodeHeight/2,
-          yposTarget = d.target.y + nodeHeight/2;
+        //Adjust for rectangle shape
+        let xposSource = d.source.x + nodeWidth/2,
+            xposTarget = d.target.x + nodeWidth/2,
+            yposSource = d.source.y + nodeHeight/2,
+            yposTarget = d.target.y + nodeHeight/2;
 
         let path='M '+ xposSource + ' ' + yposSource+' L '+ xposTarget + ' ' + yposTarget;
 
         // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-        return path
+        return path;
     });
     edgelabel.attr('transform',function(d,i){
         if (d.target.x<d.source.x){
@@ -419,17 +420,16 @@ function tick() {
             let rx = bbox.x+bbox.width/2;
             let ry = bbox.y+bbox.height/2;
             return 'rotate(180 '+rx+' '+ry+')';
-        } else {
-            return 'rotate(0)';
         }
+        else { return 'rotate(0)'; }
     });
-    // Prevvent node movement off the editing canvas by adj. each d.x, d.y
+    // Prevent node movement off the editing canvas by adj. each d.x, d.y
     svg.selectAll(".node").attr("transform", function(d) {
-      if (d.x > w ) {d.x = w-nodeWidth;}  // right
-      if (d.x < -40 ) {d.x = nodeWidth;}    // left
-      if (d.y < 0 ) {d.y = nodeWidth;}    // top
-      if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
-      return "translate(" + d.x + "," + d.y + ")";
+        if (d.x > w ) {d.x = w-nodeWidth;}  // right
+        if (d.x < -40 ) {d.x = nodeWidth;}  // left
+        if (d.y < 0 ) {d.y = nodeWidth;}    // top
+        if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
+        return "translate(" + d.x + "," + d.y + ")";
     });
 
     // Node Text label
@@ -441,7 +441,6 @@ function tick() {
 //------------------------------------------------------------------------------
 //---- Additional Functions ----------------------------------------------------
 
-// edit()
 //   Edit either a "node" or an "edge"
 function edit(d, i, source, graph){
     // upsource used in editor display to match exercises text
@@ -449,7 +448,6 @@ function edit(d, i, source, graph){
 
     console.log("You clicked a  " +source)
     console.log("     edit: " + source + " " + d.prefix + ":" + d.label);
-    //console.log("clicked");
 
     // If another node or edge was already selected (edit window already present,
     //   then made another dbl click, you must purge the existing info to allow
@@ -481,8 +479,7 @@ function edit(d, i, source, graph){
           else {return (upSource + " values");}
         });  // Selet div for appending
 
-
-        // PREFIX - both nodes and edges
+    // PREFIX - both nodes and edges
     let prefixText = div.append("p")
                         .text("Prefix: ");
     let prefixData = ["eg","ncit","rdf", "rdfs", "schema", "sdtmterm" ]
@@ -598,14 +595,15 @@ function edit(d, i, source, graph){
                                 mousedown_node = d; // Captures the node Initialized to null as per Kirsling
                                 selected_node = mousedown_node ;
                                 console.log("D: ", d)
-                                //let foo = indexOf(node());
                                 console.log("So you want to DELETE a node!")
                                 console.log("Selected_node: " , selected_node)
                                 // must delete the node and any edge attached to it (ingoing and outgoing)
                                 graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
-
+                                console.log("Nodes data post-deletion:");
+                                console.log(graph.nodesData);
                                 d3.select("#buttons").style("opacity", 1);  // redisplay buttons
                                 update(graph);
+
                             }
                             if(source=="edge"){
                                 console.log("So you want to DELETE an Edge!")
@@ -629,7 +627,8 @@ function addNode(graph){
         label: 'NEW',
         prefix: 'new',
         type: 'UNSPEC',
-        x:200, y:200,
+        x:200,
+        y:200,
         fixed:true
     };
     let n = graph.nodesData.push(newNode);
