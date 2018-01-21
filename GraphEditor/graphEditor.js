@@ -49,6 +49,7 @@ function processData (error, graph) {
     console.log(graph.nodesData[0]);
     console.log(graph.edgesData[0]);
     initializeGraph(graph);
+    update(graph);  // Update graph for the first time
 ;}
 
 let svg=d3.select("#whiteboard")
@@ -95,9 +96,10 @@ function initializeGraph(graph){
         .attr('stroke','#ccc');
 
     let edge = svg.append("g").attr("id","edgeGroup") //.append('svg:g') //.selectAll('path');
-    let rect = svg.append("g").attr("id","rectGroup") //.append('svg:g') //.selectAll('g');
     let edgepath = svg.append("g").attr("id","edgepathGroup") //.append('svg:g') //.selectAll(".edgepath");
     let edgelabel = svg.append("g").attr("id","edgelabelGroup") //.append('svg:g') //.selectAll(".edgelabel");
+    let rect = svg.append("g").attr("id","rectGroup") //.append('svg:g') //.selectAll('g');
+    let nodeLabels = svg.append("g").attr("id","nodeLabelGroup") //.append('svg:g') //.selectAll('g');
 
     // Add node icon. Within initiallizeGraph() for access to "graph"data
     svg.append("svg:image")
@@ -122,27 +124,35 @@ function initializeGraph(graph){
                                     });
         })
         .on('click', function(d){ addNode(graph);});
-
-    update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
 function tick() {
+
+    // alert("d:"+JSON.stringify(d))
 
     // edge.attr('d', function(d) {
     // svg.selectAll(".edge")
     svg.select("#edgeGroup")
         .attr('d', function(d) {
-        let xposSource = d.source.x + nodeWidth/2,
-            xposTarget = d.target.x + nodeWidth/2,
-            yposSource = d.source.y + nodeHeight/2,
-            yposTarget = d.target.y + nodeHeight/2;
-        return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
+        if (d) {
+            let xposSource = d.source.x + nodeWidth/2,
+                xposTarget = d.target.x + nodeWidth/2,
+                yposSource = d.source.y + nodeHeight/2,
+                yposTarget = d.target.y + nodeHeight/2;
+            return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;            
+        } else {
+            return 'M' + 0 + ',' + 100 + 'L' + 0 + ',' + 100;            
+        }
     });
+        // if (d) {
+        // } else {
+        //     return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;            
+        // }
 
     // Prevvent node movement off the editing canvas
     // svg.selectAll(".rectNodes")
     // svg.selectAll(".node")
-    svg.select("#rectGroup")
+    svg.select("#rectGroup").selectAll(".node")
         .attr("transform", function(d) {
             if (d.x > w ) {d.x = w-nodeWidth;}  // right
             if (d.x < -40 ) {d.x = nodeWidth;}    // left
@@ -151,15 +161,16 @@ function tick() {
             return "translate(" + d.x + "," + d.y + ")";
         });
 
-    // svg.selectAll(".nodeLabel")
     // svg.select("#")
-    //     .attr("transform", function(d) {
-    //         if (d.x > w ) {d.x = w-nodeWidth;}  // right
-    //         if (d.x < -40 ) {d.x = nodeWidth;}    // left
-    //         if (d.y < 0 ) {d.y = nodeWidth;}    // top
-    //         if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
-    //         return "translate(" + d.x + "," + d.y + ")";
-    //     });
+    // svg.select("#nodeLabelGroup").selectAll(".nodeLabel")
+    svg.selectAll(".nodeLabel")
+        .attr("transform", function(d) {
+            if (d.x > w ) {d.x = w-nodeWidth;}  // right
+            if (d.x < -40 ) {d.x = nodeWidth;}    // left
+            if (d.y < 0 ) {d.y = nodeWidth;}    // top
+            if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
+            return "translate(" + d.x + "," + d.y + ")";
+        });
 
     svg.selectAll(".edgepath")
         .attr("transform", function(d) {
@@ -196,6 +207,7 @@ function update(graph){
     // let theEdges = svg.selectAll("#edgeGroup").selectAll('path')
     let theEdges = svg.selectAll("#edgeGroup").selectAll('.edge')
         .data(graph.edgesData, function(d) { return "theEdge"+d.id; });
+    theEdges.exit().remove();
     theEdges.enter()
         .append('path')
         .attr("id", function(d,i){return 'edge'+d.id})
@@ -205,11 +217,11 @@ function update(graph){
         // .style("pointer-events", "none"); // From http://bl.ocks.org/jhb/5955887
     // edge.append("prefixText")
     //   .attr("id", function(d, i) {return("prefixText"+d.id) ; });
-    theEdges.exit().remove();
 
     // let theEdgepaths = svg.selectAll("#edgepathGroup").selectAll('path')
     let theEdgepaths = svg.selectAll("#edgepathGroup").selectAll('.edgepath')
         .data(graph.edgesData, function(d) { return "theEdgepath"+d.id; });
+    theEdgepaths.exit().remove();
     theEdgepaths.enter()
         .append('path')
         .attr('id',function(d,i) {return 'edgepath'+d.id})
@@ -222,14 +234,13 @@ function update(graph){
         .attr('stroke-opacity',0)
         .style("pointer-events", "none");
 
-    theEdgepaths.exit().remove();
-
     // let theEdgelables = svg.selectAll("#edgelabelGroup").selectAll('text')
     let theEdgelables = svg.selectAll("#edgelabelGroup").selectAll('.edgelabel')
         .data(graph.edgesData, function(d) { return "theEdgelabel"+d.id; });
     // theEdgelables.transition()
     //     .attr("transform","rotate()");
         // .classed("test",true);
+    theEdgelables.exit().remove();
     theEdgelables.enter()
         .append('text')
         .attr("id", function(d,i){ return "edgelabel" + d.id; })
@@ -255,7 +266,6 @@ function update(graph){
         .on("dblclick", function(d, i){
            edit(d,i, "edge", graph);
          });
-   theEdgelables.exit().remove();
 
     // NODES update ------------------------------------------------------------
 
@@ -266,6 +276,7 @@ function update(graph){
     let theRects = svg.selectAll("#rectGroup").selectAll('.rectNodes')
         .data(graph.nodesData, function(d) { return d.id; });
 
+    theRects.exit().remove();
     // add new nodeSelection
     theRects.enter()
         .append("rect")
@@ -346,13 +357,14 @@ function update(graph){
             });
         }) // end mouseout
         ;
-    theRects.exit().remove();
 
     // Add nodeText ID to each node. Adding the actual text label here with the
     //.text  causes problems with intial nodes.
-    let theTexts = svg.selectAll("#rectGroup").selectAll('text')
+    // let theTexts = svg.selectAll("#rectGroup").selectAll('text')
+    //     .data(graph.nodesData, function(d) { return d.id; });
+    let theTexts = svg.selectAll("#nodeLabelGroup").selectAll('text')
         .data(graph.nodesData, function(d) { return d.id; });
-
+    theTexts.exit().remove();
     theTexts.enter()
         .append("text") //232
         .attr({
@@ -373,7 +385,6 @@ function update(graph){
                 return d.prefix+":"+d.label;
             }
         });
-    theTexts.exit().remove();
 
     theRects.call(force.drag);
     // Exit any old nodes.
