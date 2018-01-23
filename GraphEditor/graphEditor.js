@@ -119,11 +119,10 @@ legendDiv.append("text")
 //  within update() as edge_upate, edgepath_update etc., folling the model of
 //  node_update
 // MOVE edge and rect  declares from here to within funt
-let force     = null,
+let force     = null;
   //DEL  edge      = null, //moving to update()
-    edgepath  = null,
-    edgelabel = null;
-    ;
+//    edgepath  = null,
+//    edgelabel = null;
 
     // Read source data
     d3.queue()
@@ -170,14 +169,10 @@ function initializeGraph(graph){
 
     // Create parent group for links, nodes and set their order so the nodes always
     //   appear on top of the links
-    svg.append("g").attr("id", "links")
-    svg.append("g").attr("id", "nodes")
-
-//TW This needs to move into update(). Here should remain only the parent group
-// declarations for edgePath and edgelabel as per above code for links and nodes.
-    //DEL  rect = svg.append('g').selectAll('g');
-    edgepath = svg.append('g').selectAll(".edgepath");
-    edgelabel = svg.append('g').selectAll(".edgelabel");
+    svg.append("g").attr("id", "links");
+    svg.append('g').attr("id", "edgepaths");
+    svg.append('g').attr("id", "edgelabels");
+    svg.append("g").attr("id", "nodes");
 
     // Add node icon. Within initiallizeGraph() for access to "graph"data
     svg.append("image")
@@ -251,52 +246,57 @@ function update(graph){
 //    edge.exit().remove();
 */
 
-    edgepath = edgepath.data(graph.edgesData);
-    //ERROR HERE. The problem here is that d.source.x and friends are not known
-    // for edgepath.
-    edgepath.enter()
-                  .append('path')
-                  .attr('d', function(d) {
-                     console.log("ERROR HERE for d.source.x etc.");
-                     console.log("The numbers: "+ d.source.x + " " + d.source.y + " " + d.target.x + " " + d.target.y);
-                          return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y})
-                  .attr({'class':'edgepath',
-                         'fill-opacity':0,
-                         'stroke-opacity':0,
-                         'id':function(d,i) {return 'edgepath'+d.id}})
-                  .style("pointer-events", "none");
+    // Path for the Edge Label (link) Text
+    let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
+      force.links(),
+      //build the edge path id as "ep"+sourceid+"-"+targetid
+      function(d){return ("ep" + d.source.id + "-" + d.target.id);}
+    );
 
-    edgepath.exit().remove();
+    edgepath_update.enter()
+        .append('path')
+        .attr('d', function(d) {
+            console.log("ERROR HERE for d.source.x etc.");
+            console.log("The numbers: "+ d.source.x + " " + d.source.y + " " + d.target.x + " " + d.target.y);
+            return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y})
+        .attr({'class':'edgepath',
+            'fill-opacity':0,
+            'stroke-opacity':0,
+            'id':function(d,i) {return 'edgepath'+d.id}})
+        .style("pointer-events", "none");
 
-    edgelabel = edgelabel.data(graph.edgesData);
-    edgelabel.enter()
-                    .append('text')
-                    .attr("id", function(d,i){
-                      return "edgetext" + d.id;
-                    })
-                    //.attr("class", "edgelabel")
-                    .attr("class", function(d,i){
-                        if (d.prefix == "schema" || d.prefix == "ncit"){ return "edgelabel extont";}
-                        else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
-                        //else if (d.type == "INT"){ return "node int"; }
-                        // Other external ontologies would need to be added here along with schema
-                      //  else if (d.prefix == "schema" || d.prefix == "sdtmterm"){ return "node iriont"; }
-                      //  else if (d.prefix == "eg"){ return "node iri"; }
-                      //  else if (d.type == "IRIONT"){ return "node iriont"; }
-                        else {return "edgelabel unspec";}
-                    })
-                    .attr("dy", -1) // place above line. 5 for inline
-                    .append('textPath')
-                    .style("text-anchor", "middle")
-                    .attr("startOffset", "50%")
-                    .attr('xlink:href',function(d,i) {return '#edgepath'+i})
-                    .attr('id', function(d,i){return 'edgelabel'+i})
-                    .text(function(d,i){return d.prefix+":"+d.label})
-                    //---- Double click edgelabel to edit ----------------------
-                    .on("dblclick", function(d, i){
-                       edit(d,i, "edge", graph);
-                     });
-   edgelabel.exit().remove();
+    edgepath_update.exit().remove();
+
+    // Edge Label (link) text --------------------------------------------------
+    let edgelabel_update = svg.select("edgelabels").selectAll('.edgelabel').data(
+      force.links(),
+      //build the edge text id as "et"+sourceid+"-"+targetid
+      function(d){return ("et" + d.source.id + "-" + d.target.id);}
+    );
+
+    edgelabel_update.enter()
+        .append('text')
+            .attr("id", function(d,i){
+                return "edgetext" + d.id;
+            })
+            //.attr("class", "edgelabel")
+            .attr("class", function(d,i){
+                if (d.prefix == "schema" || d.prefix == "ncit"){ return "edgelabel extont";}
+                else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
+                else {return "edgelabel unspec";}
+            })
+            .attr("dy", -1) // place above line. 5 for inline
+            .append('textPath')
+            .style("text-anchor", "middle")
+            .attr("startOffset", "50%")
+            .attr('xlink:href',function(d,i) {return '#edgepath'+i})
+            .attr('id', function(d,i){return 'edgelabel'+i})
+            .text(function(d,i){return d.prefix+":"+d.label})
+            //---- Double click edgelabel to edit ----------------------
+            .on("dblclick", function(d, i){
+                edit(d,i, "edge", graph);
+            });
+   edgelabel_update.exit().remove();
 
     // NODES -------------------------------------------------------------------
    // Data for nodes
@@ -441,8 +441,9 @@ function tick() {
         return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
     });
 */
-
-    edgepath.attr('d', function(d) {
+   svg.selectAll(".edgepath")
+    //DEL edgepath.attr('d', function(d) {
+    .attr('d', function(d) {
         //Adjust for rectangle shape
         let xposSource = d.source.x + nodeWidth/2,
             xposTarget = d.target.x + nodeWidth/2,
@@ -454,7 +455,10 @@ function tick() {
         // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
         return path;
     });
-    edgelabel.attr('transform',function(d,i){
+
+    svg.selectAll(".edgelabel")
+    //DEL  edgelabel.attr('transform',function(d,i){
+    .attr('transform',function(d,i){
         if (d.target.x<d.source.x){
             let bbox = this.getBBox();
             let rx = bbox.x+bbox.width/2;
@@ -463,6 +467,8 @@ function tick() {
         }
         else { return 'rotate(0)'; }
     });
+
+    // NODES
     // Prevent node movement off the editing canvas by adj. each d.x, d.y
     svg.selectAll(".node").attr("transform", function(d) {
         if (d.x > w ) {d.x = w-nodeWidth;}  // right
