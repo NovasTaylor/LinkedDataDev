@@ -120,7 +120,7 @@ legendDiv.append("text")
 //  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null,
-  //  edge      = null, //moving to update()
+  //DEL  edge      = null, //moving to update()
     edgepath  = null,
     edgelabel = null;
     ;
@@ -157,21 +157,25 @@ function initializeGraph(graph){
     svg.append('defs').append('marker')
         .attr({'id'          :'arrowhead',
                'viewBox'     : '-0 -5 10 10',
-               'refX'        : 90,
+               'refX'        : 60,
                'refY'        : 0,
                'orient'      : 'auto',
-               'markerWidth' : 10,
-               'markerHeight': 10,
+               'markerWidth' : 5,
+               'markerHeight': 5,
                'xoverflow'   :'visible'})
         .append('path')
         .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
-//TW these will all become let
-//    edge = svg.append('g').selectAll('path');
 
+    // Create parent group for links, nodes and set their order so the nodes always
+    //   appear on top of the links
+    svg.append("g").attr("id", "links")
+    svg.append("g").attr("id", "nodes")
 
-  //  rect = svg.append('g').selectAll('g');
+//TW This needs to move into update(). Here should remain only the parent group
+// declarations for edgePath and edgelabel as per above code for links and nodes.
+    //DEL  rect = svg.append('g').selectAll('g');
     edgepath = svg.append('g').selectAll(".edgepath");
     edgelabel = svg.append('g').selectAll(".edgelabel");
 
@@ -213,9 +217,11 @@ function initializeGraph(graph){
 }  // end of initializeGraph
 
 function update(graph){
-    //---- Links ---------------------------------------------------------------
+    //---- LINKS ---------------------------------------------------------------
     // link data. Use of force.links to match FN D3 construct
-    let link_update = svg.selectAll('.link').data(
+    // let link_update = svg.selectAll('.link').data(
+    // #links used for layer order (under nodes)
+    let link_update = svg.select("#links").selectAll('.link').data(
          force.links(),
          function(d) {return d.source.id + "-" + d.target.id;}
     );
@@ -230,7 +236,7 @@ function update(graph){
           .attr("id", function(d, i) {return("prefixText"+d.id) ; });
     link_update.exit().remove();
 
-/*TW TO DELETE
+/*TW TO DELETE after using as example for how changes were made.
 //edge = svg.append('g').selectAll('path');
 //    edge = edge.data(graph.edgesData);
 //    edge.enter()
@@ -292,13 +298,11 @@ function update(graph){
                      });
    edgelabel.exit().remove();
 
-
-
     // NODES -------------------------------------------------------------------
    // Data for nodes
    // THE PROBLEM HERE IS in the NODE ID.
-
-    let node_update = svg.selectAll('.node').data(
+   //#nodes used for layer order.
+    let node_update = svg.select("#nodes").selectAll('.node').data(
         force.nodes(),
         function(d) {return d.id;}
     ).enter();
@@ -392,6 +396,7 @@ function update(graph){
     nodeText_update.append("text")
         .attr({
             // 'id':    function(d, i) {return("nodeText"+i) ; },
+            // ID linkes to editing window
             'id':    function(d, i) {return("nodeText"+d.id) ; },
             'class': 'nodeText'
         })
