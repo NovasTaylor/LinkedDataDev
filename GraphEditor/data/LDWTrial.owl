@@ -25,20 +25,15 @@ eg:investigator rdf:type rdfs:Property;
 
 eg:drugname rdf:type rdfs:Property;
   rdfs:domain eg:Drug;
-  dfs:range   eg:Drugname;
+  rdfs:range   eg:Drugname.
 
-eg:Drug rdg:type rdfs:Class;
-  rdfs:subClassOf  eg:Product;
+eg:Drug rdf:type rdfs:Class;
+  rdfs:subClassOf  eg:Product.
 
 eg:treatmentarm rdf:type rdfs:Property;
   rdfs:domain eg:Trial;
-  dfs:range   eg:Treatmentarm;
+  rdfs:range   eg:Treatmentarm.
 
 eg:treatmenttype rdf:type rdfs:Property;
   rdfs:domain eg:Treatment;
-  dfs:range   eg:TreatmentType;
-
-
-
-eg:Person1  eg:enrolledin  eg:Study1  .
-eg:Person3  eg:investigator eg:Study1 .
+  rdfs:range   eg:TreatmentType.
