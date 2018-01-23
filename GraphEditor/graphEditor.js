@@ -120,7 +120,7 @@ legendDiv.append("text")
 //  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null,
-    edge      = null,
+  //  edge      = null, //moving to update()
     edgepath  = null,
     edgelabel = null;
     ;
@@ -168,7 +168,7 @@ function initializeGraph(graph){
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
 //TW these will all become let
-    edge = svg.append('g').selectAll('path');
+//    edge = svg.append('g').selectAll('path');
 
 
   //  rect = svg.append('g').selectAll('g');
@@ -213,17 +213,37 @@ function initializeGraph(graph){
 }  // end of initializeGraph
 
 function update(graph){
-    //---- EDGES update ----------------------------------------------------------
-    edge = edge.data(graph.edgesData);
-    edge.enter()
-        .append('path')
-        .attr("id", function(d,i){return 'edge'+d.id})
+    //---- Links ---------------------------------------------------------------
+    // link data. Use of force.links to match FN D3 construct
+    let link_update = svg.selectAll('.link').data(
+         force.links(),
+         function(d) {return d.source.id + "-" + d.target.id;}
+    );
+    link_update.enter()
+        .insert("line", ".node")
+        .attr("class", "link")
+        .attr("id", function(d,i){return 'edge'+d.id}) // d.soure.id + "-" + d.target.id
         .attr('marker-end', 'url(#arrowhead)')
-        //  .attr('class', 'edge')
         .style("stroke", "#ccc");
-    edge.append("prefixText")
-      .attr("id", function(d, i) {return("prefixText"+d.id) ; });
-    edge.exit().remove();
+        ;
+    link_update.append("prefixText")
+          .attr("id", function(d, i) {return("prefixText"+d.id) ; });
+    link_update.exit().remove();
+
+/*TW TO DELETE
+//edge = svg.append('g').selectAll('path');
+//    edge = edge.data(graph.edgesData);
+//    edge.enter()
+//        .append('path')
+//        .attr("id", function(d,i){return 'edge'+d.id})
+//        .attr('marker-end', 'url(#arrowhead)')
+        //  .attr('class', 'edge')
+//        .style("stroke", "#ccc");
+
+//    edge.append("prefixText")
+//      .attr("id", function(d, i) {return("prefixText"+d.id) ; });
+//    edge.exit().remove();
+*/
 
     edgepath = edgepath.data(graph.edgesData);
     //ERROR HERE. The problem here is that d.source.x and friends are not known
@@ -398,6 +418,16 @@ function update(graph){
 }  // end of update(graph)
 
 function tick() {
+    svg.selectAll(".link")
+        .attr('d', function(d) {
+            let xposSource = d.source.x + nodeWidth/2,
+                xposTarget = d.target.x + nodeWidth/2,
+                yposSource = d.source.y + nodeHeight/2,
+                yposTarget = d.target.y + nodeHeight/2;
+            return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
+        });
+
+/*
     edge.attr('d', function(d) {
         let xposSource = d.source.x + nodeWidth/2,
             xposTarget = d.target.x + nodeWidth/2,
@@ -405,6 +435,7 @@ function tick() {
             yposTarget = d.target.y + nodeHeight/2;
         return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
     });
+*/
 
     edgepath.attr('d', function(d) {
         //Adjust for rectangle shape
