@@ -220,7 +220,7 @@ function update(graph){
          function(d) {return d.source.id + "-" + d.target.id;}
     );
     link_update.enter()
-        .insert("line", ".node")
+        .append("path")  // differs from code example
         .attr("class", "link")
         .attr("id", function(d,i){return 'edge'+d.id}) // d.soure.id + "-" + d.target.id
         .attr('marker-end', 'url(#arrowhead)')
