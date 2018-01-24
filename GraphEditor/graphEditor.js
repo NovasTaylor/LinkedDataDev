@@ -142,8 +142,10 @@ let force     = null;
 function initializeGraph(graph){
     // Find the max Node and Edge ID values based on array length. Used when
     // creating IDs for new nodes (increment counter)
-    lastEdgeId = graph.edgesData.length -1;
-    lastNodeId = graph.nodesData.length -1;
+    lastEdgeId = graph.edgesData.length;
+    console.log("Init lastEdgeId: "+lastEdgeId)
+    lastNodeId = graph.nodesData.length;
+    console.log("Init lastNodeId: "+lastNodeId)
     //console.log ("Max Id for Edges, Nodes: "+ lastEdgeId+ ","  +lastNodeId);
 
     // Initialize D3 force layout
@@ -217,8 +219,8 @@ function update(graph){
     // let link_update = svg.selectAll('.link').data(
     // #links used for layer order (under nodes)
 
-    // let link_update = svg.select("#links").selectAll('.link').data(
-    let link_update = svg.selectAll('.link').data(
+    let link_update = svg.select("#links").selectAll('.link').data(
+    // let link_update = svg.selectAll('.link').data(
          graph.edgesData,
          function(d) {
              return d.id;
@@ -255,8 +257,8 @@ function update(graph){
 */
 
     // Path for the Edge Label (link) Text
-    // let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
-    let edgepath_update = svg.selectAll('.edgepath').data(
+    let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
+    // let edgepath_update = svg.selectAll('.edgepath').data(
       graph.edgesData,
       //build the edge path id as "ep"+sourceid+"-"+targetid
       function(d){
@@ -284,8 +286,8 @@ function update(graph){
     edgepath_update.exit().remove();
 
     // Edge Label (link) text --------------------------------------------------
-    // let edgelabel_update = svg.select("#edgelabels").selectAll('.edgelabel').data(
-    let edgelabel_update = svg.selectAll('.edgelabel').data(
+    let edgelabel_update = svg.select("#edgelabels").selectAll('.edgelabel').data(
+    // let edgelabel_update = svg.selectAll('.edgelabel').data(
       graph.edgesData,
       //build the edge label id as "el"+sourceid+"-"+targetid
       function(d){
@@ -312,11 +314,11 @@ function update(graph){
             .attr("startOffset", "50%")
             .attr('xlink:href', function(d,i) {
 
-               return '#edgepath'+i;
+               return '#edgepath'+d.id;
               //TW return ("ep" + d.source.id + "-" + d.target.id);
             })
             .attr('id', function(d,i){
-              return "edgelabel" + i
+              return "edgelabel" + d.id
               //return 'edgelabel'+i
               //TW return ("el" + d.source.id + "-" + d.target.id);
             })
@@ -332,8 +334,8 @@ function update(graph){
    // Data for nodes
    // THE PROBLEM HERE IS in the NODE ID.
    //#nodes used for layer order.
-    // let node_update = svg.select("#nodes").selectAll('.node').data(
-    let node_update = svg.selectAll('.node').data(
+    let node_update = svg.select("#nodes").selectAll('.node').data(
+    // let node_update = svg.selectAll('.node').data(
         graph.nodesData,
         function(d) {return d.id;}
     );
@@ -382,12 +384,13 @@ function update(graph){
                     let selected_rect = d3.select(this);
                     console.log("SELECTED FOR LINK: ", d3.select(this))
                     selected_rect.classed("subjectLink", true); // add type class
-                    startNode= i;
+                    startNode= d.id;
                     console.log("Setting Start Node as node ID: " + startNode);
                 }
                 // Only set endNode if it is not the same as the startNode.
-                else if (startNode !== null && startNode !== i){
-                    endNode= i;
+                // else if (startNode !== null && startNode !== i){
+                else {
+                    endNode= d.id;
                     console.log("Start Node: " + startNode + " End Node: " + endNode);
                     addEdge(graph);
                     d3.selectAll(".subjectLink")
@@ -425,8 +428,9 @@ function update(graph){
 
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
+    // let nodeText_update = svg.selectAll(".nodeText").data(
         graph.nodesData,
-        function(d){ return d.id;}
+        function(d){ return "nodeText"+d.id;}
     );
 
     // Add id (nodeTextn) and the text
@@ -434,7 +438,7 @@ function update(graph){
         .attr({
             // 'id':    function(d, i) {return("nodeText"+i) ; },
             // ID linkes to editing window
-            'id':    function(d, i) {return("nodeText"+d.id) ; },
+            'id':    function(d, i) {return "nodeText"+d.id ; },
             'class': 'nodeText'
         })
         .text(function(d,i) {
@@ -527,6 +531,7 @@ function edit(d, i, source, graph){
 
     console.log("You clicked a  " +source)
     console.log("     edit: " + source + " " + d.prefix + ":" + d.label);
+    console.log(d);
 
     // If another node or edge was already selected (edit window already present,
     //   then made another dbl click, you must purge the existing info to allow
@@ -606,9 +611,9 @@ function edit(d, i, source, graph){
 
                           //---- NODE ------------------------------------------
                           if(source=="node"){
-                              console.log("Update on Node: "+ i)
+                              console.log("Update on Node: "+ d.id)
                               // Label
-                              d3.select("#nodeText" + i)
+                              d3.select("#nodeText" + d.id)
                                 // IRI uppercase. INT and STRING can be mixed case.
                                 .text(function(d) {
                                     if (typeInput.node().value==="IRI"){//var nodeText =
@@ -622,12 +627,12 @@ function edit(d, i, source, graph){
 
                                    });
                               // Type
-                              d3.select("#typeText" + i)
+                              d3.select("#typeText" + d.id)
                                 .text(function(d) {return (d.type = typeInput.node().value); });
                               // Node Class
                               // Change class of rect to match TYPE so the node display will change
                               //   according to the node type
-                              d3.select("#rect" + i)
+                              d3.select("#rect" + d.id)
                                 .attr("class", "")  // Remove all classes (node, iri, string, int)
                                 .attr("class", "node") // Add the node class back in.
                                 .classed(typeInput.node().value.toLowerCase(), true); // add type class
@@ -641,13 +646,13 @@ function edit(d, i, source, graph){
                           //---- EDGE -----------------------------------------
                           if(source=="edge"){
                             console.log("Updating Edge")
-                            d3.select("#edgetext" + i)
+                            d3.select("#edgetext" + d.id)
                               .attr("class", "")  // Remove all classes (node, iri, string, int)
                               .attr("class", "edgelabel") // Add the node class back in.
                               .classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
 
                             // edge labels forced to lowercase for exercises.
-                            d3.select("#edgelabel" + i)
+                            d3.select("#edgelabel" + d.id)
                               .text(function(d)  {
                                 // 1. Values for the data array
                                 d.prefix = prefixInput.node().value;
@@ -691,7 +696,7 @@ function edit(d, i, source, graph){
 }
 
 function addNode(graph){
-    console.log("A node you wish to add!")
+    console.log("A node you wish to add! lastNodeId before"+lastNodeId)
     let newNode = {
         id: ++lastNodeId,
         label: 'NEW',
