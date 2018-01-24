@@ -216,19 +216,26 @@ function update(graph){
     // link data. Use of force.links to match FN D3 construct
     // let link_update = svg.selectAll('.link').data(
     // #links used for layer order (under nodes)
+
     let link_update = svg.select("#links").selectAll('.link').data(
          force.links(),
-         function(d) {return d.source.id + "-" + d.target.id;}
+         function(d) {
+             return d.id;
+           // return d.source.id + "-" + d.target.id;
+         }
     );
+    console.log("RUNS TO HERE");
     link_update.enter()
         .append("path")  // differs from code example
         .attr("class", "link")
-        .attr("id", function(d,i){return 'edge'+d.id}) // d.soure.id + "-" + d.target.id
+        .attr("id", function(d,i){return 'edge'+ d.id}) // d.soure.id + "-" + d.target.id
         .attr('marker-end', 'url(#arrowhead)')
         .style("stroke", "#ccc");
         ;
     link_update.append("prefixText")
-          .attr("id", function(d, i) {return("prefixText"+d.id) ; });
+          .attr("id", function(d, i) {
+            return("prefixText"+d.id) ;
+          });
     link_update.exit().remove();
 
 /*TW TO DELETE after using as example for how changes were made.
@@ -250,19 +257,26 @@ function update(graph){
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
       force.links(),
       //build the edge path id as "ep"+sourceid+"-"+targetid
-      function(d){return ("ep" + d.source.id + "-" + d.target.id);}
+      function(d){
+        return d.id;
+        //return ("ep" + d.source.id + "-" + d.target.id);
+      }
     );
 
     edgepath_update.enter()
         .append('path')
-        .attr('d', function(d) {
+        .attr('d', function(d,i) {
             console.log("ERROR HERE for d.source.x etc.");
             console.log("The numbers: "+ d.source.x + " " + d.source.y + " " + d.target.x + " " + d.target.y);
             return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y})
         .attr({'class':'edgepath',
             'fill-opacity':0,
             'stroke-opacity':0,
-            'id':function(d,i) {return 'edgepath'+d.id}})
+            'id':function(d,i) {
+              return 'edgepath'+d.id}}
+              //return ("ep" + d.source.id + "-" + d.target.id);}}
+
+          )
         .style("pointer-events", "none");
 
     edgepath_update.exit().remove();
@@ -270,8 +284,12 @@ function update(graph){
     // Edge Label (link) text --------------------------------------------------
     let edgelabel_update = svg.select("edgelabels").selectAll('.edgelabel').data(
       force.links(),
-      //build the edge text id as "et"+sourceid+"-"+targetid
-      function(d){return ("et" + d.source.id + "-" + d.target.id);}
+      //build the edge label id as "el"+sourceid+"-"+targetid
+      function(d){
+
+        return d.id;
+        //return ("el" + d.source.id + "-" + d.target.id);
+      }
     );
 
     edgelabel_update.enter()
@@ -289,8 +307,17 @@ function update(graph){
             .append('textPath')
             .style("text-anchor", "middle")
             .attr("startOffset", "50%")
-            .attr('xlink:href',function(d,i) {return '#edgepath'+i})
-            .attr('id', function(d,i){return 'edgelabel'+i})
+            .attr('xlink:href', function(d,i) {
+
+               return '#edgepath'+i;
+              //TW return ("ep" + d.source.id + "-" + d.target.id);
+            })
+            .attr('id', function(d,i){
+              return "edgelabel" + i
+              //return 'edgelabel'+i
+              //TW return ("el" + d.source.id + "-" + d.target.id);
+            })
+            //.text("FOO")
             .text(function(d,i){return d.prefix+":"+d.label})
             //---- Double click edgelabel to edit ----------------------
             .on("dblclick", function(d, i){
