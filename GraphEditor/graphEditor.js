@@ -502,12 +502,13 @@ function tick() {
 
     // NODES
     // Prevent node movement off the editing canvas by adj. each d.x, d.y
-    svg.selectAll(".node").attr("transform", function(d) {
-        if (d.x > w ) {d.x = w-nodeWidth;}  // right
-        if (d.x < -40 ) {d.x = nodeWidth;}  // left
-        if (d.y < 0 ) {d.y = nodeWidth;}    // top
-        if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
-        return "translate(" + d.x + "," + d.y + ")";
+    svg.selectAll(".node")
+        .attr("transform", function(d) {
+            if (d.x > w ) {d.x = w-nodeWidth;}  // right
+            if (d.x < -40 ) {d.x = nodeWidth;}  // left
+            if (d.y < 0 ) {d.y = nodeWidth;}    // top
+            if (d.y > h ) {d.y = h-nodeWidth;}  // bottom
+            return "translate(" + d.x + "," + d.y + ")";
     });
 
     // Node Text label
@@ -716,6 +717,17 @@ function deleteNode(graph, selected_node){
     graph.nodesData.splice(graph.nodesData.indexOf(selected_node), 1); // Delete selected node from array
     console.log("Nodes data post-deletion:");
     console.log(graph.nodesData);
+    console.log("Edges data pre-deletion:");
+    console.log(graph.edgesData);
+    graph.edgesData = graph.edgesData.filter(function(l) {
+        console.log("looping")
+        console.log(l)
+        console.log(selected_node)
+                        // return l.source.id !== selected_node.id && l.target.id !== selected_node.id;
+                        return l.source.id !== selected_node.id && l.target.id !== selected_node.id;
+    });
+    console.log("Edges data post-deletion:");
+    console.log(graph.edgesData);
     // Remove the text in the SVG that is associated with this node. [TW KLUDGE]
     d3.select("#nodeText" + selected_node.id).remove();
     d3.select("#buttons").style("opacity", 1);  // redisplay buttons
