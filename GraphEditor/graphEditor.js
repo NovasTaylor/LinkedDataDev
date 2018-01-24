@@ -373,8 +373,8 @@ function update(graph){
                     window.confirm("Links from " + d.type + " nodes are not allowed.");
                     return;
                 }
-                if (startNode===d.id){
-                    console.log("Deselecting link: ", startNode);
+                if (startNode!==null && startNode.id === d.id){
+                    console.log("Deselecting link: ", startNode.id);
                     let selected_rect = d3.select(this);
                     selected_rect.classed("subjectLink", false); // add type class
                     startNode= null;
@@ -384,14 +384,14 @@ function update(graph){
                     let selected_rect = d3.select(this);
                     console.log("SELECTED FOR LINK: ", d3.select(this))
                     selected_rect.classed("subjectLink", true); // add type class
-                    startNode= d.id;
-                    console.log("Setting Start Node as node ID: " + startNode);
+                    startNode = d;
+                    console.log("Setting Start Node as node ID: " + startNode.id);
                 }
                 // Only set endNode if it is not the same as the startNode.
                 // else if (startNode !== null && startNode !== i){
                 else {
-                    endNode= d.id;
-                    console.log("Start Node: " + startNode + " End Node: " + endNode);
+                    endNode= d;
+                    console.log("Start Node: " + startNode.id + " End Node: " + endNode.id);
                     addEdge(graph);
                     d3.selectAll(".subjectLink")
                         .classed("subjectLink", false); // add type class
@@ -744,8 +744,8 @@ function addEdge(graph){
 
     let newEdge = {
         id: ++lastEdgeId,
-        source: graph.nodesData[startNode],
-        target: graph.nodesData[endNode],
+        source: startNode,
+        target: endNode,
         label: 'NEW',
         prefix: 'eg'
     };
