@@ -219,7 +219,7 @@ function update(graph){
 
     // let link_update = svg.select("#links").selectAll('.link').data(
     let link_update = svg.selectAll('.link').data(
-         force.links(),
+         graph.edgesData,
          function(d) {
              return d.id;
            // return d.source.id + "-" + d.target.id;
@@ -257,7 +257,7 @@ function update(graph){
     // Path for the Edge Label (link) Text
     // let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
     let edgepath_update = svg.selectAll('.edgepath').data(
-      force.links(),
+      graph.edgesData,
       //build the edge path id as "ep"+sourceid+"-"+targetid
       function(d){
         return d.id;
@@ -286,7 +286,7 @@ function update(graph){
     // Edge Label (link) text --------------------------------------------------
     // let edgelabel_update = svg.select("#edgelabels").selectAll('.edgelabel').data(
     let edgelabel_update = svg.selectAll('.edgelabel').data(
-      force.links(),
+      graph.edgesData,
       //build the edge label id as "el"+sourceid+"-"+targetid
       function(d){
 
@@ -334,7 +334,7 @@ function update(graph){
    //#nodes used for layer order.
     // let node_update = svg.select("#nodes").selectAll('.node').data(
     let node_update = svg.selectAll('.node').data(
-        force.nodes(),
+        graph.nodesData,
         function(d) {return d.id;}
     );
 
@@ -419,13 +419,13 @@ function update(graph){
 
     // Remove nodes
     // var nodeExit = svg.selectAll(".node").data(
-    //     force.nodes()
+    //     graph.nodesData
     //  ).exit().remove();
     node_update.exit().remove();
 
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
-        force.nodes(),
+        graph.nodesData,
         function(d){ return d.id;}
     );
 
@@ -446,7 +446,7 @@ function update(graph){
 
      // Remove nodeText
      // var nodeTextExit = svg.selectAll(".nodeText").data(
-     //     force.nodes()
+     //     graph.nodesData
      //  ).exit().remove();
      nodeText_update.exit().remove();
 
