@@ -217,7 +217,8 @@ function update(graph){
     // let link_update = svg.selectAll('.link').data(
     // #links used for layer order (under nodes)
 
-    let link_update = svg.select("#links").selectAll('.link').data(
+    // let link_update = svg.select("#links").selectAll('.link').data(
+    let link_update = svg.selectAll('.link').data(
          force.links(),
          function(d) {
              return d.id;
@@ -253,7 +254,8 @@ function update(graph){
 */
 
     // Path for the Edge Label (link) Text
-    let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
+    // let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
+    let edgepath_update = svg.selectAll('.edgepath').data(
       force.links(),
       //build the edge path id as "ep"+sourceid+"-"+targetid
       function(d,i){
@@ -276,7 +278,8 @@ function update(graph){
     edgepath_update.exit().remove();
 
     // Edge Label (link) text --------------------------------------------------
-    let edgelabel_update = svg.select("edgelabels").selectAll('.edgelabel').data(
+    // let edgelabel_update = svg.select("#edgelabels").selectAll('.edgelabel').data(
+    let edgelabel_update = svg.selectAll('.edgelabel').data(
       force.links(),
       //build the edge label id as "el"+sourceid+"-"+targetid
       function(d){
@@ -323,19 +326,14 @@ function update(graph){
    // Data for nodes
    // THE PROBLEM HERE IS in the NODE ID.
    //#nodes used for layer order.
-    let node_update = svg.select("#nodes").selectAll('.node').data(
+    // let node_update = svg.select("#nodes").selectAll('.node').data(
+    let node_update = svg.selectAll('.node').data(
         force.nodes(),
         function(d) {return d.id;}
-    ).enter();
-
-    // Data for node text
-    let nodeText_update = svg.selectAll(".nodeText").data(
-        force.nodes(),
-        function(d){ return d.id;}
-    ).enter();
+    );
 
     // Append the rect shape to the node data
-    node_update.append("rect")
+    node_update.enter().append("rect")
         .attr("width", function(d){ return nodeWidth; })
         .attr("height", nodeHeight)
         .attr("rx", 5) // Round edges
@@ -413,8 +411,20 @@ function update(graph){
 
         }); // end mouseout
 
+    // Remove nodes
+    // var nodeExit = svg.selectAll(".node").data(
+    //     force.nodes()
+    //  ).exit().remove();
+    node_update.exit().remove();
+
+    // Data for node text
+    let nodeText_update = svg.selectAll(".nodeText").data(
+        force.nodes(),
+        function(d){ return d.id;}
+    );
+
     // Add id (nodeTextn) and the text
-    nodeText_update.append("text")
+    nodeText_update.enter().append("text")
         .attr({
             // 'id':    function(d, i) {return("nodeText"+i) ; },
             // ID linkes to editing window
@@ -428,16 +438,11 @@ function update(graph){
             else{ return d.prefix+":"+d.label; }
         });
 
-    // Remove nodes
-    var nodeExit = svg.selectAll(".node").data(
-        force.nodes()
-     ).exit().remove();
-
      // Remove nodeText
-     var nodeTextExit = svg.selectAll(".nodeText").data(
-         force.nodes()
-      ).exit().remove();
-
+     // var nodeTextExit = svg.selectAll(".nodeText").data(
+     //     force.nodes()
+     //  ).exit().remove();
+     nodeText_update.exit().remove();
 
      // Start the force layout.
     force.start();  // Restart the force
