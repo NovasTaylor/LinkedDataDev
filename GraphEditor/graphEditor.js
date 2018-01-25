@@ -170,8 +170,8 @@ function initializeGraph(graph){
     // Create parent group for links, nodes and set their order so the nodes always
     //   appear on top of the links
     svg.append("g").attr("id", "links");
-    svg.append('g').attr("id", "edgepaths");
-    svg.append('g').attr("id", "edgelabels");
+    svg.append("g").attr("id", "edgepaths");
+    svg.append("g").attr("id", "edgelabels");
     svg.append("g").attr("id", "nodes");
 
     // Add node icon. Within initiallizeGraph() for access to "graph"data
@@ -224,7 +224,6 @@ function update(graph){
            // return d.source.id + "-" + d.target.id;
          }
     );
-    console.log("RUNS TO HERE");
     link_update.enter()
         .append("path")  // differs from code example
         .attr("class", "link")
@@ -257,28 +256,23 @@ function update(graph){
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
       force.links(),
       //build the edge path id as "ep"+sourceid+"-"+targetid
-      function(d){
+      function(d,i){
+        //d.label, d.prefix work here. d.source 0, d.target=1, etc.
         return d.id;
-        //return ("ep" + d.source.id + "-" + d.target.id);
+        //FOR LATER return ("ep" + d.source + "-" + d.target);
       }
     );
 
     edgepath_update.enter()
         .append('path')
-        .attr('d', function(d,i) {
-            console.log("ERROR HERE for d.source.x etc.");
-            console.log("The numbers: "+ d.source.x + " " + d.source.y + " " + d.target.x + " " + d.target.y);
-            return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y})
         .attr({'class':'edgepath',
             'fill-opacity':0,
             'stroke-opacity':0,
             'id':function(d,i) {
               return 'edgepath'+d.id}}
-              //return ("ep" + d.source.id + "-" + d.target.id);}}
-
+              //return ("ep" + d.source + "-" + d.target);}}
           )
         .style("pointer-events", "none");
-
     edgepath_update.exit().remove();
 
     // Edge Label (link) text --------------------------------------------------
