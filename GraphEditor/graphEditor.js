@@ -120,10 +120,6 @@ legendDiv.append("text")
 //  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null;
-  //DEL  edge      = null, //moving to update()
-//    edgepath  = null,
-//    edgelabel = null;
-
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -135,8 +131,6 @@ let force     = null;
         console.log(graph.edgesData[0]);
         initializeGraph(graph);
     ;}
-
-
 
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
@@ -227,7 +221,6 @@ function update(graph){
            // return d.source.id + "-" + d.target.id;
          }
     );
-    console.log("RUNS TO HERE");
     link_update.enter()
         .append("path")  // differs from code example
         .attr("class", "link")
@@ -240,21 +233,6 @@ function update(graph){
             return("prefixText"+d.id) ;
           });
     link_update.exit().remove();
-
-/*TW TO DELETE after using as example for how changes were made.
-//edge = svg.append('g').selectAll('path');
-//    edge = edge.data(graph.edgesData);
-//    edge.enter()
-//        .append('path')
-//        .attr("id", function(d,i){return 'edge'+d.id})
-//        .attr('marker-end', 'url(#arrowhead)')
-        //  .attr('class', 'edge')
-//        .style("stroke", "#ccc");
-
-//    edge.append("prefixText")
-//      .attr("id", function(d, i) {return("prefixText"+d.id) ; });
-//    edge.exit().remove();
-*/
 
     // Path for the Edge Label (link) Text
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
@@ -303,6 +281,7 @@ function update(graph){
                 return "edgetext" + d.id;
             })
             //.attr("class", "edgelabel")
+            // See also the code that is repeated in the edit function
             .attr("class", function(d,i){
                 if (d.prefix == "schema" || d.prefix == "ncit"){ return "edgelabel extont";}
                 else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
@@ -322,17 +301,15 @@ function update(graph){
               //return 'edgelabel'+i
               //TW return ("el" + d.source.id + "-" + d.target.id);
             })
-            //.text("FOO")
             .text(function(d,i){return d.prefix+":"+d.label})
             //---- Double click edgelabel to edit ----------------------
             .on("dblclick", function(d, i){
+
                 edit(d,i, "edge", graph);
             });
    edgelabel_update.exit().remove();
 
     // NODES -------------------------------------------------------------------
-   // Data for nodes
-   // THE PROBLEM HERE IS in the NODE ID.
    //#nodes used for layer order.
     let node_update = svg.select("#nodes").selectAll('.node').data(
     // let node_update = svg.selectAll('.node').data(
@@ -347,12 +324,14 @@ function update(graph){
         .attr("rx", 5) // Round edges
         .attr("ry", 5)
         .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
-        .attr("class", function(d,i){
+
+        .attr("class", function(d){
+
             if (d.type == "STRING"){ return "node string";}
             else if (d.type == "INT"){ return "node int"; }
             // Other external ontologies would need to be added here along with schema
             else if (d.prefix == "schema"   ||
-                    d.prefix  == "ncit"     ||
+                     d.prefix  == "ncit"    ||
                      d.prefix == "sdtmterm" ||
                      d.prefix == "cto"){ return "node iriont"; }
             else if (d.prefix == "eg"){ return "node iri"; }
@@ -468,15 +447,6 @@ function tick() {
             return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
         });
 
-/*
-    edge.attr('d', function(d) {
-        let xposSource = d.source.x + nodeWidth/2,
-            xposTarget = d.target.x + nodeWidth/2,
-            yposSource = d.source.y + nodeHeight/2,
-            yposTarget = d.target.y + nodeHeight/2;
-        return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
-    });
-*/
    svg.selectAll(".edgepath")
     //DEL edgepath.attr('d', function(d) {
     .attr('d', function(d) {
@@ -612,6 +582,11 @@ function edit(d, i, source, graph){
                           //---- NODE ------------------------------------------
                           if(source=="node"){
                               console.log("Update on Node: "+ d.id)
+
+                              d.label=labelInput.node().value;
+                              d.prefix = prefixInput.node().value;
+                              d.type = typeInput.node().value;
+
                               // Label
                               d3.select("#nodeText" + d.id)
                                 // IRI uppercase. INT and STRING can be mixed case.
@@ -634,22 +609,44 @@ function edit(d, i, source, graph){
                               //   according to the node type
                               d3.select("#rect" + d.id)
                                 .attr("class", "")  // Remove all classes (node, iri, string, int)
-                                .attr("class", "node") // Add the node class back in.
-                                .classed(typeInput.node().value.toLowerCase(), true); // add type class
-
-                              d.label=labelInput.node().value;
-                              d.prefix = prefixInput.node().value;
-                              d.type = typeInput.node().value;
-
+                                //TW Same class setting as in update().
+                                // If removed from here, a SECOND update of the node will set the
+                                // class correctly if this code is removed. THere is a callto update() needed
+                                // somewhere that may allow the removal of this code? See also the classe setting
+                                // for the edge label.
+                                .attr("class", function(d){
+                                    if (d.type == "STRING"){ return "node string";}
+                                    else if (d.type == "INT"){ return "node int"; }
+                                    // Other external ontologies would need to be added here along with schema
+                                    else if (d.prefix == "schema"   ||
+                                             d.prefix  == "ncit"    ||
+                                             d.prefix == "sdtmterm" ||
+                                             d.prefix == "ncit"     ||
+                                             d.prefix == "cto"){ return "node iriont"; }
+                                    else if (d.prefix == "eg"){ return "node iri"; }
+                                    else {return "node unspec";}
+                                })
+                            ;
                           } // end of node UPDATE
 
                           //---- EDGE -----------------------------------------
                           if(source=="edge"){
                             console.log("Updating Edge")
+                            d.label=labelInput.node().value;
+                            d.prefix = prefixInput.node().value;
+
                             d3.select("#edgetext" + d.id)
                               .attr("class", "")  // Remove all classes (node, iri, string, int)
-                              .attr("class", "edgelabel") // Add the node class back in.
-                              .classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
+                              //TW repetition of code found in update() function for setting class.
+                              // see also node text class setting and need for an update() call?
+                              .attr("class", function(d,i){
+                                  if (d.prefix == "schema" ||
+                                      d.prefix == "ncit") { return "edgelabel extont";}
+                                  else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
+                                  else {return "edgelabel unspec";}
+                              })
+;
+                              //.classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
 
                             // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + d.id)
@@ -668,7 +665,10 @@ function edit(d, i, source, graph){
                           editActive = false;  // turn off the edit area
                           d3.select("#buttons").style("opacity", 1);  // redisplay buttons
 
-                      }) // end of click on update button
+                      })
+                      ;
+
+                  //  ) // end of click on update button
 
     let delButton = div.append("button")
                         .text("Delete")
