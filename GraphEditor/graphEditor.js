@@ -766,10 +766,11 @@ function resetMouseVars() {
 
 //HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
 function createTTL(jsonData) {
-    //console.log("Now Create TTL");
+    alert("You will now create the TTL file. Click OK to confirm.");
     console.log(jsonData);
-    //TW re-enable later: //    alert("You will now create the TTL file. Click OK to confirm.");
 
+    // Add a sort of jsonData by jsonData.edgesData.source.id  here to make for a more
+    // pretty/readable TTL file.
     // Set the prefixes
     let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
                                          ncit: 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#',
