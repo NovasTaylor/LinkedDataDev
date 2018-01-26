@@ -2,7 +2,7 @@
   "nodesData":[
     { "id": 0,
       "prefix":"eg",
-      "label":"Drug-A",
+      "label":"Drug1",
       "type":"IRI",
       "x":400,
       "y":10,
