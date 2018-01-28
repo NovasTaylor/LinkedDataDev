@@ -317,6 +317,12 @@ function update(graph){
         function(d) {return d.id;}
     );
 
+    // Remove nodes
+    // var nodeExit = svg.selectAll(".node").data(
+    //     graph.nodesData
+    //  ).exit().remove();
+    node_update.exit().remove();
+
     // Append the rect shape to the node data
     node_update.enter().append("rect")
         .attr("width", function(d){ return nodeWidth; })
@@ -324,19 +330,6 @@ function update(graph){
         .attr("rx", 5) // Round edges
         .attr("ry", 5)
         .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
-
-        .attr("class", function(d){
-
-            if (d.type == "STRING"){ return "node string";}
-            else if (d.type == "INT"){ return "node int"; }
-            // Other external ontologies would need to be added here along with schema
-            else if (d.prefix == "schema"   ||
-                     d.prefix  == "ncit"    ||
-                     d.prefix == "sdtmterm" ||
-                     d.prefix == "cto"){ return "node iriont"; }
-            else if (d.prefix == "eg"){ return "node iri"; }
-            else {return "node unspec";}
-        })
         .call(force.drag)
         //---- Double click node to edit -----------------------------------------
         // For new nodes, this should allow the entry of label, type, and prefix...
@@ -399,11 +392,19 @@ function update(graph){
 
         }); // end mouseout
 
-    // Remove nodes
-    // var nodeExit = svg.selectAll(".node").data(
-    //     graph.nodesData
-    //  ).exit().remove();
-    node_update.exit().remove();
+    // Update part
+    node_update.attr("class", function(d){
+            if (d.type == "STRING"){ return "node string";}
+            else if (d.type == "INT"){ return "node int"; }
+            // Other external ontologies would need to be added here along with schema
+            else if (d.prefix == "schema"   ||
+                     d.prefix  == "ncit"    ||
+                     d.prefix == "sdtmterm" ||
+                     d.prefix == "cto"){ return "node iriont"; }
+            else if (d.prefix == "eg"){ return "node iri"; }
+            else {return "node unspec";}
+        })
+
 
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
@@ -412,6 +413,12 @@ function update(graph){
         function(d){ return "nodeText"+d.id;}
     );
 
+     // Remove nodeText
+     // var nodeTextExit = svg.selectAll(".nodeText").data(
+     //     graph.nodesData
+     //  ).exit().remove();
+     nodeText_update.exit().remove();
+
     // Add id (nodeTextn) and the text
     nodeText_update.enter().append("text")
         .attr({
@@ -419,19 +426,16 @@ function update(graph){
             // ID linkes to editing window
             'id':    function(d, i) {return "nodeText"+d.id ; },
             'class': 'nodeText'
-        })
-        .text(function(d,i) {
+        });
+
+    // Update part
+    nodeText_update.text(function(d,i) {
             //No prefix for INT, STRING
             if (d.type ==='INT' || d.type ==='STRING') { return d.label; }
             // Prefix for all other types
             else{ return d.prefix+":"+d.label; }
         });
 
-     // Remove nodeText
-     // var nodeTextExit = svg.selectAll(".nodeText").data(
-     //     graph.nodesData
-     //  ).exit().remove();
-     nodeText_update.exit().remove();
 
      // Start the force layout.
     force.start();  // Restart the force
@@ -587,45 +591,6 @@ function edit(d, i, source, graph){
                               d.prefix = prefixInput.node().value;
                               d.type = typeInput.node().value;
 
-                              // Label
-                              d3.select("#nodeText" + d.id)
-                                // IRI uppercase. INT and STRING can be mixed case.
-                                .text(function(d) {
-                                    if (typeInput.node().value==="IRI"){//var nodeText =
-                                      //return (d.label = labelInput.node().value.toUpperCase());
-                                      return prefixInput.node().value + ":" + labelInput.node().value;
-
-                                    }
-                                    else{
-                                      return (d.label = labelInput.node().value);
-                                    }
-
-                                   });
-                              // Type
-                              d3.select("#typeText" + d.id)
-                                .text(function(d) {return (d.type = typeInput.node().value); });
-                              // Node Class
-                              // Change class of rect to match TYPE so the node display will change
-                              //   according to the node type
-                              d3.select("#rect" + d.id)
-                                .attr("class", "")  // Remove all classes (node, iri, string, int)
-                                //TW Same class setting as in update().
-                                // If removed from here, a SECOND update of the node will set the
-                                // class correctly if this code is removed. THere is a callto update() needed
-                                // somewhere that may allow the removal of this code? See also the classe setting
-                                // for the edge label.
-                                .attr("class", function(d){
-                                    if (d.type == "STRING"){ return "node string";}
-                                    else if (d.type == "INT"){ return "node int"; }
-                                    // Other external ontologies would need to be added here along with schema
-                                    else if (d.prefix == "schema"   ||
-                                             d.prefix  == "ncit"    ||
-                                             d.prefix == "sdtmterm" ||
-                                             d.prefix == "ncit"     ||
-                                             d.prefix == "cto"){ return "node iriont"; }
-                                    else if (d.prefix == "eg"){ return "node iri"; }
-                                    else {return "node unspec";}
-                                })
                             ;
                           } // end of node UPDATE
 
@@ -664,6 +629,8 @@ function edit(d, i, source, graph){
                           d3.select("#edit").style("opacity", 0);
                           editActive = false;  // turn off the edit area
                           d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+                          force.start();
+                          update(graph);
 
                       })
                       ;
