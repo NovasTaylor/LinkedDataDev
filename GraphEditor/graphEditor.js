@@ -120,6 +120,10 @@ legendDiv.append("text")
 //  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null;
+  //DEL  edge      = null, //moving to update()
+//    edgepath  = null,
+//    edgelabel = null;
+
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -131,6 +135,7 @@ let force     = null;
         console.log(graph.edgesData[0]);
         initializeGraph(graph);
     ;}
+
 
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
@@ -219,6 +224,7 @@ function update(graph){
            // return d.source.id + "-" + d.target.id;
          }
     );
+    console.log("RUNS TO HERE");
     link_update.enter()
         .append("path")  // differs from code example
         .attr("class", "link")
@@ -231,6 +237,21 @@ function update(graph){
             return("prefixText"+d.id) ;
           });
     link_update.exit().remove();
+
+/*TW TO DELETE after using as example for how changes were made.
+//edge = svg.append('g').selectAll('path');
+//    edge = edge.data(graph.edgesData);
+//    edge.enter()
+//        .append('path')
+//        .attr("id", function(d,i){return 'edge'+d.id})
+//        .attr('marker-end', 'url(#arrowhead)')
+        //  .attr('class', 'edge')
+//        .style("stroke", "#ccc");
+
+//    edge.append("prefixText")
+//      .attr("id", function(d, i) {return("prefixText"+d.id) ; });
+//    edge.exit().remove();
+*/
 
     // Path for the Edge Label (link) Text
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
@@ -307,18 +328,14 @@ function update(graph){
    edgelabel_update.exit().remove();
 
     // NODES -------------------------------------------------------------------
+   // Data for nodes
+   // THE PROBLEM HERE IS in the NODE ID.
    //#nodes used for layer order.
     let node_update = svg.select("#nodes").selectAll('.node').data(
     // let node_update = svg.selectAll('.node').data(
         graph.nodesData,
         function(d) {return d.id;}
     );
-
-    // Remove nodes
-    // var nodeExit = svg.selectAll(".node").data(
-    //     graph.nodesData
-    //  ).exit().remove();
-    //node_update.exit().remove();
 
     // Append the rect shape to the node data
     node_update.enter().append("rect")
@@ -400,32 +417,18 @@ function update(graph){
 
         }); // end mouseout
 
+    // Remove nodes
+    // var nodeExit = svg.selectAll(".node").data(
+    //     graph.nodesData
+    //  ).exit().remove();
+    node_update.exit().remove();
 
- node_update.exit().remove();
-    // Update part
-//TW TRY COMMENT THIS OUT POST MERGE
-    node_update.attr("class", function(d){
-            if (d.type == "STRING"){ return "node string";}
-            else if (d.type == "INT"){ return "node int"; }
-   
-            else if (d.prefix == "schema"   ||
-                     d.prefix  == "ncit"    ||
-                     d.prefix == "sdtmterm" ||
-                     d.prefix == "cto"){ return "node iriont"; }
-            else if (d.prefix == "eg"){ return "node iri"; }
-            else {return "node unspec";}
-        })
-
-//TW END TRY COMMENT OUT
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
     // let nodeText_update = svg.selectAll(".nodeText").data(
         graph.nodesData,
         function(d){ return "nodeText"+d.id;}
     );
-
-     
-     
 
     // Add id (nodeTextn) and the text
     nodeText_update.enter().append("text")
@@ -436,7 +439,6 @@ function update(graph){
             'class': 'nodeText'
         })
         .text(function(d,i) {
-    
             //No prefix for INT, STRING
             if (d.type ==='INT' || d.type ==='STRING') { return d.label; }
             // Prefix for all other types
@@ -444,6 +446,9 @@ function update(graph){
         });
 
      // Remove nodeText
+     // var nodeTextExit = svg.selectAll(".nodeText").data(
+     //     graph.nodesData
+     //  ).exit().remove();
      nodeText_update.exit().remove();
 
      // Start the force layout.
@@ -460,6 +465,15 @@ function tick() {
             return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
         });
 
+/*
+    edge.attr('d', function(d) {
+        let xposSource = d.source.x + nodeWidth/2,
+            xposTarget = d.target.x + nodeWidth/2,
+            yposSource = d.source.y + nodeHeight/2,
+            yposTarget = d.target.y + nodeHeight/2;
+        return 'M' + xposSource + ',' + yposSource + 'L' + xposTarget + ',' + yposTarget;
+    });
+*/
    svg.selectAll(".edgepath")
     //DEL edgepath.attr('d', function(d) {
     .attr('d', function(d) {
@@ -624,27 +638,15 @@ function edit(d, i, source, graph){
                               d.prefix = prefixInput.node().value;
                               d.type = typeInput.node().value;
 
-                           
                           } // end of node UPDATE
 
                           //---- EDGE -----------------------------------------
                           if(source=="edge"){
                             console.log("Updating Edge")
-                        
                             d3.select("#edgetext" + d.id)
                               .attr("class", "")  // Remove all classes (node, iri, string, int)
                               .attr("class", "edgelabel") // Add the node class back in.
                               .classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
-//TW try comment out post merge
-                              .attr("class", function(d,i){
-                                  if (d.prefix == "schema" ||
-                                      d.prefix == "ncit") { return "edgelabel extont";}
-                                  else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
-                                  else {return "edgelabel unspec";}
-                              })
-;
-                              //.classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
-//TW END COMMENT OUT POST MERGE.
 
                             // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + d.id)
@@ -662,12 +664,9 @@ function edit(d, i, source, graph){
                           d3.select("#edit").style("opacity", 0);
                           editActive = false;  // turn off the edit area
                           d3.select("#buttons").style("opacity", 1);  // redisplay buttons
-                        
 
                       }) // end of click on update button
-                      
 
-               
     let delButton = div.append("button")
                         .text("Delete")
                         .on("click", function() {
@@ -766,11 +765,10 @@ function resetMouseVars() {
 
 //HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
 function createTTL(jsonData) {
-    alert("You will now create the TTL file. Click OK to confirm.");
+    //console.log("Now Create TTL");
     console.log(jsonData);
+    //TW re-enable later: //    alert("You will now create the TTL file. Click OK to confirm.");
 
-    // Add a sort of jsonData by jsonData.edgesData.source.id  here to make for a more
-    // pretty/readable TTL file.
     // Set the prefixes
     let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
                                          ncit: 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#',
