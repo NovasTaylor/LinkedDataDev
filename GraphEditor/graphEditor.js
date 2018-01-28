@@ -399,9 +399,6 @@ function update(graph){
         }); // end mouseout
 
     // Remove nodes
-    // var nodeExit = svg.selectAll(".node").data(
-    //     graph.nodesData
-    //  ).exit().remove();
     node_update.exit().remove();
 
     // Data for node text
@@ -427,9 +424,6 @@ function update(graph){
         });
 
      // Remove nodeText
-     // var nodeTextExit = svg.selectAll(".nodeText").data(
-     //     graph.nodesData
-     //  ).exit().remove();
      nodeText_update.exit().remove();
 
      // Start the force layout.
@@ -666,9 +660,7 @@ function edit(d, i, source, graph){
 
                       })
                       ;
-
                   //  ) // end of click on update button
-
     let delButton = div.append("button")
                         .text("Delete")
                         .on("click", function() {
@@ -691,7 +683,6 @@ function edit(d, i, source, graph){
                                 d3.select("#buttons").style("opacity", 1);  // redisplay buttons
                                 force.start();
                                 update(graph);
-
                             }
                         });
 }
