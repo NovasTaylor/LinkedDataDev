@@ -232,7 +232,6 @@ function update(graph){
             return("prefixText"+d.id) ;
           });
     link_update.exit().remove();
-
     // Path for the Edge Label (link) Text
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
     // let edgepath_update = svg.selectAll('.edgepath').data(
@@ -280,7 +279,6 @@ function update(graph){
                 return "edgetext" + d.id;
             })
             //.attr("class", "edgelabel")
-            // See also the code that is repeated in the edit function
             .attr("class", function(d,i){
                 if (d.prefix == "schema" || d.prefix == "ncit"){ return "edgelabel extont";}
                 else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
@@ -300,10 +298,10 @@ function update(graph){
               //return 'edgelabel'+i
               //TW return ("el" + d.source.id + "-" + d.target.id);
             })
+            //.text("FOO")
             .text(function(d,i){return d.prefix+":"+d.label})
             //---- Double click edgelabel to edit ----------------------
             .on("dblclick", function(d, i){
-
                 edit(d,i, "edge", graph);
             });
    edgelabel_update.exit().remove();
@@ -323,9 +321,7 @@ function update(graph){
         .attr("rx", 5) // Round edges
         .attr("ry", 5)
         .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
-
-        .attr("class", function(d){
-
+        .attr("class", function(d,i){
             if (d.type == "STRING"){ return "node string";}
             else if (d.type == "INT"){ return "node int"; }
             // Other external ontologies would need to be added here along with schema
@@ -398,9 +394,22 @@ function update(graph){
 
         }); // end mouseout
 
-    // Remove nodes
     node_update.exit().remove();
+    // Update part
+//TW TRY COMMENT THIS OUT POST MERGE
+    node_update.attr("class", function(d){
+            if (d.type == "STRING"){ return "node string";}
+            else if (d.type == "INT"){ return "node int"; }
 
+            else if (d.prefix == "schema"   ||
+                     d.prefix  == "ncit"    ||
+                     d.prefix == "sdtmterm" ||
+                     d.prefix == "cto"){ return "node iriont"; }
+            else if (d.prefix == "eg"){ return "node iri"; }
+            else {return "node unspec";}
+        })
+
+//TW END TRY COMMENT OUT
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
     // let nodeText_update = svg.selectAll(".nodeText").data(
@@ -575,11 +584,6 @@ function edit(d, i, source, graph){
                           //---- NODE ------------------------------------------
                           if(source=="node"){
                               console.log("Update on Node: "+ d.id)
-
-                              d.label=labelInput.node().value;
-                              d.prefix = prefixInput.node().value;
-                              d.type = typeInput.node().value;
-
                               // Label
                               d3.select("#nodeText" + d.id)
                                 // IRI uppercase. INT and STRING can be mixed case.
@@ -602,36 +606,24 @@ function edit(d, i, source, graph){
                               //   according to the node type
                               d3.select("#rect" + d.id)
                                 .attr("class", "")  // Remove all classes (node, iri, string, int)
-                                //TW Same class setting as in update().
-                                // If removed from here, a SECOND update of the node will set the
-                                // class correctly if this code is removed. THere is a callto update() needed
-                                // somewhere that may allow the removal of this code? See also the classe setting
-                                // for the edge label.
-                                .attr("class", function(d){
-                                    if (d.type == "STRING"){ return "node string";}
-                                    else if (d.type == "INT"){ return "node int"; }
-                                    // Other external ontologies would need to be added here along with schema
-                                    else if (d.prefix == "schema"   ||
-                                             d.prefix  == "ncit"    ||
-                                             d.prefix == "sdtmterm" ||
-                                             d.prefix == "ncit"     ||
-                                             d.prefix == "cto"){ return "node iriont"; }
-                                    else if (d.prefix == "eg"){ return "node iri"; }
-                                    else {return "node unspec";}
-                                })
-                            ;
+                                .attr("class", "node") // Add the node class back in.
+                                .classed(typeInput.node().value.toLowerCase(), true); // add type class
+
+                              d.label=labelInput.node().value;
+                              d.prefix = prefixInput.node().value;
+                              d.type = typeInput.node().value;
+
                           } // end of node UPDATE
 
                           //---- EDGE -----------------------------------------
                           if(source=="edge"){
                             console.log("Updating Edge")
-                            d.label=labelInput.node().value;
-                            d.prefix = prefixInput.node().value;
-
                             d3.select("#edgetext" + d.id)
                               .attr("class", "")  // Remove all classes (node, iri, string, int)
-                              //TW repetition of code found in update() function for setting class.
-                              // see also node text class setting and need for an update() call?
+                              .attr("class", "edgelabel") // Add the node class back in.
+                              .classed(prefixInput.node().value.toLowerCase(), true)
+//TW                              ; // add prefix style class
+//TW try comment out post merge
                               .attr("class", function(d,i){
                                   if (d.prefix == "schema" ||
                                       d.prefix == "ncit") { return "edgelabel extont";}
@@ -640,6 +632,7 @@ function edit(d, i, source, graph){
                               })
 ;
                               //.classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
+//TW END COMMENT OUT POST MERGE.
 
                             // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + d.id)
@@ -658,9 +651,7 @@ function edit(d, i, source, graph){
                           editActive = false;  // turn off the edit area
                           d3.select("#buttons").style("opacity", 1);  // redisplay buttons
 
-                      })
-                      ;
-                  //  ) // end of click on update button
+                      }) // end of click on update button
     let delButton = div.append("button")
                         .text("Delete")
                         .on("click", function() {
@@ -758,11 +749,10 @@ function resetMouseVars() {
 
 //HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
 function createTTL(jsonData) {
-    alert("You will now create the TTL file. Click OK to confirm.");
+    //console.log("Now Create TTL");
     console.log(jsonData);
+    //TW re-enable later: //    alert("You will now create the TTL file. Click OK to confirm.");
 
-    // Add a sort of jsonData by jsonData.edgesData.source.id  here to make for a more
-    // pretty/readable TTL file.
     // Set the prefixes
     let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
                                          ncit: 'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#',
