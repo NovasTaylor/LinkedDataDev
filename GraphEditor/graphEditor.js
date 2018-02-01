@@ -530,16 +530,6 @@ function edit(d, i, source, graph){
                         .text(function (d) { return d; })
                         .property("selected", function(g){ return g === d.prefix; });
 
-    // LABEL  - both nodes and edge
-    let labelText = div.append("p")
-                        .text("Label: ");
-    let labelInput = labelText.append("input")
-                        .attr({
-                          'size': '15',
-                          'type': 'text',
-                          'value': d.label
-                        });
-
     //TYPE - NODES only
     let typeText   = ""
     let typeInput  = ""
@@ -558,6 +548,17 @@ function edit(d, i, source, graph){
                             .property("selected", function(g){ return g === d.type; });
     }
 
+    // LABEL  - both nodes and edge
+    let labelText = div.append("p")
+                        .text("Label: ");
+    let labelInput = labelText.append("input")
+                        .attr({
+                          'size': '15',
+                          'type': 'text',
+                          'value': d.label
+                        });
+
+
     //---- UPDATE BUTTON -------------------------------------------------------
     let button =  div.append("button")
                       .text("Update/Hide")
@@ -567,6 +568,14 @@ function edit(d, i, source, graph){
                           //---- NODE ------------------------------------------
                           if(source=="node"){
                               console.log("Update on Node: "+ d.id)
+                              if (typeInput.node().value == "INT") {
+                                let inputValue = labelInput.node().value
+                                // if (isNaN(parseFloat(inputValue)) && !isFinite(inputValue)) {  // Allows float
+                                if (!/^\d+$/.test(inputValue)) {  // Allows integers
+                                    window.confirm("Incorrect value for INT: " + inputValue);
+                                    return
+                                }
+                              }
                               d.label=labelInput.node().value;
                               d.prefix = prefixInput.node().value;
                               d.type = typeInput.node().value;
