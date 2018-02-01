@@ -227,10 +227,6 @@ function update(graph){
         .attr('marker-end', 'url(#arrowhead)')
         .style("stroke", "#ccc");
         ;
-    link_update.append("prefixText")
-          .attr("id", function(d, i) {
-            return("prefixText"+d.id) ;
-          });
     link_update.exit().remove();
     // Path for the Edge Label (link) Text
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
