@@ -774,9 +774,15 @@ function saveState(graph){
 }
 function restoreSaveState(){
     let graph = {}
-    console.log(localStorage.nodes)
-    alert(localStorage.nodes)
-    // graph.nodesData = localStorage.nodes
+    graph.nodesData = JSON.parse(localStorage.nodes)
+    graph.edgesData = JSON.parse(localStorage.edges)
+    console.log(graph)
+
+    svg.selectAll("*").remove();
+    let buttonsDiv = d3.select("#buttons");
+    buttonsDiv.selectAll("*").remove();
+    // force.start()
     // graph.nodesData = localStorage.edges
+    initializeGraph(graph)
     // update(graph)
 }
