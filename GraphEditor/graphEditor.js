@@ -120,6 +120,21 @@ legendDiv.append("text")
 //  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null;
+
+let loadStorage = window.confirm("Load from last session?");
+if (loadStorage) {
+    let graph = {}
+    graph.nodesData = JSON.parse(localStorage.nodes)
+    graph.edgesData = JSON.parse(localStorage.edges)
+    for(let edge in graph.edgesData){
+        // alert(JSON.stringify(graph.edgesData(edge)))
+        console.log(graph.edgesData[edge])
+        edge.source = graph.edgesData[edge].id
+    }
+    console.log("is it changed")
+    console.log(graph.edgesData)
+    initializeGraph(graph);
+} else {
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -131,6 +146,7 @@ let force     = null;
         console.log(graph.edgesData[0]);
         initializeGraph(graph);
     ;}
+}
 
 
 // Initialize the graph components ---------------------------------------------
