@@ -638,13 +638,13 @@ function edit(d, i, source, graph){
                                 selected_edge = mousedown_edge ;  //Playing here. Restructure?
                                 console.log("Selected_edge: " , selected_edge)
                                 graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
-                                d3.select("#edit").selectAll("*").remove();
-                                d3.select("#edit").style("opacity", 0);
-                                editActive = false;  // turn off the edit area
-                                d3.select("#buttons").style("opacity", 1);  // redisplay buttons
-                                force.start();
-                                update(graph);
                             }
+                            d3.select("#edit").selectAll("*").remove();
+                            d3.select("#edit").style("opacity", 0);
+                            editActive = false;  // turn off the edit area
+                            d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+                            force.start();
+                            update(graph);
                         });
 }
 
