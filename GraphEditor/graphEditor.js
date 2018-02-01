@@ -649,7 +649,7 @@ function addNode(graph){
     console.log("A node you wish to add! lastNodeId before"+lastNodeId)
     let newNode = {
         id: ++lastNodeId,
-        label: 'NEW',
+        label: 'NEW'+lastNodeId,
         prefix: 'new',
         type: 'UNSPEC',
         x:200,
@@ -696,7 +696,7 @@ function addEdge(graph){
         id: ++lastEdgeId,
         source: startNode,
         target: endNode,
-        label: 'NEW',
+        label: 'NEW'+lastEdgeId,
         prefix: 'eg'
     };
     let n = graph.edgesData.push(newEdge);
