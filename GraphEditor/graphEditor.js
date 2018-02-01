@@ -234,13 +234,11 @@ function update(graph){
     link_update.exit().remove();
     // Path for the Edge Label (link) Text
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
-    // let edgepath_update = svg.selectAll('.edgepath').data(
-      graph.edgesData,
-      //build the edge path id as "ep"+sourceid+"-"+targetid
-      function(d){
-        return d.id;
-        //return ("ep" + d.source.id + "-" + d.target.id);
-      }
+        graph.edgesData,
+        //build the edge path id as "ep"+sourceid+"-"+targetid
+        function(d){
+            return d.id;
+        }
     );
 
     edgepath_update.enter()
@@ -263,14 +261,11 @@ function update(graph){
 
     // Edge Label (link) text --------------------------------------------------
     let edgelabel_update = svg.select("#edgelabels").selectAll('.edgelabel').data(
-    // let edgelabel_update = svg.selectAll('.edgelabel').data(
-      graph.edgesData,
-      //build the edge label id as "el"+sourceid+"-"+targetid
-      function(d){
-
-        return d.id;
-        //return ("el" + d.source.id + "-" + d.target.id);
-      }
+        graph.edgesData,
+        //build the edge label id as "el"+sourceid+"-"+targetid
+        function(d){
+            return d.id;
+        }
     );
 
     edgelabel_update.enter()
@@ -278,7 +273,6 @@ function update(graph){
             .attr("id", function(d,i){
                 return "edgetext" + d.id;
             })
-            //.attr("class", "edgelabel")
             .attr("class", function(d,i){
                 if (d.prefix == "schema" || d.prefix == "ncit"){ return "edgelabel extont";}
                 else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
@@ -321,17 +315,6 @@ function update(graph){
         .attr("rx", 5) // Round edges
         .attr("ry", 5)
         .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
-        .attr("class", function(d,i){
-            if (d.type == "STRING"){ return "node string";}
-            else if (d.type == "INT"){ return "node int"; }
-            // Other external ontologies would need to be added here along with schema
-            else if (d.prefix == "schema"   ||
-                     d.prefix  == "ncit"    ||
-                     d.prefix == "sdtmterm" ||
-                     d.prefix == "cto"){ return "node iriont"; }
-            else if (d.prefix == "eg"){ return "node iri"; }
-            else {return "node unspec";}
-        })
         .call(force.drag)
         //---- Double click node to edit -----------------------------------------
         // For new nodes, this should allow the entry of label, type, and prefix...
@@ -397,7 +380,8 @@ function update(graph){
     node_update.exit().remove();
     // Update part
 //TW TRY COMMENT THIS OUT POST MERGE
-    node_update.attr("class", function(d){
+    node_update
+        .attr("class", function(d){
             if (d.type == "STRING"){ return "node string";}
             else if (d.type == "INT"){ return "node int"; }
 
@@ -407,7 +391,7 @@ function update(graph){
                      d.prefix == "cto"){ return "node iriont"; }
             else if (d.prefix == "eg"){ return "node iri"; }
             else {return "node unspec";}
-        })
+        });
 
 //TW END TRY COMMENT OUT
     // Data for node text
@@ -418,7 +402,13 @@ function update(graph){
     );
 
     // Add id (nodeTextn) and the text
-    nodeText_update.enter().append("text")
+    nodeText_update.enter()
+        .append("text");
+
+     // Remove nodeText
+     nodeText_update.exit().remove();
+
+    nodeText_update
         .attr({
             // 'id':    function(d, i) {return("nodeText"+i) ; },
             // ID linkes to editing window
@@ -431,9 +421,6 @@ function update(graph){
             // Prefix for all other types
             else{ return d.prefix+":"+d.label; }
         });
-
-     // Remove nodeText
-     nodeText_update.exit().remove();
 
      // Start the force layout.
     force.start();  // Restart the force
@@ -584,35 +571,9 @@ function edit(d, i, source, graph){
                           //---- NODE ------------------------------------------
                           if(source=="node"){
                               console.log("Update on Node: "+ d.id)
-                              // Label
-                              d3.select("#nodeText" + d.id)
-                                // IRI uppercase. INT and STRING can be mixed case.
-                                .text(function(d) {
-                                    if (typeInput.node().value==="IRI"){//var nodeText =
-                                      //return (d.label = labelInput.node().value.toUpperCase());
-                                      return prefixInput.node().value + ":" + labelInput.node().value;
-
-                                    }
-                                    else{
-                                      return (d.label = labelInput.node().value);
-                                    }
-
-                                   });
-                              // Type
-                              d3.select("#typeText" + d.id)
-                                .text(function(d) {return (d.type = typeInput.node().value); });
-                              // Node Class
-                              // Change class of rect to match TYPE so the node display will change
-                              //   according to the node type
-                              d3.select("#rect" + d.id)
-                                .attr("class", "")  // Remove all classes (node, iri, string, int)
-                                .attr("class", "node") // Add the node class back in.
-                                .classed(typeInput.node().value.toLowerCase(), true); // add type class
-
                               d.label=labelInput.node().value;
                               d.prefix = prefixInput.node().value;
                               d.type = typeInput.node().value;
-
                           } // end of node UPDATE
 
                           //---- EDGE -----------------------------------------
@@ -650,6 +611,7 @@ function edit(d, i, source, graph){
                           d3.select("#edit").style("opacity", 0);
                           editActive = false;  // turn off the edit area
                           d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+                          update(graph);
 
                       }) // end of click on update button
     let delButton = div.append("button")
