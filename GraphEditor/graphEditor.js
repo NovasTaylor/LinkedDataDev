@@ -203,6 +203,9 @@ function initializeGraph(graph){
     buttonsDiv.append("button")
       .text("Save State")
       .on("click", function(d){ saveState(graph);});
+    buttonsDiv.append("button")
+      .text("Restore")
+      .on("click", function(d){ restoreSaveState();});
     update(graph);  // Update graph for the first time
 }  // end of initializeGraph
 
@@ -766,23 +769,14 @@ function createTTL(jsonData) {
 } // end createTTL()
 
 function saveState(graph){
-    // Clone the original graph to allow pre-export cleansing
-    let graphClone = JSON.parse(JSON.stringify(graph));
-
-    // Remove properties created by the force() function
-    graphClone.nodesData.forEach(n => {
-        delete n.index;
-        delete n.px;
-        delete n.py;
-        delete n.weight;
-    });
-
-    // Replace node array values with their index reference
-    graphClone.edgesData.forEach(e => {
-        e.source = e.source.id;
-        e.target = e.target.id;
-    });
-    // Convert to blob for saving, then save.
-    var blob = new Blob([JSON.stringify(graphClone)], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, "graph-Saved.JSON");
+    localStorage.nodes = JSON.stringify(graph.nodesData)
+    localStorage.edges = JSON.stringify(graph.edgesData)
+}
+function restoreSaveState(){
+    let graph = {}
+    console.log(localStorage.nodes)
+    alert(localStorage.nodes)
+    // graph.nodesData = localStorage.nodes
+    // graph.nodesData = localStorage.edges
+    // update(graph)
 }
