@@ -120,6 +120,24 @@ legendDiv.append("text")
 //  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null;
+
+let loadStorage = window.confirm("Load from last session?");
+if (loadStorage) {
+    let graph = {}
+    let graphInit = {}
+    graphInit.nodesData = JSON.parse(localStorage.nodes)
+    graphInit.edgesData = JSON.parse(localStorage.edges)
+    graph = graphInit
+    for(let edge in graph.edgesData){
+        // alert(JSON.stringify(graph.edgesData(edge)))
+        console.log(graph.edgesData[edge])
+        // graphInit.edgesData[edge].source = graph.edgesData[edge].id
+        graphInit.edgesData[edge].source = graph.edgesData[edge].id
+    }
+    console.log("is it changed")
+    console.log(graph.edgesData)
+    initializeGraph(graph);
+} else {
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -131,6 +149,7 @@ let force     = null;
         console.log(graph.edgesData[0]);
         initializeGraph(graph);
     ;}
+}
 
 
 // Initialize the graph components ---------------------------------------------
@@ -769,8 +788,24 @@ function createTTL(jsonData) {
 } // end createTTL()
 
 function saveState(graph){
-    localStorage.nodes = JSON.stringify(graph.nodesData)
-    localStorage.edges = JSON.stringify(graph.edgesData)
+    // Clone the original graph to allow pre-export cleansing
+    let graphClone = JSON.parse(JSON.stringify(graph));
+
+    // Remove properties created by the force() function
+    graphClone.nodesData.forEach(n => {
+        delete n.index;
+        delete n.px;
+        delete n.py;
+        delete n.weight;
+    });
+
+    // Replace node array values with their index reference
+    graphClone.edgesData.forEach(e => {
+        e.source = e.source.id;
+        e.target = e.target.id;
+    });
+    localStorage.nodes = JSON.stringify(graphClone.nodesData)
+    localStorage.edges = JSON.stringify(graphClone.edgesData)
 }
 function restoreSaveState(){
     let graph = {}
