@@ -120,6 +120,30 @@ legendDiv.append("text")
 //  node_update
 // MOVE edge and rect  declares from here to within funt
 let force     = null;
+
+if (localStorage.reloadFromLocalStorage === "true") {
+    localStorage.reloadFromLocalStorage = false
+    console.log("Loading from local storage")
+    let graph = {}
+    graph.nodesData = JSON.parse(localStorage.nodes)
+    graph.edgesData = JSON.parse(localStorage.edges)
+    console.log(graph.edgesData)
+    initializeGraph(graph);
+} else if (localStorage.loadFile !== undefined) {
+    console.log("Loading my selected file: "+localStorage.loadFile)
+    d3.queue()
+       .defer(d3.json, '/graphEditor/data/'+localStorage.loadFile+'.json')
+       .await(processData);
+
+    function processData (error, graph) {
+        if(error) { console.log(error); }
+        console.log(graph.nodesData[0]);
+        console.log(graph.edgesData[0]);
+        initializeGraph(graph);
+    ;}
+    localStorage.removeItem("loadFile")
+} else {
+    console.log("Loading from file")
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -131,6 +155,13 @@ let force     = null;
         console.log(graph.edgesData[0]);
         initializeGraph(graph);
     ;}
+}
+
+
+// let loadStorage = window.confirm("Load from last session?");
+// if (loadStorage) {
+// } else {
+// }
 
 
 // Initialize the graph components ---------------------------------------------
@@ -203,7 +234,34 @@ function initializeGraph(graph){
     buttonsDiv.append("button")
       .text("Save State")
       .on("click", function(d){ saveState(graph);});
+    buttonsDiv.append("button")
+      .text("Restore")
+      .on("click", function(d){ restoreSaveState();});
     update(graph);  // Update graph for the first time
+
+    let loadFileDiv = d3.select("#loadfile")
+    let loadText = loadFileDiv.append("p")
+        .text("File: ");
+    let graphFiles = ["graph","graph1", "graph2"]
+    let fileSelect = loadText.append("select")
+        .attr('class','select')
+        .attr('id',"selectedFile")
+    let fileOption = fileSelect.selectAll('option')
+        .data(graphFiles).enter()
+        .append('option')
+        .text(function (d) { return d; })
+        // .property("selected", function(g){ return g === d.type; })
+        ;
+    // loadFileDiv.append("button")
+    let loadButton = loadFileDiv.append("button")
+      .text("Load")
+      .on("click", function(d){
+                            // let selectedFile = d3.select("selectedFile").selected
+                            let selectedFile = fileSelect.node().value
+                            console.log("Selected file: "+selectedFile)
+                            localStorage.loadFile = selectedFile
+                            window.location.reload(false);
+                            });
 }  // end of initializeGraph
 
 function update(graph){
@@ -782,7 +840,10 @@ function saveState(graph){
         e.source = e.source.id;
         e.target = e.target.id;
     });
-    // Convert to blob for saving, then save.
-    var blob = new Blob([JSON.stringify(graphClone)], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, "graph-Saved.JSON");
+    localStorage.nodes = JSON.stringify(graphClone.nodesData)
+    localStorage.edges = JSON.stringify(graphClone.edgesData)
+}
+function restoreSaveState(){
+    localStorage.reloadFromLocalStorage = true
+    window.location.reload(false);
 }
