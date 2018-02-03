@@ -123,23 +123,27 @@ let force     = null;
 
 if (localStorage.reloadFromLocalStorage === "true") {
     localStorage.reloadFromLocalStorage = false
-    alert("Going to load from local storage")
+    console.log("Loading from local storage")
     let graph = {}
-    let graphInit = {}
-    graphInit.nodesData = JSON.parse(localStorage.nodes)
-    graphInit.edgesData = JSON.parse(localStorage.edges)
-    graph = graphInit
-    for(let edge in graph.edgesData){
-        // alert(JSON.stringify(graph.edgesData(edge)))
-        console.log(graph.edgesData[edge])
-        // graphInit.edgesData[edge].source = graph.edgesData[edge].id
-        graphInit.edgesData[edge].source = graph.edgesData[edge].id
-    }
-    console.log("is it changed")
+    graph.nodesData = JSON.parse(localStorage.nodes)
+    graph.edgesData = JSON.parse(localStorage.edges)
     console.log(graph.edgesData)
     initializeGraph(graph);
+} else if (localStorage.loadFile !== undefined) {
+    console.log("Loading my selected file: "+localStorage.loadFile)
+    d3.queue()
+       .defer(d3.json, '/graphEditor/data/'+localStorage.loadFile+'.json')
+       .await(processData);
+
+    function processData (error, graph) {
+        if(error) { console.log(error); }
+        console.log(graph.nodesData[0]);
+        console.log(graph.edgesData[0]);
+        initializeGraph(graph);
+    ;}
+    localStorage.removeItem("loadFile")
 } else {
-    alert("Going to load from file")
+    console.log("Loading from file")
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -234,6 +238,30 @@ function initializeGraph(graph){
       .text("Restore")
       .on("click", function(d){ restoreSaveState();});
     update(graph);  // Update graph for the first time
+
+    let loadFileDiv = d3.select("#loadfile")
+    let loadText = loadFileDiv.append("p")
+        .text("File: ");
+    let graphFiles = ["graph","graph1", "graph2"]
+    let fileSelect = loadText.append("select")
+        .attr('class','select')
+        .attr('id',"selectedFile")
+    let fileOption = fileSelect.selectAll('option')
+        .data(graphFiles).enter()
+        .append('option')
+        .text(function (d) { return d; })
+        // .property("selected", function(g){ return g === d.type; })
+        ;
+    // loadFileDiv.append("button")
+    let loadButton = loadFileDiv.append("button")
+      .text("Load")
+      .on("click", function(d){
+                            // let selectedFile = d3.select("selectedFile").selected
+                            let selectedFile = fileSelect.node().value
+                            console.log("Selected file: "+selectedFile)
+                            localStorage.loadFile = selectedFile
+                            window.location.reload(false);
+                            });
 }  // end of initializeGraph
 
 function update(graph){
