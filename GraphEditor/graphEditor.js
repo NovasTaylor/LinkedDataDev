@@ -121,8 +121,9 @@ legendDiv.append("text")
 // MOVE edge and rect  declares from here to within funt
 let force     = null;
 
-let loadStorage = window.confirm("Load from last session?");
-if (loadStorage) {
+if (localStorage.reloadFromLocalStorage === "true") {
+    localStorage.reloadFromLocalStorage = false
+    alert("Going to load from local storage")
     let graph = {}
     let graphInit = {}
     graphInit.nodesData = JSON.parse(localStorage.nodes)
@@ -138,6 +139,7 @@ if (loadStorage) {
     console.log(graph.edgesData)
     initializeGraph(graph);
 } else {
+    alert("Going to load from file")
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -150,6 +152,12 @@ if (loadStorage) {
         initializeGraph(graph);
     ;}
 }
+
+
+// let loadStorage = window.confirm("Load from last session?");
+// if (loadStorage) {
+// } else {
+// }
 
 
 // Initialize the graph components ---------------------------------------------
@@ -808,16 +816,6 @@ function saveState(graph){
     localStorage.edges = JSON.stringify(graphClone.edgesData)
 }
 function restoreSaveState(){
-    let graph = {}
-    graph.nodesData = JSON.parse(localStorage.nodes)
-    graph.edgesData = JSON.parse(localStorage.edges)
-    console.log(graph)
-
-    svg.selectAll("*").remove();
-    let buttonsDiv = d3.select("#buttons");
-    buttonsDiv.selectAll("*").remove();
-    // force.start()
-    // graph.nodesData = localStorage.edges
-    initializeGraph(graph)
-    // update(graph)
+    localStorage.reloadFromLocalStorage = true
+    window.location.reload(false);
 }
