@@ -675,7 +675,7 @@ function createTTL(jsonData) {
 } // End createTTL()
 
 function setLoadFiles(){
-    let loadFileDiv = d3.select("#loadfile")
+    let loadFileDiv = d3.select("#buttons")
     let loadText = loadFileDiv.append("p")
         .text("File: ");
     let graphFiles = ["graph","graph1", "graph2"]
