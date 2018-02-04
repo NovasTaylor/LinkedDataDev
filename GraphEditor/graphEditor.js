@@ -83,9 +83,11 @@ if (localStorage.reloadFromLocalStorage === "true") {
     graph.nodesData = JSON.parse(localStorage.nodes)
     graph.edgesData = JSON.parse(localStorage.edges)
     console.log(graph.edgesData)
+    localStorage.currentGraph = "Restored from last save state"
     initializeGraph(graph);
 } else if (localStorage.loadFile !== undefined) {
     console.log("Loading my selected file: "+localStorage.loadFile)
+    localStorage.currentGraph = "Loaded from file: "+localStorage.loadFile
     d3.queue()
        .defer(d3.json, '/graphEditor/data/'+localStorage.loadFile+'.json')
        .await(processData);
@@ -99,6 +101,7 @@ if (localStorage.reloadFromLocalStorage === "true") {
     localStorage.removeItem("loadFile")
 } else {
     console.log("Loading from file")
+    localStorage.currentGraph = "Loaded from default file: graph.json"
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -691,6 +694,13 @@ function setLoadFiles(){
                             localStorage.loadFile = selectedFile
                             window.location.reload(false);
                             });
+    loadFileDiv.append('text')
+        .attr('x',w/2)
+        .attr('y',10)
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")  
+        .text(localStorage.currentGraph);
+
 } // End setLoadFiles
 
 function saveState(graph){
