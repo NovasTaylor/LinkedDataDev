@@ -83,11 +83,11 @@ if (localStorage.reloadFromLocalStorage === "true") {
     graph.nodesData = JSON.parse(localStorage.nodes)
     graph.edgesData = JSON.parse(localStorage.edges)
     console.log(graph.edgesData)
-    localStorage.currentGraph = "Restored from last save state"
+    localStorage.currentGraph = "Current graph based on last save state"
     initializeGraph(graph);
 } else if (localStorage.loadFile !== undefined) {
     console.log("Loading my selected file: "+localStorage.loadFile)
-    localStorage.currentGraph = "Loaded from file: "+localStorage.loadFile
+    localStorage.currentGraph = "Current graph loaded from file: "+localStorage.loadFile
     d3.queue()
        .defer(d3.json, '/graphEditor/data/'+localStorage.loadFile+'.json')
        .await(processData);
@@ -101,7 +101,7 @@ if (localStorage.reloadFromLocalStorage === "true") {
     localStorage.removeItem("loadFile")
 } else {
     console.log("Loading from file")
-    localStorage.currentGraph = "Loaded from default file: graph.json"
+    localStorage.currentGraph = "Current graph loaded from file: graph.json"
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
