@@ -14,6 +14,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 TW TODO: 1. Remove all unnecess. Code
     2. Change legend to create from array & loop
     3. Change mult attr to use {} pattern
+    4. Add tooltip,  both node and edge labels.
 -----------------------------------------------------------------------------*/
 "use strict";
 
@@ -39,8 +40,9 @@ let selected_node  = null,
 
 let svg=d3.select("#whiteboard")
           .append("svg")
-          .attr("width", w)
-          .attr("height", h);
+          .attr({"width": w,
+                 "height": h
+               });
 
 //Legend creation
 //TODO : Change to creation using a loop over the array of values in the legend.
@@ -49,22 +51,25 @@ let legendNodeHeight = 15,
 legendNodeWidth  = 20;
 // IRI
 legendDiv.append("rect")
-    .attr("class", "node iri")
-    .attr("width", legendNodeWidth)
-    .attr("height", legendNodeHeight)
-    .attr("x", 5)
-    .attr("y", 0);
+    .attr({"class" : "node iri",
+           "width" : legendNodeWidth,
+           "height" : legendNodeHeight,
+           "x" : 5,
+           "y" : 0
+         });
 legendDiv.append("text")
-    .attr("dx", 35)
-    .attr("dy", 15)
+    .attr({"dx" : 35,
+          "dy" : 15
+          })
     .text("IRI (links to/from)");
 //New (unspecified)
 legendDiv.append("rect")
-    .attr("class", "node unspec")
-    .attr("width", legendNodeWidth)
-    .attr("height", legendNodeHeight)
-    .attr("x", 5)
-    .attr("y", 25);
+    .attr({"class" : "node unspec",
+    "width" : legendNodeWidth,
+    "height" : legendNodeHeight,
+    "x" : 5,
+    "y" : 25
+  });
 legendDiv.append("text")
     .attr("dx", 35)
     .attr("dy", 40)
@@ -265,16 +270,11 @@ function update(graph){
 
     edgepath_update.enter()
         .append('path')
-        .attr('d', function(d,i) {
-            console.log("ERROR HERE for d.source.x etc.");
-            console.log("The numbers: "+ d.source.x + " " + d.source.y + " " + d.target.x + " " + d.target.y);
-            return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y})
         .attr({'class':'edgepath',
             'fill-opacity':0,
             'stroke-opacity':0,
-            'id':function(d,i) {
-              return 'edgepath'+d.id}}
-          )
+            'id':function(d,i) { return 'edgepath'+d.id}
+        })
         .style("pointer-events", "none");
 
     edgepath_update.exit().remove();
@@ -483,10 +483,6 @@ function edit(d, i, source, graph){
     // upsource used in editor display to match exercises text
     let upSource = source.charAt(0).toUpperCase() + source.slice(1);
 
-    console.log("You clicked a  " +source)
-    console.log("     edit: " + source + " " + d.prefix + ":" + d.label);
-    console.log(d);
-
     // If another node or edge was already selected (edit window already present,
     //   then made another dbl click, you must purge the existing info to allow
     //   display of info from the second dbl clicked item to replace the first.
@@ -515,7 +511,7 @@ function edit(d, i, source, graph){
           // Use 'Link values' for edges to match exercises (for comprehension)
           if (source=="edge"){return("Link values"); }
           else {return (upSource + " values");}
-        });  // Selet div for appending
+        });  // Select div for appending
 
     // PREFIX - both nodes and edges
     let prefixText = div.append("p")
@@ -530,9 +526,9 @@ function edit(d, i, source, graph){
                         .property("selected", function(g){ return g === d.prefix; });
 
     //TYPE - NODES only
-    let typeText   = ""
-    let typeInput  = ""
-    let typeSelect = ""
+    let typeText   = "";
+    let typeInput  = "";
+    let typeSelect = "";
 
     if(source=="node"){
         typeText     = div.append("p")
@@ -547,7 +543,7 @@ function edit(d, i, source, graph){
                             .property("selected", function(g){ return g === d.type; });
     }
 
-    // LABEL  - both nodes and edge
+    // Label  - both nodes and edge
     let labelText = div.append("p")
                         .text("Label: ");
     let labelInput = labelText.append("input")
@@ -556,7 +552,6 @@ function edit(d, i, source, graph){
                           'type': 'text',
                           'value': d.label
                         });
-
 
     //---- UPDATE BUTTON -------------------------------------------------------
     let button =  div.append("button")
@@ -586,16 +581,13 @@ function edit(d, i, source, graph){
                               .attr("class", "")  // Remove all classes (node, iri, string, int)
                               .attr("class", "edgelabel") // Add the node class back in.
                               .classed(prefixInput.node().value.toLowerCase(), true)
-//TW                              ; // add prefix style class
-//TW try comment out post merge
                               .attr("class", function(d,i){
                                   if (d.prefix == "schema" ||
                                       d.prefix == "ncit") { return "edgelabel extont";}
                                   else if (d.prefix == "rdf" || d.prefix == "rdfs"){ return "edgelabel rdf";}
                                   else {return "edgelabel unspec";}
-                              })
-;
-                            // edge labels forced to lowercase for exercises.
+                              });
+                            // Edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + d.id)
                               .text(function(d)  {
                                 // 1. Values for the data array
@@ -604,22 +596,18 @@ function edit(d, i, source, graph){
                                 // 2. prefix + label to display in the SVG
                                 return prefixInput.node().value + ":" + labelInput.node().value;
                               })
-
-                          } // end of Edge update
+                          } // End of Edge update
                           // Clean up the edit window after click of Hide/Update
                           d3.select("#edit").selectAll("*").remove();
                           d3.select("#edit").style("opacity", 0);
-                          editActive = false;  // turn off the edit area
-                          d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+                          editActive = false;  // Turn off the edit area
+                          d3.select("#buttons").style("opacity", 1);  // Redisplay buttons
                           update(graph);
-
-                      }) // end of click on update button
+                      }); // End of click on update button
     let delButton = div.append("button")
                         .text("Delete")
                         .on("click", function() {
-                           //console.log("Graph is: "+graph);
                             if(source=="node"){
-                                // select node
                                 mousedown_node = d; // Captures the node Initialized to null as per Kirsling
                                 selected_node = mousedown_node ;
                                 deleteNode(graph, selected_node);
@@ -627,14 +615,14 @@ function edit(d, i, source, graph){
                             if(source=="edge"){
                                 console.log("So you want to DELETE an Edge!")
                                 mousedown_edge = d; // Captures the edge.
-                                selected_edge = mousedown_edge ;  //Playing here. Restructure?
+                                selected_edge = mousedown_edge;
                                 console.log("Selected_edge: " , selected_edge)
                                 graph.edgesData.splice(graph.edgesData.indexOf(selected_edge), 1); // Delete selected edge from array
                             }
                             d3.select("#edit").selectAll("*").remove();
                             d3.select("#edit").style("opacity", 0);
-                            editActive = false;  // turn off the edit area
-                            d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+                            editActive = false;  // Turn off the edit area
+                            d3.select("#buttons").style("opacity", 1);  // Redisplay buttons
                             force.start();
                             update(graph);
                         });
@@ -654,7 +642,7 @@ function addNode(graph){
     let n = graph.nodesData.push(newNode);
     console.log(newNode)
     console.log(graph.nodesData)
-    update(graph);  // Adds node to the SVG
+    update(graph);
 }
 
 function deleteNode(graph, selected_node){
@@ -670,23 +658,19 @@ function deleteNode(graph, selected_node){
     console.log("Edges data pre-deletion:");
     console.log(graph.edgesData);
     graph.edgesData = graph.edgesData.filter(function(l) {
-        console.log("looping")
-        console.log(l)
-        console.log(selected_node)
-                        // return l.source.id !== selected_node.id && l.target.id !== selected_node.id;
-                        return l.source.id !== selected_node.id && l.target.id !== selected_node.id;
+        //console.log(l)
+        //console.log(selected_node)
+        return l.source.id !== selected_node.id && l.target.id !== selected_node.id;
     });
     console.log("Edges data post-deletion:");
     console.log(graph.edgesData);
     // Remove the text in the SVG that is associated with this node. [TW KLUDGE]
     d3.select("#nodeText" + selected_node.id).remove();
-    d3.select("#buttons").style("opacity", 1);  // redisplay buttons
+    d3.select("#buttons").style("opacity", 1);  // Redisplay buttons
     update(graph);
 }
 
 function addEdge(graph){
-    console.log("A LINK you wish to add!")
-
     let newEdge = {
         id: ++lastEdgeId,
         source: startNode,
@@ -697,22 +681,12 @@ function addEdge(graph){
     let n = graph.edgesData.push(newEdge);
     // Reset flags
     startNode = null,
-    endNode = null;
-    // RESET the flag for pulsing here!!
-    update(graph);  // Adds node to the SVG
+    endNode   = null;
+    update(graph);
 }
-
-//HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
-function resetMouseVars() {
-    mousedown_node = null;
-    mousedown_edge = null;
-}
-
-//HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
 function createTTL(jsonData) {
-    //console.log("Now Create TTL");
     console.log(jsonData);
-    //TW re-enable later: //    alert("You will now create the TTL file. Click OK to confirm.");
+    alert("You will now create the TTL file. Click OK to confirm.");
 
     // Set the prefixes
     let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
@@ -726,8 +700,7 @@ function createTTL(jsonData) {
                           });
 
     // loop through the edges to create triples
-    //   Code excludes unattached nodes. But if you have unattached nodes, you
-    // should re-evaluate your life choices... (ok, will code for them later..)
+    //   This version ignores unattached nodes.
     for(var i = 0; i < jsonData.edgesData.length; i++) {
         let raw       = jsonData.edgesData[i];  // create object for shorter references
         let subject   = raw.source.prefix + ":" + raw.source.label;
@@ -735,7 +708,7 @@ function createTTL(jsonData) {
         let object    = null;
         //console.log("S-P: " + subject + " --" + predicate)
 
-        // Creae Object based on their type
+        // Create Object based on their type
         // IRI and IRIONT are treated the same
         if (raw.target.type ==='IRI' || raw.target.type ==='IRIONT') {
             object = raw.target.prefix + ":" + raw.target.label;
@@ -746,7 +719,6 @@ function createTTL(jsonData) {
             } else if (raw.target.type =='STRING') {
                 object = '"' + raw.target.label + '"^^xsd:string' ;
             }
-          // Add some logic here to throw error if Subject, Predicate, Object undefined
         } // end of Object creation
         console.log("TRIPLE: " + subject + " --" + predicate + "--> " + object);
         writer.addTriple(subject, predicate, object); // Add triple for each edge
@@ -757,7 +729,7 @@ function createTTL(jsonData) {
         let blob = new Blob([result], {type: "text/plain;charset=utf-8"});
         saveAs(blob, "WhiteBoardTriples.ttl");
     });
-} // end createTTL()
+} // End createTTL()
 
 function saveState(graph){
     // Clone the original graph to allow pre-export cleansing
