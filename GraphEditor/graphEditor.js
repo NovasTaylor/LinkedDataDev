@@ -48,77 +48,35 @@ let svg=d3.select("#whiteboard")
 //TODO : Change to creation using a loop over the array of values in the legend.
 let legendDiv = d3.select("#legend").append("svg");
 let legendNodeHeight = 15,
-legendNodeWidth  = 20;
-// IRI
-legendDiv.append("rect")
-    .attr({"class" : "node iri",
-           "width" : legendNodeWidth,
-           "height" : legendNodeHeight,
-           "x" : 5,
-           "y" : 0
-         });
-legendDiv.append("text")
-    .attr({"dx" : 35,
-          "dy" : 15
-          })
-    .text("IRI (links to/from)");
-//New (unspecified)
-legendDiv.append("rect")
-    .attr({"class" : "node unspec",
-    "width" : legendNodeWidth,
-    "height" : legendNodeHeight,
-    "x" : 5,
-    "y" : 25
-  });
-legendDiv.append("text")
-    .attr("dx", 35)
-    .attr("dy", 40)
-    .text("New Node: edit to set properties");
+    legendNodeWidth  = 20,
+    rectStartX = 5,
+    textStartX = 35;
 
-// Subject Link
- legendDiv.append("rect")
-    .attr("class", "node iri subjectLink")
-    .attr("width", legendNodeWidth)
-    .attr("height", legendNodeHeight)
-    .attr("x", 5)
-    .attr("y", 50);
-legendDiv.append("text")
-    .attr("dx", 35)
-    .attr("dy", 65)
-    .text("Source node for new link");
-// String
-legendDiv.append("rect")
-    .attr("class", "node string")
-    .attr("width", legendNodeWidth)
-    .attr("height", legendNodeHeight)
-    .attr("x", 5)
-    .attr("y", 75);
-legendDiv.append("text")
-    .attr("dx", 35)
-    .attr("dy", 90)
-    .text("String: No outgoing links!")
-// Integer
-legendDiv.append("rect")
-    .attr("class", "node int")
-    .attr("width", legendNodeWidth)
-    .attr("height", legendNodeHeight)
-    .attr("x", 5)
-    .attr("y", 100);
-legendDiv.append("text")
-    .attr("dx", 35)
-    .attr("dy", 115)
-    .text("Integer: No outgoing links!")
-// Ontology IRI
-legendDiv.append("rect")
-    .attr("class", "node iriont")
-    .attr("width", legendNodeWidth)
-    .attr("height", legendNodeHeight)
-    .attr("x", 5)
-    .attr("y", 125);
-legendDiv.append("text")
-    .attr("dx", 35)
-    .attr("dy", 140)
-    .text("External Ontology IRI");
+var legendData = [
+      {"rectClass" : "node iri", "rectLabel" : "IRI (links to/from)"},
+      {"rectClass" : "node unspec", "rectLabel" : "New Node: edit to set properties"},
+      {"rectClass" : "node iri subjectLink", "rectLabel" : "Source node for new link"},
+      {"rectClass" : "node string", "rectLabel" : "String: No outgoing links!"},
+      {"rectClass" : "node int", "rectLabel" : "Integer: No outgoing links!"},
+      {"rectClass" : "node iriont", "rectLabel" : "External Ontology IRI"}
+    ];
+console.log("-----------------------");
+console.log(legendData);
+console.log(legendData[0].rectClass);
+for(var i = 0; i < legendData.length; i++) {
+    legendDiv.append("rect")
+        .attr({"class" : legendData[i].rectClass,
+               "width" : legendNodeWidth,
+               "height" : legendNodeHeight,
+               "x" : 5,
+               "y" : i*25
+        });
+    legendDiv.append("text")
+        .attr({"dx" : 35,
+               "dy" : i*25+15
+        })
+        .text( legendData[i].rectLabel);
+}
 
 let force     = null;
 
