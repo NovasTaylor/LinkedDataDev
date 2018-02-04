@@ -16,7 +16,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 
 // Initializations.
 let w          = 900,
-    h          = 1500,
+    h          = 800,
     nodeWidth  = 150,
     nodeHeight = 30;
 let editActive = false;  // opacity flag for editing box
@@ -446,8 +446,10 @@ function edit(d, i, source, graph){
     let self = this; //Necessary?
     editActive = true;
     d3.select("#edit").style("opacity", 1);
-    d3.select("#buttons").style("opacity", 0);
+    d3.select("#buttons").style("opacity", 0.1);
     let div = d3.select("#edit");
+
+
 
     div.append("p")
         .text(function() {
@@ -677,7 +679,7 @@ function createTTL(jsonData) {
 function setLoadFiles(){
     let loadFileDiv = d3.select("#buttons")
     let loadText = loadFileDiv.append("p")
-        .text("File: ");
+        .text("Select file: ");
     let graphFiles = ["graph","graph1", "graph2"]
     let fileSelect = loadText.append("select")
         .attr('class','select')
