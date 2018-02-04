@@ -180,27 +180,8 @@ function initializeGraph(graph){
     buttonsDiv.append("button")
       .text("Restore")
       .on("click", function(d){ restoreSaveState();});
+    setLoadFiles();
     update(graph);  // Update graph for the first time
-
-    let loadFileDiv = d3.select("#loadfile")
-    let loadText = loadFileDiv.append("p")
-        .text("File: ");
-    let graphFiles = ["graph","graph1", "graph2"]
-    let fileSelect = loadText.append("select")
-        .attr('class','select')
-        .attr('id',"selectedFile")
-    let fileOption = fileSelect.selectAll('option')
-        .data(graphFiles).enter()
-        .append('option')
-        .text(function (d) { return d; });
-    let loadButton = loadFileDiv.append("button")
-      .text("Load")
-      .on("click", function(d){
-                            let selectedFile = fileSelect.node().value
-                            console.log("Selected file: "+selectedFile)
-                            localStorage.loadFile = selectedFile
-                            window.location.reload(false);
-                            });
 }  // End initializeGraph
 
 function update(graph){
@@ -690,6 +671,28 @@ function createTTL(jsonData) {
     });
 } // End createTTL()
 
+function setLoadFiles(){
+    let loadFileDiv = d3.select("#loadfile")
+    let loadText = loadFileDiv.append("p")
+        .text("File: ");
+    let graphFiles = ["extra","graph","graph1", "graph2"]
+    let fileSelect = loadText.append("select")
+        .attr('class','select')
+        // .attr('id',"selectedFile")
+    let fileOption = fileSelect.selectAll('option')
+        .data(graphFiles).enter()
+        .append('option')
+        .text(function (d) { return d; });
+    let loadButton = loadFileDiv.append("button")
+      .text("Load")
+      .on("click", function(d){
+                            let selectedFile = fileSelect.node().value
+                            console.log("Selected file: "+selectedFile)
+                            localStorage.loadFile = selectedFile
+                            window.location.reload(false);
+                            });
+} // End setLoadFiles
+
 function saveState(graph){
     // Clone the original graph to allow pre-export cleansing
     let graphClone = JSON.parse(JSON.stringify(graph));
@@ -709,8 +712,8 @@ function saveState(graph){
     });
     localStorage.nodes = JSON.stringify(graphClone.nodesData)
     localStorage.edges = JSON.stringify(graphClone.edgesData)
-}
+} // end saveState()
 function restoreSaveState(){
     localStorage.reloadFromLocalStorage = true
     window.location.reload(false);
-}
+} // end restoreSaveState()
