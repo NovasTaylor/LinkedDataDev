@@ -23,7 +23,6 @@
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
-
 .edge{
     stroke: gray;
     stroke-width: 3;
@@ -32,20 +31,18 @@
     stroke: gray;
     stroke-width: 3;
 }
-
-
 .nodeText {
   font: 15px sans-serif;
-
   font-weight: bold;
 }
-
-.node.iri {
+.node.iri,
+.legendIri{
   fill: #bcf5bc ;
   stroke: black;
 }
 
-.node.unspec {
+.node.unspec,
+.legendUnspec{
   fill: white ;
   stroke: black;
   stroke-width: 4;
@@ -54,23 +51,27 @@
 
 .node.iri.subjectLink,
 .node.iriont.subjectLink,
-.node.unspec.subjectLink {
+.node.unspec.subjectLink,
+.legendSubjectLink {
   fill: yellow ;
   stroke: red;
   stroke-width: 6;
   stroke-dasharray: 2;
 }
-.node.string {
+.node.string,
+.legendString{
   fill:   #e4e4e4;
   stroke: #646464;
   stroke-width: 4;
 }
-.node.int {
+.node.int,
+.legendInt {
   fill: #c1e1eC ; /* light blue */
   stroke: #1a1aff;
   stroke-width: 4;
 }
-.node.iriont {
+.node.iriont,
+.legendIriont {
   fill: #ffc862 ;
   stroke: black;
 }
@@ -81,21 +82,16 @@
   font: 12pt sans-serif;
   text-anchor: middle;
 }
-
 .edgelabel.extont{
   fill: #cc7000;  /* dark orange, similar to external ont nodes */
 }
-
 .edgelabel.rdf{
   fill: #0000d8;  /* dark blue */
 }
-
 .edgelabel.unspec{
   color: #333333;
   flood-color: #FFFFFF;
 }
-
-
 
 text.id {
   text-anchor: middle;

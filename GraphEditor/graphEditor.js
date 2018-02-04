@@ -11,10 +11,6 @@ NOTE: Basing node addition on this: http://jsfiddle.net/Nivaldo/tUKh3/
       validate TTL file using RIOT: riot --validate "WhiteBoardTriples.ttl"
 TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
       Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
-TW TODO: 1. Remove all unnecess. Code
-    2. Change legend to create from array & loop
-    3. Change mult attr to use {} pattern
-    4. Add tooltip,  both node and edge labels.
 -----------------------------------------------------------------------------*/
 "use strict";
 
@@ -53,12 +49,12 @@ let legendNodeHeight = 15,
     textStartX = 35;
 
 var legendData = [
-      {"rectClass" : "node iri", "rectLabel" : "IRI (links to/from)"},
-      {"rectClass" : "node unspec", "rectLabel" : "New Node: edit to set properties"},
-      {"rectClass" : "node iri subjectLink", "rectLabel" : "Source node for new link"},
-      {"rectClass" : "node string", "rectLabel" : "String: No outgoing links!"},
-      {"rectClass" : "node int", "rectLabel" : "Integer: No outgoing links!"},
-      {"rectClass" : "node iriont", "rectLabel" : "External Ontology IRI"}
+      {"rectClass" : "legendIri",    "rectLabel" : "IRI (links to/from)"},
+      {"rectClass" : "legendUnspec", "rectLabel" : "New Node: edit to set properties"},
+      {"rectClass" : "legendSubjectLink", "rectLabel" : "Source node for new link"},
+      {"rectClass" : "legendString", "rectLabel" : "String: No outgoing links!"},
+      {"rectClass" : "legendInt",    "rectLabel" : "Integer: No outgoing links!"},
+      {"rectClass" : "legendIriont", "rectLabel" : "External Ontology IRI"}
     ];
 console.log("-----------------------");
 console.log(legendData);
@@ -140,10 +136,10 @@ function initializeGraph(graph){
                'markerHeight': 5,
                'xoverflow'   :'visible'})
         .append('path')
-        .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-        .attr('fill', '#ccc')
-        .attr('stroke','#ccc');
-
+        .attr({'d'      : 'M 0,-5 L 10 ,0 L 0,5',
+               'fill'   : '#ccc',
+               'stroke' :'#ccc'
+             });
     // Parent groups sets order so nodes always on top
     svg.append("g").attr("id", "links");
     svg.append('g').attr("id", "edgepaths");
@@ -156,16 +152,19 @@ function initializeGraph(graph){
                'y'         : 5,
                'width'     : 20,
                'height'    : 24,
-               'xlink:href': '/GraphEditor/img/AddIcon.png'})
+               'xlink:href': '/GraphEditor/img/AddIcon.png'
+             })
         .on('mouseover', function(d){
                 let addIcon = d3.select(this)
                                .attr({'width' :25,
-                                      'height':29});
+                                      'height':29
+                               });
         })
         .on('mouseout', function(d){
                 let addIcon = d3.select(this)
                                .attr({'width' :20,
-                                      'height':24});
+                                      'height':24
+                               });
         })
         .on('click', function(d){ addNode(graph);});
 
@@ -212,11 +211,11 @@ function update(graph){
     );
     link_update.enter()
         .append("path")
-        .attr("class", "link")
-        .attr("id", function(d,i){return 'edge'+ d.id}) // d.soure.id + "-" + d.target.id
-        .attr('marker-end', 'url(#arrowhead)')
+        .attr({"class" : "link",
+               "id" : function(d,i){return 'edge'+ d.id},
+               'marker-end' : 'url(#arrowhead)'
+        })
         .style("stroke", "#ccc");
-
     link_update.exit().remove();
 
     // Path for the Edge Label (link) Text
@@ -256,9 +255,10 @@ function update(graph){
             .attr("dy", -1) // place above line. 5 for inline
             .append('textPath')
             .style("text-anchor", "middle")
-            .attr("startOffset", "50%")
-            .attr('xlink:href', function(d,i) {return '#edgepath'+d.id;})
-            .attr('id', function(d,i){return "edgelabel" + d.id})
+            .attr({"startOffset" : "50%",
+                   'xlink:href' : function(d,i) {return '#edgepath'+d.id;},
+                   'id' : function(d,i){return "edgelabel" + d.id}
+                 })
             .text(function(d,i){return d.prefix+":"+d.label})
             //---- Double click edgelabel to edit ----------------------
             .on("dblclick", function(d, i){
@@ -275,11 +275,12 @@ function update(graph){
 
     // Append the rect shape to the node data
     node_update.enter().append("rect")
-        .attr("width", function(d){ return nodeWidth; })
-        .attr("height", nodeHeight)
-        .attr("rx", 5) // Round edges
-        .attr("ry", 5)
-        .attr("id", function(d, i) {return("rect"+d.id) ; })  // ID used to update class
+        .attr({"width" : function(d){ return nodeWidth; },
+               "height" : nodeHeight,
+               "rx" : 5,
+               "ry" : 5,
+               "id" : function(d, i) {return("rect"+d.id) ; }
+        })  // ID used to update class
         .call(force.drag)
         //---- Double click node to edit -----------------------------------------
         // For new nodes, this should allow the entry of label, type, and prefix...
@@ -370,7 +371,7 @@ function update(graph){
 
     nodeText_update
         .attr({
-            // id linkes to editing window
+            // id links to editing window
             'id':    function(d, i) {return "nodeText"+d.id ; },
             'class': 'nodeText'
         })
