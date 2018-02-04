@@ -11,31 +11,31 @@ NOTE: Basing node addition on this: http://jsfiddle.net/Nivaldo/tUKh3/
       validate TTL file using RIOT: riot --validate "WhiteBoardTriples.ttl"
 TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
       Discussion: https://kanbanflow.com/board/53c6d9a2c742c52254825aca6aabd85d
+TW TODO: 1. Remove all unnecess. Code
+    2. Change legend to create from array & loop
+    3. Change mult attr to use {} pattern
 -----------------------------------------------------------------------------*/
 "use strict";
 
 // Initializations.
-// nodeWidth/Height are the starting defaults for these values.
-//   nodeWidth may adjust with content in later versions.
 let w          = 900,
     h          = 1500,
     nodeWidth  = 150,
     nodeHeight = 30;
 let editActive = false;  // opacity flag for editing box
 
-// Start and end nodes when constructing a link
-//  count of edge and node Ids for later incrementing
+// Start/end nodes when constructing a link
+// last...= count of edge and node Ids tracking last in array
 let startNode   = null,
     endNode     = null,
     lastEdgeId  = null,
     lastNodeId  = null;
 
-// mouse event settings  as per Kirsling. only mousedown_node in use as of 2017-12-23
+// Mouse event settings as per Kirsling.
 let selected_node  = null,
     selected_edge  = null,
     mousedown_edge = null,
-    mousedown_node = null,
-    mouseup_node   = null;
+    mousedown_node = null;
 
 let svg=d3.select("#whiteboard")
           .append("svg")
@@ -115,10 +115,6 @@ legendDiv.append("text")
     .attr("dy", 140)
     .text("External Ontology IRI");
 
-//TODO: These declarations should be removed when code is changed to have them
-//  within update() as edge_upate, edgepath_update etc., folling the model of
-//  node_update
-// MOVE edge and rect  declares from here to within funt
 let force     = null;
 
 if (localStorage.reloadFromLocalStorage === "true") {
@@ -157,20 +153,12 @@ if (localStorage.reloadFromLocalStorage === "true") {
     ;}
 }
 
-
-// let loadStorage = window.confirm("Load from last session?");
-// if (loadStorage) {
-// } else {
-// }
-
-
 // Initialize the graph components ---------------------------------------------
 function initializeGraph(graph){
-    // Find the max Node and Edge ID values based on array length. Used when
+    // Find the max Node and Edge Id values based on array length. Used when
     // creating IDs for new nodes (increment counter)
     lastEdgeId = graph.edgesData.length - 1;
     lastNodeId = graph.nodesData.length - 1;
-    //console.log ("Max Id for Edges, Nodes: "+ lastEdgeId+ ","  +lastNodeId);
 
     // Initialize D3 force layout
     force = d3.layout.force()
@@ -178,7 +166,7 @@ function initializeGraph(graph){
             .links(graph.edgesData)
             .size([w, h])
             .on("tick", tick);
-    // Arrow marker for end of edge
+    // Edge arrow
     svg.append('defs').append('marker')
         .attr({'id'          :'arrowhead',
                'viewBox'     : '-0 -5 10 10',
@@ -193,14 +181,13 @@ function initializeGraph(graph){
         .attr('fill', '#ccc')
         .attr('stroke','#ccc');
 
-    // Create parent group for links, nodes and set their order so the nodes always
-    //   appear on top of the links
+    // Parent groups sets order so nodes always on top
     svg.append("g").attr("id", "links");
     svg.append('g').attr("id", "edgepaths");
     svg.append('g').attr("id", "edgelabels");
     svg.append("g").attr("id", "nodes");
 
-    // Add node icon. Within initiallizeGraph() for access to "graph"data
+    // Add node icon. Within initiallizeGraph() for access to data
     svg.append("image")
         .attr({'x'         : 5,
                'y'         : 5,
@@ -208,24 +195,18 @@ function initializeGraph(graph){
                'height'    : 24,
                'xlink:href': '/GraphEditor/img/AddIcon.png'})
         .on('mouseover', function(d){
-                // console.log("Add a node")
                 let addIcon = d3.select(this)
-                               .attr({
-                                      'width' :25,
-                                      'height':29
-                                    });
+                               .attr({'width' :25,
+                                      'height':29});
         })
         .on('mouseout', function(d){
                 let addIcon = d3.select(this)
-                               .attr({
-                                      'width' :20,
-                                      'height':24
-                                    });
+                               .attr({'width' :20,
+                                      'height':24});
         })
         .on('click', function(d){ addNode(graph);});
 
-    // handler for createTTL buttons
-    // Setup and display a buttons div for createTTL and saveState
+    // Setup and display div for buttons
     let buttonsDiv = d3.select("#buttons");
     buttonsDiv.append("button")
       .text("Create TTL")
@@ -249,50 +230,37 @@ function initializeGraph(graph){
     let fileOption = fileSelect.selectAll('option')
         .data(graphFiles).enter()
         .append('option')
-        .text(function (d) { return d; })
-        // .property("selected", function(g){ return g === d.type; })
-        ;
-    // loadFileDiv.append("button")
+        .text(function (d) { return d; });
     let loadButton = loadFileDiv.append("button")
       .text("Load")
       .on("click", function(d){
-                            // let selectedFile = d3.select("selectedFile").selected
                             let selectedFile = fileSelect.node().value
                             console.log("Selected file: "+selectedFile)
                             localStorage.loadFile = selectedFile
                             window.location.reload(false);
                             });
-}  // end of initializeGraph
+}  // End initializeGraph
 
 function update(graph){
     //---- LINKS ---------------------------------------------------------------
-    // link data. Use of force.links to match FN D3 construct
-    // let link_update = svg.selectAll('.link').data(
-    // #links used for layer order (under nodes)
-
     let link_update = svg.select("#links").selectAll('.link').data(
-    // let link_update = svg.selectAll('.link').data(
-         graph.edgesData,
-         function(d) {
-             return d.id;
-           // return d.source.id + "-" + d.target.id;
-         }
+        graph.edgesData,
+        function(d) { return d.id; }
     );
     link_update.enter()
-        .append("path")  // differs from code example
+        .append("path")
         .attr("class", "link")
         .attr("id", function(d,i){return 'edge'+ d.id}) // d.soure.id + "-" + d.target.id
         .attr('marker-end', 'url(#arrowhead)')
         .style("stroke", "#ccc");
-        ;
+
     link_update.exit().remove();
+
     // Path for the Edge Label (link) Text
     let edgepath_update = svg.select("#edgepaths").selectAll('.edgepath').data(
         graph.edgesData,
         //build the edge path id as "ep"+sourceid+"-"+targetid
-        function(d){
-            return d.id;
-        }
+        function(d){return d.id;}
     );
 
     edgepath_update.enter()
@@ -306,8 +274,6 @@ function update(graph){
             'stroke-opacity':0,
             'id':function(d,i) {
               return 'edgepath'+d.id}}
-              //return ("ep" + d.source.id + "-" + d.target.id);}}
-
           )
         .style("pointer-events", "none");
 
@@ -316,10 +282,7 @@ function update(graph){
     // Edge Label (link) text --------------------------------------------------
     let edgelabel_update = svg.select("#edgelabels").selectAll('.edgelabel').data(
         graph.edgesData,
-        //build the edge label id as "el"+sourceid+"-"+targetid
-        function(d){
-            return d.id;
-        }
+        function(d){return d.id;}
     );
 
     edgelabel_update.enter()
@@ -336,17 +299,8 @@ function update(graph){
             .append('textPath')
             .style("text-anchor", "middle")
             .attr("startOffset", "50%")
-            .attr('xlink:href', function(d,i) {
-
-               return '#edgepath'+d.id;
-              //TW return ("ep" + d.source.id + "-" + d.target.id);
-            })
-            .attr('id', function(d,i){
-              return "edgelabel" + d.id
-              //return 'edgelabel'+i
-              //TW return ("el" + d.source.id + "-" + d.target.id);
-            })
-            //.text("FOO")
+            .attr('xlink:href', function(d,i) {return '#edgepath'+d.id;})
+            .attr('id', function(d,i){return "edgelabel" + d.id})
             .text(function(d,i){return d.prefix+":"+d.label})
             //---- Double click edgelabel to edit ----------------------
             .on("dblclick", function(d, i){
@@ -355,7 +309,6 @@ function update(graph){
    edgelabel_update.exit().remove();
 
     // NODES -------------------------------------------------------------------
-   //#nodes used for layer order.
     let node_update = svg.select("#nodes").selectAll('.node').data(
     // let node_update = svg.selectAll('.node').data(
         graph.nodesData,
@@ -399,7 +352,6 @@ function update(graph){
                     console.log("Setting Start Node as node ID: " + startNode.id);
                 }
                 // Only set endNode if it is not the same as the startNode.
-                // else if (startNode !== null && startNode !== i){
                 else {
                     endNode= d;
                     console.log("Start Node: " + startNode.id + " End Node: " + endNode.id);
@@ -418,7 +370,6 @@ function update(graph){
 
             console.log("Node Mouseover is happening");
             // Add tooltip here
-
         })
         //Mouseout Node  - bring node back to full colour
         .on('mouseout', function(d){
@@ -432,8 +383,7 @@ function update(graph){
         }); // end mouseout
 
     node_update.exit().remove();
-    // Update part
-//TW TRY COMMENT THIS OUT POST MERGE
+
     node_update
         .attr("class", function(d){
             if (d.type == "STRING"){ return "node string";}
@@ -447,10 +397,8 @@ function update(graph){
             else {return "node unspec";}
         });
 
-//TW END TRY COMMENT OUT
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
-    // let nodeText_update = svg.selectAll(".nodeText").data(
         graph.nodesData,
         function(d){ return "nodeText"+d.id;}
     );
@@ -464,8 +412,7 @@ function update(graph){
 
     nodeText_update
         .attr({
-            // 'id':    function(d, i) {return("nodeText"+i) ; },
-            // ID linkes to editing window
+            // id linkes to editing window
             'id':    function(d, i) {return "nodeText"+d.id ; },
             'class': 'nodeText'
         })
@@ -476,9 +423,8 @@ function update(graph){
             else{ return d.prefix+":"+d.label; }
         });
 
-     // Start the force layout.
-    force.start();  // Restart the force
-}  // end of update(graph)
+    force.start();
+}  // End of update(graph)
 
 function tick() {
     svg.selectAll(".link")
@@ -491,29 +437,24 @@ function tick() {
         });
 
    svg.selectAll(".edgepath")
-    //DEL edgepath.attr('d', function(d) {
     .attr('d', function(d) {
         //Adjust for rectangle shape
         let xposSource = d.source.x + nodeWidth/2,
             xposTarget = d.target.x + nodeWidth/2,
             yposSource = d.source.y + nodeHeight/2,
             yposTarget = d.target.y + nodeHeight/2;
-
         let path='M '+ xposSource + ' ' + yposSource+' L '+ xposTarget + ' ' + yposTarget;
-
-        // let path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
         return path;
     });
 
     svg.selectAll(".edgelabel")
-    //DEL  edgelabel.attr('transform',function(d,i){
-    .attr('transform',function(d,i){
-        if (d.target.x<d.source.x){
-            let bbox = this.getBBox();
-            let rx = bbox.x+bbox.width/2;
-            let ry = bbox.y+bbox.height/2;
-            return 'rotate(180 '+rx+' '+ry+')';
-        }
+        .attr('transform',function(d,i){
+            if (d.target.x<d.source.x){
+                let bbox = this.getBBox();
+                let rx = bbox.x+bbox.width/2;
+                let ry = bbox.y+bbox.height/2;
+                return 'rotate(180 '+rx+' '+ry+')';
+            }
         else { return 'rotate(0)'; }
     });
 
@@ -565,8 +506,8 @@ function edit(d, i, source, graph){
 
     let self = this; //Necessary?
     editActive = true;
-    d3.select("#edit").style("opacity", 1);  // Display edit div
-    d3.select("#buttons").style("opacity", 0);  // Display edit div
+    d3.select("#edit").style("opacity", 1);
+    d3.select("#buttons").style("opacity", 0);
     let div = d3.select("#edit");
 
     div.append("p")
@@ -628,7 +569,6 @@ function edit(d, i, source, graph){
                               console.log("Update on Node: "+ d.id)
                               if (typeInput.node().value == "INT") {
                                 let inputValue = labelInput.node().value
-                                // if (isNaN(parseFloat(inputValue)) && !isFinite(inputValue)) {  // Allows float
                                 if (!/^\d+$/.test(inputValue)) {  // Allows integers
                                     window.confirm("Incorrect value for INT: " + inputValue);
                                     return
@@ -655,9 +595,6 @@ function edit(d, i, source, graph){
                                   else {return "edgelabel unspec";}
                               })
 ;
-                              //.classed(prefixInput.node().value.toLowerCase(), true); // add prefix style class
-//TW END COMMENT OUT POST MERGE.
-
                             // edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + d.id)
                               .text(function(d)  {
@@ -768,7 +705,6 @@ function addEdge(graph){
 //HK: Code as per Kirsling. Not yet in use. Move to fnt area of code.
 function resetMouseVars() {
     mousedown_node = null;
-    mouseup_node = null;
     mousedown_edge = null;
 }
 
