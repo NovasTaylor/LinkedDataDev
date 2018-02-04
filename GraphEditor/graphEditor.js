@@ -675,15 +675,15 @@ function setLoadFiles(){
     let loadFileDiv = d3.select("#loadfile")
     let loadText = loadFileDiv.append("p")
         .text("File: ");
-    let graphFiles = ["extra","graph","graph1", "graph2"]
+    let graphFiles = ["graph","graph1", "graph2"]
     let fileSelect = loadText.append("select")
         .attr('class','select')
-        // .attr('id',"selectedFile")
     let fileOption = fileSelect.selectAll('option')
         .data(graphFiles).enter()
         .append('option')
         .text(function (d) { return d; });
-    let loadButton = loadFileDiv.append("button")
+    // let loadButton = loadFileDiv.append("button")
+    let loadButton = loadText.append("button")
       .text("Load")
       .on("click", function(d){
                             let selectedFile = fileSelect.node().value
