@@ -281,10 +281,19 @@ function update(graph){
                 edit(d,i, "edge", graph);
 
             })
-
-
-
-
+            .on('mouseover', function(d){
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html(d.label)
+                    .style("left", (d3.event.pageX + 6) + "px")
+                    .style("top", (d3.event.pageY - 10) + "px");
+            })
+            .on('mouseout', function(d){
+              tooltip.transition()
+                  .duration(500)
+                  .style("opacity", 0);
+            })
             ;
    edgelabel_update.exit().remove();
 
@@ -361,12 +370,10 @@ function update(graph){
           })
         //Mouseout Node  - bring node back to full colour
         .on('mouseout', function(d){
-            //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
             let nodeSelection = d3.select(this).attr({
               'width':nodeWidth,
               'height': nodeHeight
             });
-            // Removal of tooltip
             tooltip.transition()
                 .duration(500)
                 .style("opacity", 0);
