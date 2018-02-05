@@ -74,6 +74,13 @@ for(var i = 0; i < legendData.length; i++) {
         .text( legendData[i].rectLabel);
 }
 
+// Tooltip definition
+let tooltip = d3.select("body").append("div")
+//let tooltip = svg.append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+
 let force     = null;
 
 if (localStorage.reloadFromLocalStorage === "true") {
@@ -140,6 +147,7 @@ function initializeGraph(graph){
                'fill'   : '#ccc',
                'stroke' :'#ccc'
              });
+
     // Parent groups sets order so nodes always on top
     svg.append("g").attr("id", "links");
     svg.append('g').attr("id", "edgepaths");
@@ -259,11 +267,25 @@ function update(graph){
                    'xlink:href' : function(d,i) {return '#edgepath'+d.id;},
                    'id' : function(d,i){return "edgelabel" + d.id}
                  })
-            .text(function(d,i){return d.prefix+":"+d.label})
+            .text(function(d,i){
+                let displayLabel=d.label;
+                // Shorten the label and add elipse if it is over 12 char
+                if (d.label.length > 12) {
+                    displayLabel = d.label.substr(0,12) + "...";
+                }
+                return d.prefix + ":" + displayLabel;
+            })
             //---- Double click edgelabel to edit ----------------------
             .on("dblclick", function(d, i){
+              //TW console.log("LABEL LENGTH: "+ d.label.length);
                 edit(d,i, "edge", graph);
-            });
+
+            })
+
+
+
+
+            ;
    edgelabel_update.exit().remove();
 
     // NODES -------------------------------------------------------------------
@@ -329,7 +351,14 @@ function update(graph){
 
             console.log("Node Mouseover is happening");
             // Add tooltip here
-        })
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            //tooltip.html(d.props)
+            tooltip.html(d.label)
+                .style("left", (d3.event.pageX + 6) + "px")
+                .style("top", (d3.event.pageY - 10) + "px");
+          })
         //Mouseout Node  - bring node back to full colour
         .on('mouseout', function(d){
             //  let nodeSelection= d3.select(this).style({opacity:'1.0',})
@@ -337,8 +366,10 @@ function update(graph){
               'width':nodeWidth,
               'height': nodeHeight
             });
-            //TODO: Add removal of tooltip
-
+            // Removal of tooltip
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
         }); // end mouseout
 
     node_update.exit().remove();
@@ -376,12 +407,20 @@ function update(graph){
             'class': 'nodeText'
         })
         .text(function(d,i) {
-            //No prefix for INT, STRING
-            if (d.type ==='INT' || d.type ==='STRING') { return d.label; }
-            // Prefix for all other types
-            else{ return d.prefix+":"+d.label; }
+            let displayLabel="";
+            // Shorten the label and add elipse if it is over 12 char
+            if (d.label.length > 12) {
+                displayLabel = d.label.substr(0,12) + "...";
+            }else{
+                displayLabel = d.label;
+            }
+            // No prefix for INT, STRING. Prefix for all others
+            if (d.type ==='INT' || d.type ==='STRING') {
+                  return displayLabel;
+            }else{
+                return d.prefix + ":" + displayLabel;
+            }
         });
-
     force.start();
 }  // End of update(graph)
 
@@ -548,13 +587,18 @@ function edit(d, i, source, graph){
                               });
                             // Edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + d.id)
-                              .text(function(d)  {
-                                // 1. Values for the data array
-                                d.prefix = prefixInput.node().value;
-                                d.label=labelInput.node().value;
-                                // 2. prefix + label to display in the SVG
-                                return prefixInput.node().value + ":" + labelInput.node().value;
-                              })
+                                .text(function(d)  {
+                                    // 1. Values for the data array
+                                    d.prefix = prefixInput.node().value;
+                                    d.label = labelInput.node().value;
+                                    // 2. prefix + label to display in the SVG
+                                    let displayLabel=d.label;
+                                    // Shorten the label and add elipse if it is over 12 char
+                                    if (d.label.length > 10) {
+                                        displayLabel = d.label.substr(0,10) + "...";
+                                    }
+                                    return d.prefix + ":" + displayLabel;
+                                })
                           } // End of Edge update
                           // Clean up the edit window after click of Hide/Update
                           d3.select("#edit").selectAll("*").remove();
