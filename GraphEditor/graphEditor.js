@@ -74,11 +74,16 @@ for(var i = 0; i < legendData.length; i++) {
         .text( legendData[i].rectLabel);
 }
 
-// Tooltip definition
+// Tooltip defn for Nodes
 let tooltip = d3.select("body").append("div")
 //let tooltip = svg.append("div")
       .attr("class", "tooltip")
       .style("opacity", 0);
+
+// Tooltip defn for Nodes
+let edgeTooltip = d3.select("body").append("div")
+    .attr("class", "edgeTooltip")
+    .style("opacity", 0);
 
 
 let force     = null;
@@ -282,15 +287,15 @@ function update(graph){
 
             })
             .on('mouseover', function(d){
-                tooltip.transition()
+                edgeTooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
-                tooltip.html(d.label)
+                edgeTooltip.html(d.label)
                     .style("left", (d3.event.pageX + 6) + "px")
                     .style("top", (d3.event.pageY - 10) + "px");
             })
             .on('mouseout', function(d){
-              tooltip.transition()
+              edgeTooltip.transition()
                   .duration(500)
                   .style("opacity", 0);
             })
