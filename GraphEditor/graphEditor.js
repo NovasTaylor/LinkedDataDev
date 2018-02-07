@@ -16,7 +16,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 
 // Initializations.
 let w          = 900,
-    h          = 1500,
+    h          = 800,
     nodeWidth  = 150,
     nodeHeight = 30;
 let editActive = false;  // opacity flag for editing box
@@ -95,11 +95,11 @@ if (localStorage.reloadFromLocalStorage === "true") {
     graph.nodesData = JSON.parse(localStorage.nodes)
     graph.edgesData = JSON.parse(localStorage.edges)
     console.log(graph.edgesData)
-    localStorage.currentGraph = "Restored from last save state"
+    localStorage.currentGraph = "Current graph based on last save state"
     initializeGraph(graph);
 } else if (localStorage.loadFile !== undefined) {
     console.log("Loading my selected file: "+localStorage.loadFile)
-    localStorage.currentGraph = "Loaded from file: "+localStorage.loadFile
+    localStorage.currentGraph = "Current graph loaded from file: "+localStorage.loadFile
     d3.queue()
        .defer(d3.json, '/graphEditor/data/'+localStorage.loadFile+'.json')
        .await(processData);
@@ -113,7 +113,7 @@ if (localStorage.reloadFromLocalStorage === "true") {
     localStorage.removeItem("loadFile")
 } else {
     console.log("Loading from file")
-    localStorage.currentGraph = "Loaded from default file: graph.json"
+    localStorage.currentGraph = "Current graph loaded from file: graph.json"
     // Read source data
     d3.queue()
        .defer(d3.json, '/graphEditor/data/graph.json')
@@ -500,6 +500,8 @@ function edit(d, i, source, graph){
     d3.select("#buttons").style("opacity", 0);
     let div = d3.select("#edit");
 
+
+
     div.append("p")
         .text(function() {
           // Use 'Link values' for edges to match exercises (for comprehension)
@@ -731,9 +733,9 @@ function createTTL(jsonData) {
 } // End createTTL()
 
 function setLoadFiles(){
-    let loadFileDiv = d3.select("#loadfile")
+    let loadFileDiv = d3.select("#buttons")
     let loadText = loadFileDiv.append("p")
-        .text("File: ");
+        .text("Select file: ");
     let graphFiles = ["graph","graph1", "graph2"]
     let fileSelect = loadText.append("select")
         .attr('class','select')
