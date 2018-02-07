@@ -497,7 +497,7 @@ function edit(d, i, source, graph){
     let self = this; //Necessary?
     editActive = true;
     d3.select("#edit").style("opacity", 1);
-    d3.select("#buttons").style("opacity", 0.1);
+    d3.select("#buttons").style("opacity", 0);
     let div = d3.select("#edit");
 
 
