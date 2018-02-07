@@ -2,26 +2,29 @@
   See : http://www.w3schools.com/css/tryit.asp?filename=trycss_tooltip
   NOT USED due to restriction of the table cell being unable to show the enlarged tip
 */
-.tooltip {
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted black;
+.tooltip{
+    position: absolute;
+    width: 350px;
+    height: 70px;
+    padding: 3px;
+    font: 16pt sans-serif;
+    background: #eee8d5;
+    border: 4px;
+    border-style: solid;
+    border-color: #003d4d;
+    pointer-events: none;
 }
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-
-    /* Position the tooltip */
-    position: relative;
-    z-index: 999;
-}
-.tooltip:hover .tooltiptext {
-    visibility: visible;
+.edgeTooltip{
+    position: absolute;
+    width: 250px;
+    height: 30px;
+    padding: 2px;
+    font: 14pt sans-serif;
+    background: #FEECA5;
+    border: 2px;
+    border-style: solid;
+    border-color: #003d4d;
+    pointer-events: none;
 }
 .edge{
     stroke: gray;
@@ -34,6 +37,7 @@
 .nodeText {
   font: 15px sans-serif;
   font-weight: bold;
+  white-space: nowrap;
 }
 .node.iri,
 .legendIri{
