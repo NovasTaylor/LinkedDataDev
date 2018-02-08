@@ -311,6 +311,7 @@ function update(graph){
             if (d3.event.shiftKey)  {
                 // In this case you are trying to START a link from a literal,
                 // which is not allowed. STRING/INT not allowed as startnode.
+                clearCurrent();
                 if(startNode === null && (d.type === "STRING" || d.type === "INT")){
                     console.log("STart node is: " + startNode);
                     window.confirm("Links from " + d.type + " nodes are not allowed.");
@@ -493,6 +494,10 @@ function edit(d, i, source, graph){
         d3.selectAll(".subjectLink")
             .classed("subjectLink", false);
     }
+    clearCurrent();
+    if (source === "node") {
+      d3.select("#rect" + d.id).classed("current",true)
+    }
 
     let self = this; //Necessary?
     editActive = true;
@@ -629,6 +634,11 @@ function edit(d, i, source, graph){
                         });
 }
 
+function clearCurrent() {
+    d3.selectAll(".node").classed("current",false)
+    d3.selectAll(".edgelabel").classed("current",false)
+}
+
 function addNode(graph){
     console.log("A node you wish to add! lastNodeId before"+lastNodeId)
     let newNode = {
@@ -647,6 +657,7 @@ function addNode(graph){
 }
 
 function deleteNode(graph, selected_node){
+    clearCurrent();
     console.log("A node you will delete!")
     console.log("id number: ", )
     console.log("Selected_node: " , selected_node)

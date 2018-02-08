@@ -44,7 +44,13 @@
   fill: #bcf5bc ;
   stroke: black;
 }
-
+.current
+{
+  fill: orange !important;
+  stroke: red;
+  stroke-width: 6;
+  stroke-dasharray: 2;
+}
 .node.unspec,
 .legendUnspec{
   fill: white ;
