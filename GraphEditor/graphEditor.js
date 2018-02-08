@@ -392,7 +392,8 @@ function update(graph){
 
     // Add id (nodeTextn) and the text
     nodeText_update.enter()
-        .append("text");
+        .append("text")
+        .attr("pointer-events","none");
 
      // Remove nodeText
      nodeText_update.exit().remove();
