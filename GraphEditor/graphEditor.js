@@ -331,8 +331,15 @@ function update(graph){
                     startNode = d;
                     console.log("Setting Start Node as node ID: " + startNode.id);
                 }
-                // Only set endNode if it is not the same as the startNode.
+                // Only set endNode if it is not the same as the startNode or a node which already has a link.
                 else {
+                    let linkExist = graph.edgesData.filter(function(l) {
+                        return (l.source.id === startNode.id && l.target.id === d.id) || (l.source.id === d.id && l.target.id === startNode.id);
+                    });
+                    if (linkExist.length !== 0) {
+                        window.confirm("Cannot make more than one link between the same two nodes")
+                        return
+                    }
                     endNode= d;
                     console.log("Start Node: " + startNode.id + " End Node: " + endNode.id);
                     addEdge(graph);
