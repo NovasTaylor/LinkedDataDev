@@ -378,6 +378,8 @@ function update(graph){
 
     node_update.exit().remove();
 
+    // Find the currently edited node, so it can be set current again (if adding a new node or making a link)
+    let currentEditNode = d3.select(".current") //.classed("current",true)
     node_update
         .attr("class", function(d){
             if (d.type == "STRING"){ return "node string";}
@@ -390,6 +392,11 @@ function update(graph){
             else if (d.prefix == "eg"){ return "node iri"; }
             else {return "node unspec";}
         });
+    // Highlight currently edited node again
+    if (currentEditNode) {
+        currentEditNode.classed("current",true)
+    }
+
 
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
