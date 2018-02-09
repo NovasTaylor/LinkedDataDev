@@ -38,3 +38,6 @@ This project is constructed on a foundation provided by code authors from many d
 * Ross Kirsling. Directed Graph Editor  http://bl.ocks.org/rkirsling/5001347
 * Eli Grey for FileSave JS https://github.com/eligrey/FileSaver.js/
 * The countless heros on StackOverflow who donate their time and expertise. 
+
+Code that we created is covered by the GNU General Public License v3.0 (see LICENSE.TXT).
+Please make your work available as improvements to this little project.
