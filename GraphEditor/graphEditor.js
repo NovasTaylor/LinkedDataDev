@@ -588,6 +588,7 @@ function edit(d, i, source, graph){
                               d.label=labelInput.node().value;
                               d.prefix = prefixInput.node().value;
                               d.type = typeInput.node().value;
+                              clearCurrent();
                           } // end of node UPDATE
 
                           //---- EDGE -----------------------------------------
