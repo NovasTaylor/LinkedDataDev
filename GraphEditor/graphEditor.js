@@ -587,7 +587,7 @@ function edit(d, i, source, graph){
                               }
                               // Prevent creation of node with same label
                               let nodeLabelExist = graph.nodesData.filter(function(l) {
-                                  return l.label === labelInput.node().value && l.id !== d.id;
+                                  return l.label === labelInput.node().value && l.prefix === prefixInput.node().value && l.id !== d.id;
                               });
                               if (nodeLabelExist.length !== 0) {
                                   window.confirm("A node with label: "+labelInput.node().value+" already exists")
