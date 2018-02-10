@@ -73,7 +73,7 @@ for(var i = 0; i < legendData.length; i++) {
         })
         .text( legendData[i].rectLabel);
 }
-
+d3.select("#legend").append("text").attr('id','currentGraphText').text("Not saved")
 // Tooltip defn for Nodes
 let tooltip = d3.select("body").append("div")
 //let tooltip = svg.append("div")
@@ -807,6 +807,7 @@ function saveState(graph){
     });
     localStorage.nodes = JSON.stringify(graphClone.nodesData)
     localStorage.edges = JSON.stringify(graphClone.edgesData)
+    d3.select("#currentGraphText").text("Last saved "+new Date())
 } // end saveState()
 function restoreSaveState(){
     localStorage.reloadFromLocalStorage = true
