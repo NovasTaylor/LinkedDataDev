@@ -729,21 +729,28 @@ function download(text, name, type) {
     a.click();
 }
 function compareEdges(a,b) {
-  // First compare source.id
-  if (a.source.id < b.source.id) {
+  // First compare source.prefix
+  if (a.source.prefix < b.source.prefix) {
       return -1
   }
-  if (a.source.id > b.source.id) {
+  if (a.source.prefix > b.source.prefix) {
       return 1
   }
-  // If source.id are the same, compare edge.prefix
+  // Then source.label
+  if (a.source.label < b.source.label) {
+      return -1
+  }
+  if (a.source.label > b.source.label) {
+      return 1
+  }
+  // Then edge.prefix
   if (a.prefix < b.prefix) {
       return -1
   }
   if (a.prefix > b.prefix) {
       return 1
   }
-  // If source.id and edge.prefix are the same, compare edge.label
+  // Then edge.label
   if (a.label < b.label) {
       return -1
   }
