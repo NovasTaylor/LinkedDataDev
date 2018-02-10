@@ -585,6 +585,14 @@ function edit(d, i, source, graph){
                                     return
                                 }
                               }
+                              // Prevent creation of node with same label
+                              let nodeLabelExist = graph.nodesData.filter(function(l) {
+                                  return l.label === labelInput.node().value && l.prefix === prefixInput.node().value && l.id !== d.id;
+                              });
+                              if (nodeLabelExist.length !== 0) {
+                                  window.confirm("A node with label: "+labelInput.node().value+" already exists")
+                                  return
+                              }
                               d.label=labelInput.node().value;
                               d.prefix = prefixInput.node().value;
                               d.type = typeInput.node().value;
