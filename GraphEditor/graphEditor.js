@@ -51,6 +51,7 @@ let legendNodeHeight = 15,
 var legendData = [
       {"rectClass" : "legendIri",    "rectLabel" : "IRI (links to/from)"},
       {"rectClass" : "legendUnspec", "rectLabel" : "New Node: edit to set properties"},
+      {"rectClass" : "legendEdit",   "rectLabel" : "Editing node"},
       {"rectClass" : "legendSubjectLink", "rectLabel" : "Source node for new link"},
       {"rectClass" : "legendString", "rectLabel" : "String: No outgoing links!"},
       {"rectClass" : "legendInt",    "rectLabel" : "Integer: No outgoing links!"},
@@ -273,7 +274,7 @@ function update(graph){
             .on('mouseover', function(d){
                 edgeTooltip.transition()
                     .duration(200)
-                    .style("opacity", .9);
+                    .style("opacity", 1);
                 edgeTooltip.html(d.label)
                     .style("left", (d3.event.pageX + 6) + "px")
                     .style("top", (d3.event.pageY - 10) + "px");
@@ -359,7 +360,7 @@ function update(graph){
             // Add tooltip here
             tooltip.transition()
                 .duration(200)
-                .style("opacity", .9);
+                .style("opacity", 1);
             //tooltip.html(d.props)
             tooltip.html(d.label)
                 .style("left", (d3.event.pageX + 6) + "px")
@@ -387,7 +388,6 @@ function update(graph){
 
             else if (d.prefix == "schema"   ||
                      d.prefix  == "ncit"    ||
-                     d.prefix == "sdtmterm" ||
                      d.prefix == "cto"){ return "node iriont"; }
             else if (d.prefix == "eg"){ return "node iri"; }
             else {return "node unspec";}
@@ -532,7 +532,7 @@ function edit(d, i, source, graph){
     // PREFIX - both nodes and edges
     let prefixText = div.append("p")
                         .text("Prefix: ");
-    let prefixData = ["eg","ncit","rdf", "rdfs", "schema", "sdtmterm" ]
+    let prefixData = ["eg","ncit","rdf", "rdfs", "schema" ]
     let prefixInput = prefixText.append("select")
                         .attr('class','select');
     let prefixSelect = prefixInput.selectAll('option')
@@ -730,7 +730,6 @@ function createTTL(jsonData) {
                                          rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
                                          rdfs:'http://www.w3.org/2000/01/rdf-schema#',
                                          schema:'http://schema.org/',
-                                         sdtmterm:'https://raw.githubusercontent.com/phuse-org/CTDasRDF/master/data/rdf/sdtm-terminology.rdf#',
                                          xsd:'http://www.w3.org/2001/XMLSchema#'
                                         }
                           });
@@ -791,7 +790,7 @@ function setLoadFiles(){
         .attr('x',w/2)
         .attr('y',10)
         .style("font-size", "16px")
-        .style("text-decoration", "underline")  
+        .style("text-decoration", "underline")
         .text(localStorage.currentGraph);
 
 } // End setLoadFiles

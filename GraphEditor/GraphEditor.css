@@ -7,23 +7,27 @@
     width: 350px;
     height: 70px;
     padding: 3px;
-    font: 16pt sans-serif;
-    background: #eee8d5;
-    border: 4px;
+    padding-left: 6px;
+    font: 14pt sans-serif;
+    color: black;
+    background: #F9F9F9;
+    border: 3px;
     border-style: solid;
-    border-color: #003d4d;
+    border-color: #D1E2F2;
     pointer-events: none;
 }
 .edgeTooltip{
     position: absolute;
     width: 250px;
-    height: 30px;
-    padding: 2px;
+    height: 33px;
+    padding: 1px;
+    padding-left: 6px;
     font: 14pt sans-serif;
-    background: #FEECA5;
-    border: 2px;
+    color: black;
+    background: #F9F9F9;
+    border: 3px;
     border-style: solid;
-    border-color: #003d4d;
+    border-color: #D1E2F2;
     pointer-events: none;
 }
 .edge{
@@ -44,12 +48,12 @@
   fill: #bcf5bc ;
   stroke: black;
 }
-.current
-{
-  fill: orange !important;
-  stroke: red;
-  stroke-width: 6;
-  stroke-dasharray: 2;
+.current,
+.legendEdit{
+  fill: #FFFF33 !important;
+  stroke: #CCCCCC !important;
+  stroke-width: 4;
+  stroke-dasharray: 4;
 }
 .node.unspec,
 .legendUnspec{
@@ -59,14 +63,17 @@
   stroke-dasharray: 2;
 }
 
+/* Creating a link between nodes */
 .node.iri.subjectLink,
 .node.iriont.subjectLink,
 .node.unspec.subjectLink,
 .legendSubjectLink {
-  fill: yellow ;
   stroke: red;
   stroke-width: 6;
-  stroke-dasharray: 2;
+}
+
+.legendSubjectLink {
+     fill:white;
 }
 .node.string,
 .legendString{
@@ -112,7 +119,6 @@ text.id {
 * {
   box-sizing: border-box;
 }
-/* grVisRBot not currently used for anything */
 .wrapper {
   display: grid;
   grid-gap: 1px;
