@@ -16,7 +16,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 
 // Initializations.
 let w          = 900,
-    h          = 800,
+    h          = 1100,
     nodeWidth  = 150,
     nodeHeight = 30;
 let editActive = false;  // opacity flag for editing box
@@ -85,7 +85,6 @@ let tooltip = d3.select("body").append("div")
 let edgeTooltip = d3.select("body").append("div")
     .attr("class", "edgeTooltip")
     .style("opacity", 0);
-
 
 let force     = null;
 
