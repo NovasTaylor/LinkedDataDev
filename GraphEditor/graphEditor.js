@@ -720,6 +720,48 @@ function addEdge(graph){
     endNode   = null;
     update(graph);
 }
+// Just saving JSON for debugging createTTL
+function download(text, name, type) {
+    var a = document.createElement("a");
+    var file = new Blob([JSON.stringify(text)], {type: type});
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    a.click();
+}
+function compareEdges(a,b) {
+  // First compare source.prefix
+  if (a.source.prefix < b.source.prefix) {
+      return -1
+  }
+  if (a.source.prefix > b.source.prefix) {
+      return 1
+  }
+  // Then source.label
+  if (a.source.label < b.source.label) {
+      return -1
+  }
+  if (a.source.label > b.source.label) {
+      return 1
+  }
+  // Then edge.prefix
+  if (a.prefix < b.prefix) {
+      return -1
+  }
+  if (a.prefix > b.prefix) {
+      return 1
+  }
+  // Then edge.label
+  if (a.label < b.label) {
+      return -1
+  }
+  if (a.label > b.label) {
+      return 1
+  }
+  // If here, everything is equal. Which should never occur as you cannot have two edges between the same nodes
+  return 0
+}
+
+
 function createTTL(jsonData) {
     console.log(jsonData);
     alert("You will now create the TTL file. Click OK to confirm.");
@@ -734,11 +776,16 @@ function createTTL(jsonData) {
                                          xsd:'http://www.w3.org/2001/XMLSchema#'
                                         }
                           });
+    // Sort edges
+    // download(jsonData.edgesData, 'before.json', 'application/json');
+    let sortedEdges = jsonData.edgesData
+    sortedEdges.sort(compareEdges)
+    // download(sortedEdges, 'sorted.json', 'application/json');
 
     // loop through the edges to create triples
     //   This version ignores unattached nodes.
-    for(var i = 0; i < jsonData.edgesData.length; i++) {
-        let raw       = jsonData.edgesData[i];  // create object for shorter references
+    for(var i = 0; i < sortedEdges.length; i++) {
+        let raw       = sortedEdges[i];  // create object for shorter references
         let subject   = raw.source.prefix + ":" + raw.source.label;
         let predicate = raw.prefix + ":" + raw.label;
         let object    = null;
