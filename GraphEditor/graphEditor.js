@@ -601,10 +601,13 @@ function edit(d, i, source, graph){
                           //---- EDGE -----------------------------------------
                           if(source=="edge"){
                             console.log("Updating Edge")
+                            // 1. Values for the data array
+                            d.prefix = prefixInput.node().value;
+                            d.label = labelInput.node().value;
                             d3.select("#edgetext" + d.id)
                               .attr("class", "")  // Remove all classes (node, iri, string, int)
                               .attr("class", "edgelabel") // Add the node class back in.
-                              .classed(prefixInput.node().value.toLowerCase(), true)
+                              .classed(d.prefix.toLowerCase(), true)
                               .attr("class", function(d,i){
                                   if (d.prefix == "schema" ||
                                       d.prefix == "ncit") { return "edgelabel extont";}
@@ -614,9 +617,6 @@ function edit(d, i, source, graph){
                             // Edge labels forced to lowercase for exercises.
                             d3.select("#edgelabel" + d.id)
                                 .text(function(d)  {
-                                    // 1. Values for the data array
-                                    d.prefix = prefixInput.node().value;
-                                    d.label = labelInput.node().value;
                                     // 2. prefix + label to display in the SVG
                                     let displayLabel=d.label;
                                     // Shorten the label and add elipse if it is over 12 char
