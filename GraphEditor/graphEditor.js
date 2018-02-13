@@ -807,7 +807,8 @@ function createTTL(jsonData) {
     // Write out to file
     writer.end(function (error, result) {
         console.log(result);
-        let blob = new Blob([result], {type: "text/plain;charset=utf-8"});
+        //TW let blob = new Blob([result], {type: "text/plain;charset=utf-8"});
+        let blob = new Blob([result], {type: "text/plain;charset=ascii"});
         saveAs(blob, "WhiteBoardTriples.ttl");
     });
 } // End createTTL()
