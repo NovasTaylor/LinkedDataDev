@@ -778,7 +778,7 @@ function createTTL(jsonData) {
     // download(jsonData.edgesData, 'before.json', 'application/json');
     let sortedEdges = jsonData.edgesData
     sortedEdges.sort(compareEdges)
-    // download(sortedEdges, 'sorted.json', 'application/json');
+    download(jsonData, 'whiteboard.json', 'application/json');
 
     // loop through the edges to create triples
     //   This version ignores unattached nodes.
