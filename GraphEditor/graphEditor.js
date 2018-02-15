@@ -630,6 +630,17 @@ function edit(d, i, source, graph){
                           d3.select("#buttons").style("opacity", 1);  // Redisplay buttons
                           update(graph);
                       }); // End of click on update button
+    if(source=="edge" && d.target.type !== "STRING" && d.target.type !== "INT"){
+        let reverseButton = div.append("button")
+                            .text("Reverse")
+                            .on("click", function() {
+                                console.log(d)
+                                let tmpSource = d.source
+                                d.source = d.target
+                                d.target = tmpSource
+                                update(graph)
+                            });
+    }
     let delButton = div.append("button")
                         .text("Delete")
                         .on("click", function() {
