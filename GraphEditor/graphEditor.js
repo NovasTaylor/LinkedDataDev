@@ -146,15 +146,15 @@ function initializeGraph(graph){
                'viewBox'     : '-0 -5 10 10',
                'refX'        : 60,
                'refY'        : 0,
+               'fill'        : '#C7C7C7',
+               'stroke'      : '#9C9C9C',
                'orient'      : 'auto',
                'markerWidth' : 5,
                'markerHeight': 5,
-               'xoverflow'   :'visible'})
+               'xoverflow'   :'visible',
+             })
         .append('path')
-        .attr({'d'      : 'M 0,-5 L 10 ,0 L 0,5',
-               'fill'   : '#ccc',
-               'stroke' :'#ccc'
-             });
+        .attr("d", "M 0,-5 L 10 ,0 L 0,5");
 
     // Parent groups sets order so nodes always on top
     svg.append("g").attr("id", "links");
@@ -266,9 +266,7 @@ function update(graph){
             })
             //---- Double click edgelabel to edit ----------------------
             .on("dblclick", function(d, i){
-              //TW console.log("LABEL LENGTH: "+ d.label.length);
                 edit(d,i, "edge", graph);
-
             })
             .on('mouseover', function(d){
                 edgeTooltip.transition()
@@ -395,7 +393,6 @@ function update(graph){
     if (currentEditNode) {
         currentEditNode.classed("current",true)
     }
-
 
     // Data for node text
     let nodeText_update = svg.selectAll(".nodeText").data(
@@ -699,7 +696,7 @@ function deleteNode(graph, selected_node){
     });
     console.log("Edges data post-deletion:");
     console.log(graph.edgesData);
-    // Remove the text in the SVG that is associated with this node. [TW KLUDGE]
+    // Remove the text in the SVG that is associated with this node. [KLUDGE]
     d3.select("#nodeText" + selected_node.id).remove();
     d3.select("#buttons").style("opacity", 1);  // Redisplay buttons
     update(graph);
@@ -807,7 +804,7 @@ function createTTL(jsonData) {
     // Write out to file
     writer.end(function (error, result) {
         console.log(result);
-        //TW let blob = new Blob([result], {type: "text/plain;charset=utf-8"});
+        //utf-8 causes error when reading TTL with R redland, so use ascii
         let blob = new Blob([result], {type: "text/plain;charset=ascii"});
         saveAs(blob, "WhiteBoardTriples.ttl");
     });
