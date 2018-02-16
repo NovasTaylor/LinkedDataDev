@@ -122,7 +122,7 @@ text.id {
 .wrapper {
   display: grid;
   grid-gap: 1px;
-  grid-template-columns: 910px 320px;
+  grid-template-columns: 950px 259px;
   grid-template-rows: 220px 100px 270px 190px 100px; /* Sum should match svg def in javascript*/
   background-color: gray;
   color: #fff;

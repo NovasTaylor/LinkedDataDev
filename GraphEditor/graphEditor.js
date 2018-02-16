@@ -15,7 +15,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 "use strict";
 
 // Initializations.
-let w          = 900,
+let w          = 1200,
     h          = 890,
     nodeWidth  = 150,
     nodeHeight = 30;
