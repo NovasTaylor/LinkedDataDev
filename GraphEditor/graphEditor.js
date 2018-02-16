@@ -786,7 +786,23 @@ function createTTL(jsonData) {
     // download(jsonData.edgesData, 'before.json', 'application/json');
     let sortedEdges = jsonData.edgesData
     sortedEdges.sort(compareEdges)
-    download(jsonData, 'whiteboard.json', 'application/json');
+    // Clone the original graph to allow pre-export cleansing
+    let graphClone = JSON.parse(JSON.stringify(jsonData));
+
+    // Remove properties created by the force() function
+    graphClone.nodesData.forEach(n => {
+        delete n.index;
+        delete n.px;
+        delete n.py;
+        delete n.weight;
+    });
+
+    // Replace node array values with their index reference
+    graphClone.edgesData.forEach(e => {
+        e.source = e.source.id;
+        e.target = e.target.id;
+    });
+    download(graphClone, 'whiteboard.json', 'application/json');
 
     // loop through the edges to create triples
     //   This version ignores unattached nodes.
