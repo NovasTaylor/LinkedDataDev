@@ -710,7 +710,7 @@ function deleteNode(graph, selected_node){
     // Remove the text in the SVG that is associated with this node. [KLUDGE]
     d3.select("#nodeText" + selected_node.id).remove();
     d3.select("#buttons").style("opacity", 1);  // Redisplay buttons
-    update(graph);
+    update(graph)
 }
 
 function addEdge(graph){
@@ -730,7 +730,8 @@ function addEdge(graph){
 // Just saving JSON for debugging createTTL
 function download(text, name, type) {
     var a = document.createElement("a");
-    var file = new Blob([JSON.stringify(text)], {type: type});
+    // var file = new Blob([JSON.stringify(text)], {type: type});
+    var file = new Blob([JSON.stringify(text, null, 2)], {type: type});
     a.href = URL.createObjectURL(file);
     a.download = name;
     a.click();
@@ -768,10 +769,33 @@ function compareEdges(a,b) {
   return 0
 }
 
+function cleanJson(graph) {
+    let cleanedGraph = JSON.parse(JSON.stringify(graph));
+
+    // Remove properties created by the force() function
+    cleanedGraph.nodesData.forEach(n => {
+        delete n.index;
+        delete n.px;
+        delete n.py;
+        delete n.weight;
+    });
+
+    // Replace node array values with their index reference
+    cleanedGraph.edgesData.forEach(e => {
+        e.source = e.source.id;
+        e.target = e.target.id;
+    });
+    return cleanedGraph;
+}
 
 function createTTL(jsonData) {
-    console.log(jsonData);
     alert("You will now create the TTL file. Click OK to confirm.");
+    // Sort edges
+    let sortedEdges = jsonData.edgesData
+    sortedEdges.sort(compareEdges)
+    // Clean up JSON and save
+    let graphClone = cleanJson(jsonData);
+    download(graphClone, 'whiteboard.json', 'application/json');
 
     // Set the prefixes
     let writer = N3.Writer({ prefixes: { eg: 'http://example.org/LDWorkshop#',
@@ -782,28 +806,6 @@ function createTTL(jsonData) {
                                          xsd:'http://www.w3.org/2001/XMLSchema#'
                                         }
                           });
-    // Sort edges
-    // download(jsonData.edgesData, 'before.json', 'application/json');
-    let sortedEdges = jsonData.edgesData
-    sortedEdges.sort(compareEdges)
-    // Clone the original graph to allow pre-export cleansing
-    let graphClone = JSON.parse(JSON.stringify(jsonData));
-
-    // Remove properties created by the force() function
-    graphClone.nodesData.forEach(n => {
-        delete n.index;
-        delete n.px;
-        delete n.py;
-        delete n.weight;
-    });
-
-    // Replace node array values with their index reference
-    graphClone.edgesData.forEach(e => {
-        e.source = e.source.id;
-        e.target = e.target.id;
-    });
-    download(graphClone, 'whiteboard.json', 'application/json');
-
     // loop through the edges to create triples
     //   This version ignores unattached nodes.
     for(var i = 0; i < sortedEdges.length; i++) {
@@ -868,21 +870,7 @@ function setLoadFiles(){
 
 function saveState(graph){
     // Clone the original graph to allow pre-export cleansing
-    let graphClone = JSON.parse(JSON.stringify(graph));
-
-    // Remove properties created by the force() function
-    graphClone.nodesData.forEach(n => {
-        delete n.index;
-        delete n.px;
-        delete n.py;
-        delete n.weight;
-    });
-
-    // Replace node array values with their index reference
-    graphClone.edgesData.forEach(e => {
-        e.source = e.source.id;
-        e.target = e.target.id;
-    });
+    let graphClone = cleanJson(graph);
     localStorage.nodes = JSON.stringify(graphClone.nodesData)
     localStorage.edges = JSON.stringify(graphClone.edgesData)
     d3.select("#currentGraphText").text("Last saved "+new Date())
