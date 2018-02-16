@@ -16,7 +16,7 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 
 // Initializations.
 let w          = 900,
-    h          = 1100,
+    h          = 890,
     nodeWidth  = 150,
     nodeHeight = 30;
 let editActive = false;  // opacity flag for editing box
@@ -42,7 +42,7 @@ let svg=d3.select("#whiteboard")
 
 //Legend creation
 //TODO : Change to creation using a loop over the array of values in the legend.
-let legendDiv = d3.select("#legend").append("svg");
+let legendDiv = d3.select("#legend").append("svg").attr("id","legendsvg");
 let legendNodeHeight = 15,
     legendNodeWidth  = 20,
     rectStartX = 5,
@@ -74,7 +74,7 @@ for(var i = 0; i < legendData.length; i++) {
         })
         .text( legendData[i].rectLabel);
 }
-d3.select("#legend").append("text").attr('id','currentGraphText').text("Not saved")
+d3.select("#saveText").append("text").attr('id','currentGraphText').text("Not saved")
 // Tooltip defn for Nodes
 let tooltip = d3.select("body").append("div")
 //let tooltip = svg.append("div")
