@@ -122,8 +122,8 @@ text.id {
 .wrapper {
   display: grid;
   grid-gap: 1px;
-  grid-template-columns: 910px 300px;
-  grid-template-rows: 250px 100px 800px 500px;
+  grid-template-columns: 910px 320px;
+  grid-template-rows: 220px 100px 270px 190px 100px; /* Sum should match svg def in javascript*/
   background-color: gray;
   color: #fff;
 }
@@ -135,11 +135,7 @@ text.id {
 }
 #whiteboard{
   grid-column: 1;
-  grid-row: 1 / 4;
-}
-#info{
-  grid-column: 2;
-  grid-row: 1;
+  grid-row: 1 / 6;
 }
 #edit{
   grid-column: 2;
@@ -156,6 +152,14 @@ text.id {
 #legend{
   grid-column: 2;
   grid-row: 4;
+}
+#legendsvg{
+    width: 290px;
+    height: 180px;
+}
+#saveText{
+  grid-column: 2;
+  grid-row: 5;
 }
 
 /* Help Box */
