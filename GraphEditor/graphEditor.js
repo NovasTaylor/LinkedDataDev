@@ -74,7 +74,13 @@ for(var i = 0; i < legendData.length; i++) {
         })
         .text( legendData[i].rectLabel);
 }
-d3.select("#saveText").append("text").attr('id','currentGraphText').text("Not saved")
+d3.select("#saveText").append("text")
+    .attr('id','currentGraphText')
+    .on("click", function() {
+        undo();
+    })
+    .text("Not saved");
+
 // Tooltip defn for Nodes
 let tooltip = d3.select("body").append("div")
 //let tooltip = svg.append("div")
@@ -868,7 +874,35 @@ function setLoadFiles(){
 
 } // End setLoadFiles
 
+function undo() {
+    // Get the modal
+var modal = document.getElementById('myModal');
+
+// // Get the <span> element that closes the modal
+// var span = document.getElementsByClassName("close")[0];
+    modal.style.display = "block";
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+    alert("tjena")
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+
 function saveState(graph){
+    // Backup the last state
+    localStorage.undoNodes = localStorage.nodes
+    localStorage.undoEdges = localStorage.edges
+
     // Clone the original graph to allow pre-export cleansing
     let graphClone = cleanJson(graph);
     localStorage.nodes = JSON.stringify(graphClone.nodesData)
