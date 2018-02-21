@@ -485,10 +485,16 @@ function tick() {
 //---- Additional Functions ----------------------------------------------------
 
 function nodeIsSource(nodeId,edgesData){
-    let hasSource = edgesData.filter(function(l) {
+    let isSourceList = edgesData.filter(function(l) {
       return l.source.id === nodeId;
     });
-    return hasSource.length !== 0;
+    return isSourceList.length !== 0;
+}
+function nodeIsTarget(nodeId,edgesData){
+    let isTargetList = edgesData.filter(function(l) {
+      return l.target.id === nodeId;
+    });
+    return isTargetList.length !== 0;
 }
 
 //   Edit either a "node" or an "edge"
@@ -561,7 +567,10 @@ function edit(d, i, source, graph){
             typeData = ["IRI"]
         // If the node is a literal, you cannot change it back to IRI
         } else if (d.type === "STRING" || d.type === "INT") {
-            typeData = ["STRING", "INT"]
+            let isTarget = nodeIsTarget(d.id,graph.edgesData)
+            if (isTarget) {
+                typeData = ["STRING", "INT"]
+            }
         }
         typeInput    = typeText.append("select")
                             .attr('class','select')
