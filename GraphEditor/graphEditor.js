@@ -565,12 +565,6 @@ function edit(d, i, source, graph){
         // If yes, you cannot change it to a literal
         if (isSource) {
             typeData = ["IRI"]
-        // If the node is a literal, you cannot change it back to IRI
-        } else if (d.type === "STRING" || d.type === "INT") {
-            let isTarget = nodeIsTarget(d.id,graph.edgesData)
-            if (isTarget) {
-                typeData = ["STRING", "INT"]
-            }
         }
         typeInput    = typeText.append("select")
                             .attr('class','select')
