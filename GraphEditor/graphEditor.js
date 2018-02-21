@@ -484,6 +484,13 @@ function tick() {
 //------------------------------------------------------------------------------
 //---- Additional Functions ----------------------------------------------------
 
+function nodeIsSource(nodeId,edgesData){
+    let hasSource = edgesData.filter(function(l) {
+      return l.source.id === nodeId;
+    });
+    return hasSource.length !== 0;
+}
+
 //   Edit either a "node" or an "edge"
 function edit(d, i, source, graph){
     // upsource used in editor display to match exercises text
@@ -545,7 +552,17 @@ function edit(d, i, source, graph){
     if(source=="node"){
         typeText     = div.append("p")
                             .text("Type: ");
+        // Set default types for nodes
         let typeData = ["IRI","STRING", "INT"]
+        // Check if the node is the source in any relation
+        let isSource = nodeIsSource(d.id,graph.edgesData)
+        // If yes, you cannot change it to a literal
+        if (isSource) {
+            typeData = ["IRI"]
+        // If the node is a literal, you cannot change it back to IRI
+        } else if (d.type === "STRING" || d.type === "INT") {
+            typeData = ["STRING", "INT"]
+        }
         typeInput    = typeText.append("select")
                             .attr('class','select')
         typeSelect   = typeInput.selectAll('option')
