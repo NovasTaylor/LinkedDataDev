@@ -271,7 +271,7 @@ function update(graph){
             .on('mouseover', function(d){
                 edgeTooltip.transition()
                     .duration(200)
-                    .style("opacity", 1);
+                    .style("opacity", 0.95);
                 edgeTooltip.html(d.label)
                     .style("left", (d3.event.pageX + 6) + "px")
                     .style("top", (d3.event.pageY - 10) + "px");
@@ -357,7 +357,7 @@ function update(graph){
             // Add tooltip here
             tooltip.transition()
                 .duration(200)
-                .style("opacity", 1);
+                .style("opacity", 0.95);
             //tooltip.html(d.props)
             tooltip.html(d.label)
                 .style("left", (d3.event.pageX + 6) + "px")

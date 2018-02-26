@@ -5,7 +5,7 @@
 .tooltip{
     position: absolute;
     width: 350px;
-    height: 70px;
+    height: 35px;
     padding: 3px;
     padding-left: 6px;
     font: 14pt sans-serif;
@@ -24,7 +24,7 @@
     padding-left: 6px;
     font: 14pt sans-serif;
     color: black;
-    background: #F9F9F9;
+    background: #ececec;
     border: 3px;
     border-style: solid;
     border-color: #D1E2F2;
