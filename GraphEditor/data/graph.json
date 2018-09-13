@@ -13,6 +13,13 @@
       "type":"IRI",
       "x":730,
       "y":10,
+      "fixed":true},
+    { "id": 2,
+      "prefix":"eg",
+      "label":"UnlinkedNode",
+      "type":"IRI",
+      "x":730,
+      "y":50,
       "fixed":true}
   ],
   "edgesData":[
