@@ -14,6 +14,9 @@ TODO: Task list:  https://kanbanflow.com/board/5d2eb8e3f370395a0ab2fff3c9cc65c6
 -----------------------------------------------------------------------------*/
 "use strict";
 
+// Set allowed IRI label strings
+let allowedIriLabels = ["Study","TrtArm","Phase","Person","ActiveArm","PlaceboArm","Drug","Serum","Female","Male"]
+
 // Initializations.
 let w          = 1200,
     h          = 890,
@@ -353,7 +356,7 @@ function update(graph){
               'height':nodeHeight+5
             });
 
-            console.log("Node Mouseover is happening");
+            // console.log("Node Mouseover is happening");
             // Add tooltip here
             tooltip.transition()
                 .duration(200)
@@ -633,18 +636,18 @@ function edit(d, i, source, graph){
 
 
     }
-console.log("labelText: "+labelText)
+// console.log("labelText: "+labelText)
 
 
     //---- UPDATE BUTTON -------------------------------------------------------
     let button =  div.append("button")
                       .text("Update/Hide")
                       .on("click", function() {
-                          console.log("Prefix is: " + d.prefix);
+                          // console.log("Prefix is: " + d.prefix);
 
                           //---- NODE ------------------------------------------
                           if(source=="node"){
-                              console.log("Update on Node: "+ d.id)
+                              // console.log("Update on Node: "+ d.id)
                               if (typeInput.node().value == "INT") {
                                 let inputValue = labelInput.node().value
                                 if (!/^\d+$/.test(inputValue)) {  // Allows integers
@@ -653,12 +656,24 @@ console.log("labelText: "+labelText)
                                 }
                               }
                               if (typeInput.node().value == "IRI") {
+                                // Remove spaces from label
+                                labelInput.node().value = labelInput.node().value.replace(" ","");
+                                // Correct case of label
                                 let inputValue = labelInput.node().value
                                 labelInput.node().value = labelInput.node().value.replace(/study/ig,"Study");
                                 labelInput.node().value = labelInput.node().value.replace(/trtarm/ig,"TrtArm");
                                 labelInput.node().value = labelInput.node().value.replace(/person/ig,"Person");
                                 if (labelInput.node().value !== inputValue) {
                                     console.log("Corrected IRI label:"+inputValue+" -> "+labelInput.node().value)
+                                }
+                                // Check that label is among allowed values
+                                // Remove numbers,"-" and " " from string
+                                let iriLabelFragment = labelInput.node().value.replace(/[0-9]/g,'').replace(/-/,'');
+                                if (allowedIriLabels.indexOf(iriLabelFragment) < 0) {
+                                    window.confirm("Unknown IRI label: " + labelInput.node().value + "\nPlease check");
+                                    return
+                                } else {
+                                    console.log("IRI Label is OK: "+labelInput.node().value)
                                 }
                               }
                               // Prevent creation of node with same label
